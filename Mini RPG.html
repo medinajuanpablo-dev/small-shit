@@ -124,6 +124,11 @@
         font-size: clamp(1.2rem, 3vw, 1.5rem);
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
       }
+      .game-victory {
+        color: #2ecc71;
+        font-size: clamp(1.2rem, 3vw, 1.5rem);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
       .info-section {
         margin-top: 2rem;
         padding: 1rem;
@@ -230,6 +235,7 @@
           expToNext: 100,
           battlesLeft: 100,
           isDead: false,
+          isVictory: false,
         });
 
         const [currentDungeon, setCurrentDungeon] = setSignal(0);
@@ -286,6 +292,11 @@
               message: '¡Se acabaron tus batallas! Fin del juego.',
               className: 'error',
             });
+            setHero({
+              ...hero(),
+              isDead: true,
+            });
+            checkAndHandleHeroDeath();
             return;
           }
 
@@ -300,15 +311,11 @@
           const newMonsters = generateMonsters();
           setCurrentMonsters(newMonsters);
           setDidEscape(false);
-          addToLog({
-            message: `¡Nueva batalla en la Mazmorra ${romanNumerals[currentDungeon()]}!`,
-            className: 'info',
-          });
 
           const monsterNames = newMonsters.map(m => m.name).join(', ');
           addToLog({
             message: `Te has encontrado con: ${monsterNames}`,
-            className: 'info',
+            className: 'warning',
           });
         };
 
@@ -399,7 +406,7 @@
 
         const endBattle = () => {
           if (!didEscape()) {
-            if (currentDungeon() < 9 && !canAdvance()) {
+            if (!canAdvance()) {
               addToLog({
                 message: 'Victoria. Puedes avanzar a la siguiente mazmorra!',
                 className: 'success',
@@ -407,7 +414,7 @@
               setCanAdvance(true);
             } else {
               addToLog({
-                message: 'Victoria. Batalla terminada',
+                message: 'Victoria. Batalla terminada.',
                 className: 'success',
               });
             }
@@ -426,21 +433,30 @@
         };
 
         const advanceDungeon = () => {
-          if (!canAdvance() || currentDungeon() >= 9) {
+          if (!canAdvance()) {
             addToLog({
               message: `¡No puedes avanzar a la siguiente mazmorra aún! Debes ganar al menos 1 batalla`,
               className: 'error',
             });
             return;
+          } else if (currentDungeon() === 8) {
+            addToLog({
+              message: `¡Has superado todas las mazmorras! Ganaste el juego, felicidades.`,
+              className: 'success',
+            });
+            setHero({
+              ...hero(),
+              isVictory: true,
+            });
+          } else {
+            healHero();
+            setCurrentDungeon(currentDungeon() + 1);
+            setCanAdvance(false);
+            addToLog({
+              message: `¡Avanzaste a la Mazmorra ${romanNumerals[currentDungeon()]}!`,
+              className: 'success',
+            });
           }
-
-          healHero();
-          setCurrentDungeon(currentDungeon() + 1);
-          setCanAdvance(false);
-          addToLog({
-            message: `¡Avanzaste a la Mazmorra ${romanNumerals[currentDungeon()]}!`,
-            className: 'success',
-          });
         };
 
         const levelUp = stat => {
@@ -493,6 +509,8 @@
           });
         };
 
+        const isEndGame = () => hero().isDead || hero().isVictory;
+
         return h(
           Fragment,
           null,
@@ -500,8 +518,12 @@
             'div',
             { className: 'container' },
             h('h1', null, 'Mini RPG'),
-            h('h2', { className: () => (hero().isDead ? 'game-over' : 'game-status') }, () =>
-              hero().isDead ? '¡Héroe derrotado! Fin del juego.' : `Mazmorra ${romanNumerals[currentDungeon()]}`
+            h('h2', { className: () => (hero().isDead ? 'game-over' : hero().isVictory ? 'game-victory' : 'game-status') }, () =>
+              hero().isDead
+                ? '¡Héroe derrotado! Fin del juego.'
+                : hero().isVictory
+                ? 'Ganaste el juego, felicidades.'
+                : `Mazmorra ${romanNumerals[currentDungeon()]}`
             ),
             h('div', { className: 'stats' }, [
               h('div', null, () => `Nivel: ${hero().level}`),
@@ -527,13 +549,13 @@
               )
             ),
             h('div', null, [
-              h('button', { className: () => (hero().isDead ? '' : 'hidden'), onclick: resetGame }, 'Empezar de nuevo'),
-              h('button', { className: () => (hero().isDead ? 'hidden' : ''), onclick: startBattle }, 'Iniciar Batalla'),
-              h('button', { className: () => (hero().isDead ? 'hidden' : ''), onclick: attack }, 'Atacar'),
-              h('button', { className: () => (hero().isDead ? 'hidden' : ''), onclick: escape }, 'Escapar'),
-              h('button', { className: () => (hero().isDead ? 'hidden' : ''), onclick: advanceDungeon }, 'Avanzar Mazmorra'),
+              h('button', { className: () => (isEndGame() ? '' : 'hidden'), onclick: resetGame }, 'Empezar de nuevo'),
+              h('button', { className: () => (isEndGame() ? 'hidden' : ''), onclick: startBattle }, 'Explorar'),
+              h('button', { className: () => (isEndGame() ? 'hidden' : ''), onclick: attack }, 'Atacar'),
+              h('button', { className: () => (isEndGame() ? 'hidden' : ''), onclick: escape }, 'Escapar'),
+              h('button', { className: () => (isEndGame() ? 'hidden' : ''), onclick: advanceDungeon }, 'Avanzar Mazmorra'),
             ]),
-            h('div', { id: 'level-up', className: () => (!hero().isDead && showLevelUp() ? 'level-up visible' : 'level-up') }, [
+            h('div', { id: 'level-up', className: () => (!isEndGame() && showLevelUp() ? 'level-up visible' : 'level-up') }, [
               h('h2', null, '¡Subiste de nivel!'),
               h('button', { onclick: () => levelUp('hp') }, 'Aumentar HP'),
               h('button', { onclick: () => levelUp('atk') }, 'Aumentar ATK'),
