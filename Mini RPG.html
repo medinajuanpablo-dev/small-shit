@@ -11,7 +11,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         text-align: center;
         padding: 10px;
-        min-height: 100vh;
+        min-height: 90vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -47,6 +47,21 @@
         text-align: left;
         font-size: clamp(0.9rem, 2.5vw, 1rem);
         border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .battle-log .message {
+        margin: 0.3rem 0;
+      }
+      .battle-log .success {
+        color: #2ecc71;
+      }
+      .battle-log .error {
+        color: #e74c3c;
+      }
+      .battle-log .warning {
+        color: #f1c40f;
+      }
+      .battle-log .info {
+        color: #3498db;
       }
       button {
         padding: clamp(0.5rem, 2vw, 0.8rem) clamp(1rem, 4vw, 1.5rem);
@@ -85,6 +100,13 @@
         border-radius: 15px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .level-up.visible {
+        visibility: visible;
+        opacity: 1;
       }
       button:disabled {
         background: linear-gradient(145deg, #95a5a6, #7f8c8d);
@@ -126,9 +148,12 @@
       const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
       const monsterTypes = [
-        { name: 'Goblin', baseHp: 20, baseAtk: 5, baseDef: 2 },
-        { name: 'Orco', baseHp: 30, baseAtk: 6, baseDef: 4 },
-        { name: 'Troll', baseHp: 40, baseAtk: 9, baseDef: 2 },
+        { name: 'Goblin', baseHp: 20, baseAtk: 5, baseDef: 2, sinceLevel: 1 },
+        { name: 'Orco', baseHp: 30, baseAtk: 6, baseDef: 4, sinceLevel: 1 },
+        { name: 'Troll', baseHp: 40, baseAtk: 9, baseDef: 2, sinceLevel: 2 },
+        { name: 'Minotauro', baseHp: 50, baseAtk: 12, baseDef: 6, sinceLevel: 3 },
+        { name: 'Dragón', baseHp: 70, baseAtk: 15, baseDef: 8, sinceLevel: 4 },
+        { name: 'Lich', baseHp: 60, baseAtk: 18, baseDef: 5, sinceLevel: 5 },
       ];
 
       function Game() {
@@ -147,17 +172,27 @@
         const [currentDungeon, setCurrentDungeon] = setSignal(0);
         const [currentMonsters, setCurrentMonsters] = setSignal([]);
         const [battleLog, setBattleLog] = setSignal([]);
-        const [showLevelUp, setShowLevelUp] = setSignal(false);
+        const [showLevelUp, setShowLevelUpRaw] = setSignal(false);
         const [didEscape, setDidEscape] = setSignal(false);
         const [canAdvance, setCanAdvance] = setSignal(false);
 
+        const setShowLevelUp = value => {
+          const levelUpElement = document.getElementById('level-up');
+          if (levelUpElement) {
+            levelUpElement.className = `level-up ${value ? 'visible' : ''}`;
+          }
+          setShowLevelUpRaw(value);
+        };
+
         const generateMonsters = () => {
-          const numMonsters = Math.floor(Math.random() * 3) + 1;
+          const numMonsters = Math.floor(Math.random() * 5) + 1;
           const monsters = [];
+          const currentLevel = currentDungeon() + 1;
 
           for (let i = 0; i < numMonsters; i++) {
-            const type = monsterTypes[Math.floor(Math.random() * monsterTypes.length)];
-            const modifier = currentDungeon() + 1;
+            const availableMonsters = monsterTypes.filter(type => type.sinceLevel <= currentLevel);
+            const type = availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
+            const modifier = currentLevel;
 
             monsters.push({
               ...type,
@@ -174,39 +209,58 @@
         const checkAndHandleHeroDeath = () => {
           if (hero().hp > 0) return;
           setHero({ ...hero(), isDead: true });
-          addToLog('¡Héroe derrotado! Fin del juego.');
+          addToLog({
+            message: '¡Héroe derrotado! Fin del juego.',
+            className: 'error',
+          });
           document.getElementById('game-status').className = 'game-over';
         };
 
         const healHero = () => {
           setHero({ ...hero(), hp: hero().maxHp });
-          addToLog('¡Héroe curado completamente!');
+          addToLog({
+            message: '¡Héroe curado completamente!',
+            className: 'success',
+          });
         };
 
         const startBattle = () => {
           if (hero().isDead) return;
 
           if (hero().battlesLeft <= 0) {
-            addToLog('¡Se acabaron tus batallas! Fin del juego.');
+            addToLog({
+              message: '¡Se acabaron tus batallas! Fin del juego.',
+              className: 'error',
+            });
             return;
           }
 
           if (currentMonsters().length > 0) {
-            addToLog('¡Ya estás en una batalla!');
+            addToLog({
+              message: '¡Ya estás en una batalla!',
+              className: 'warning',
+            });
             return;
           }
 
           const newMonsters = generateMonsters();
           setCurrentMonsters(newMonsters);
           setDidEscape(false);
-          addToLog(`¡Nueva batalla en la Mazmorra ${romanNumerals[currentDungeon()]}!`);
+          addToLog({
+            message: `¡Nueva batalla en la Mazmorra ${romanNumerals[currentDungeon()]}!`,
+            className: 'info',
+          });
 
           const monsterNames = newMonsters.map(m => m.name).join(', ');
-          addToLog(`Te has encontrado con: ${monsterNames}`);
+          addToLog({
+            message: `Te has encontrado con: ${monsterNames}`,
+            className: 'info',
+          });
         };
 
         const addToLog = message => {
-          setBattleLog([...battleLog(), message]);
+          const logEntry = typeof message === 'string' ? { message, className: 'info' } : message;
+          setBattleLog([...battleLog(), logEntry]);
         };
 
         const attack = () => {
@@ -333,26 +387,38 @@
             h('div', null, () => `EXP: ${hero().exp}/${hero().expToNext}`),
             h('div', null, () => `Batallas: ${hero().battlesLeft}`),
           ]),
-          h(
-            'div',
-            { className: 'battle-log' },
-            Array.from({ length: 10 }, (_, i) => h('div', { key: i }, () => battleLog()[battleLog().length - i - 1]))
-          ),
+          h('div', { className: 'battle-log' }, () => {
+            console.log(battleLog());
+            return Array.from({ length: 10 }, (_, i) =>
+              h(
+                'div',
+                {
+                  key: i,
+                  className: `message`,
+                },
+                () => battleLog()[battleLog().length - i - 1]?.message
+              )
+            );
+          }),
           h('div', null, [
             h('button', { onclick: startBattle }, 'Iniciar Batalla'),
             h('button', { onclick: attack }, 'Atacar'),
             h('button', { onclick: escape }, 'Escapar'),
             h('button', { onclick: advanceDungeon }, 'Avanzar Mazmorra'),
           ]),
-          () =>
-            showLevelUp()
-              ? h('div', { className: 'level-up' }, [
-                  h('h2', null, '¡Subiste de nivel!'),
-                  h('button', { onclick: () => levelUp('hp') }, 'Aumentar HP'),
-                  h('button', { onclick: () => levelUp('atk') }, 'Aumentar ATK'),
-                  h('button', { onclick: () => levelUp('def') }, 'Aumentar DEF'),
-                ])
-              : null
+          h(
+            'div',
+            {
+              id: 'level-up',
+              className: 'level-up',
+            },
+            [
+              h('h2', null, '¡Subiste de nivel!'),
+              h('button', { onclick: () => levelUp('hp') }, 'Aumentar HP'),
+              h('button', { onclick: () => levelUp('atk') }, 'Aumentar ATK'),
+              h('button', { onclick: () => levelUp('def') }, 'Aumentar DEF'),
+            ]
+          )
         );
       }
 
