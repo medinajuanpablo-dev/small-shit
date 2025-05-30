@@ -8,10 +8,10 @@
       body {
         background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
         color: #ecf0f1;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         text-align: center;
         padding: 10px;
-        min-height: 100vh;
+        min-height: 90vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -94,6 +94,13 @@
         border-color: #3498db;
         box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
       }
+      input.error {
+        border-color: #e74c3c;
+        background: rgba(231, 76, 60, 0.1);
+      }
+      button.error {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+      }
       button {
         padding: clamp(0.8rem, 3vw, 1rem) clamp(1.5rem, 5vw, 2rem);
         font-size: clamp(1rem, 3vw, 1.2rem);
@@ -109,6 +116,12 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         width: 90%;
         max-width: 300px;
+      }
+      button:disabled {
+        background: linear-gradient(145deg, #95a5a6, #7f8c8d);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
       button:hover {
         transform: translateY(-2px);
@@ -130,7 +143,7 @@
   <body>
     <script type="module">
       //prettier-ignore
-      const { setSignal, setEffect, h } = (()=>{let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=(newValue)=>{value=typeof newValue==="function"?newValue(value):newValue;subscribers.forEach((fn)=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS="http://www.w3.org/2000/svg";const isSvg=(tag)=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==="boolean")continue;if(typeof child==="function"){const marker=document.createComment("");let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==="object"&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=="object"){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==="object"&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==="function")return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==="children"||key==="ref")continue;if(key.startsWith("on")&&typeof props[key]==="function"){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==="style"&&typeof props[key]==="object"){Object.assign(el.style,props[key]);}else if(key==="className"||key==="class"){el.setAttribute("class",props[key]);}else if(typeof props[key]!=="function"){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==="function"){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
 
       function DiceRoller() {
         const [diceCount, setDiceCount] = setSignal(1);
@@ -138,7 +151,13 @@
         const [diceResults, setDiceResults] = setSignal([]);
         const [total, setTotal] = setSignal(0);
 
+        const isValidDiceCount = () => diceCount() > 0 && diceCount() <= 99999;
+        const isValidDiceSides = () => diceSides() > 0 && diceSides() <= 99999;
+        const isFormValid = () => isValidDiceCount() && isValidDiceSides();
+
         const rollDice = () => {
+          if (!isFormValid()) return;
+
           const results = [];
           for (let i = 0; i < diceCount(); i++) {
             results.push(Math.floor(Math.random() * diceSides()) + 1);
@@ -148,40 +167,40 @@
         };
 
         return h(
-          "div",
-          { className: "container" },
-          h("h1", null, "🎲 Simulador de Dados 🎲"),
+          'div',
+          { className: 'container' },
+          h('h1', null, '🎲 Simulador de Dados 🎲'),
           h(
-            "div",
-            { className: "input-group" },
-            h("label", null, "Cantidad de dados:"),
-            h("input", {
-              type: "number",
-              min: "1",
-              max: "10",
+            'div',
+            { className: 'input-group' },
+            h('label', null, 'Cantidad de dados:'),
+            h('input', {
+              type: 'number',
+              min: '1',
+              max: '10',
               value: diceCount(),
-              onchange: (e) => setDiceCount(parseInt(e.target.value) || 1),
+              className: () => (isValidDiceCount() ? '' : 'error'),
+              onchange: e => setDiceCount(parseInt(e.target.value) || 0),
             })
           ),
           h(
-            "div",
-            { className: "input-group" },
-            h("label", null, "Caras por dado:"),
-            h("input", {
-              type: "number",
-              min: "2",
-              max: "100",
+            'div',
+            { className: 'input-group' },
+            h('label', null, 'Caras por dado:'),
+            h('input', {
+              type: 'number',
+              min: '2',
+              max: '100',
               value: diceSides(),
-              onchange: (e) => setDiceSides(parseInt(e.target.value) || 6),
+              className: () => (isValidDiceSides() ? '' : 'error'),
+              onchange: e => setDiceSides(parseInt(e.target.value) || 0),
             })
           ),
-          h("button", { onclick: rollDice }, "Tirar Dados"),
-          h("div", { className: "dice-container" }, () =>
-            diceResults().map((result, index) =>
-              h("div", { className: "dice" }, result)
-            )
+          h('button', { onclick: rollDice, className: () => (isFormValid() ? '' : 'error') }, () =>
+            isFormValid() ? 'Tirar Dados' : 'Campos Inválidos'
           ),
-          h("div", { className: "total" }, () => `Total: ${total()}`)
+          h('div', { className: 'dice-container' }, () => diceResults().map((result, index) => h('div', { className: 'dice' }, result))),
+          h('div', { className: 'total' }, () => `Total: ${total()}`)
         );
       }
 
