@@ -302,8 +302,8 @@
 
           if (currentMonsters().length > 0) {
             addToLog({
-              message: '¡Ya estás en una batalla!',
-              className: 'warning',
+              message: '¡Estás en una batalla!',
+              className: 'error',
             });
             return;
           }
@@ -352,7 +352,13 @@
               exp: hero().exp + expGained,
             });
             addToLog({
-              message: `${monster.name} derrotado! +${expGained} EXP. Quedan ${currentMonsters().length} monstruos`,
+              message: `${monster.name} derrotado! +${expGained} EXP. ${
+                currentMonsters().length > 1
+                  ? `Queda${currentMonsters().length - 1 === 1 ? '' : 'n'} ${currentMonsters().length - 1} monstruo${
+                      currentMonsters().length - 1 === 1 ? '' : 's'
+                    }`
+                  : ''
+              }`,
               className: 'info',
             });
 
@@ -469,14 +475,14 @@
 
           switch (stat) {
             case 'hp':
-              newHero.maxHp += 20;
+              newHero.maxHp += 35;
               newHero.hp = newHero.maxHp;
               break;
             case 'atk':
               newHero.atk += 5;
               break;
             case 'def':
-              newHero.def += 3;
+              newHero.def += 5;
               break;
           }
 
