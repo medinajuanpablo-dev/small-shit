@@ -343,7 +343,6 @@
             setHero({
               ...hero(),
               exp: hero().exp + expGained,
-              battlesLeft: hero().battlesLeft - 1,
             });
             addToLog({
               message: `${monster.name} derrotado! +${expGained} EXP. Quedan ${currentMonsters().length} monstruos`,
@@ -420,6 +419,10 @@
               className: 'success',
             });
           }
+          setHero({
+            ...hero(),
+            battlesLeft: hero().battlesLeft - 1,
+          });
         };
 
         const advanceDungeon = () => {
