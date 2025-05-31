@@ -29,7 +29,7 @@
       }
       .stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 0.5rem;
         margin: 1rem 0;
         padding: clamp(0.8rem, 2vw, 1rem);
@@ -51,17 +51,48 @@
       .battle-log .message {
         margin: 0.3rem 0;
       }
+      .battle-log .message:nth-child(-n + 2) {
+        font-weight: bold;
+        font-size: 1.05em;
+        padding: 0.3rem;
+        border-left: 2px solid #3498db;
+        margin-left: -0.3rem;
+        background: rgba(52, 152, 219, 0.05);
+      }
       .battle-log .success {
         color: #2ecc71;
+      }
+      .battle-log .success:nth-child(-n + 2) {
+        border-left: 2px solid #2ecc71;
+        background: rgba(46, 204, 113, 0.05);
       }
       .battle-log .error {
         color: #e74c3c;
       }
+      .battle-log .error:nth-child(-n + 2) {
+        border-left: 2px solid #e74c3c;
+        background: rgba(231, 76, 60, 0.05);
+      }
       .battle-log .warning {
         color: #f1c40f;
       }
+      .battle-log .warning:nth-child(-n + 2) {
+        border-left: 2px solid #f1c40f;
+        background: rgba(241, 196, 15, 0.05);
+      }
       .battle-log .info {
         color: #87ceeb;
+      }
+      .battle-log .info:nth-child(-n + 2) {
+        border-left: 2px solid #87ceeb;
+        background: rgba(135, 206, 235, 0.05);
+      }
+      .battle-log .info-success {
+        color: #27c6a3;
+      }
+      .battle-log .info-success:nth-child(-n + 2) {
+        border-left: 2px solid #2ecc71;
+        background: rgba(46, 204, 113, 0.05);
       }
       button {
         padding: clamp(0.5rem, 2vw, 0.8rem) clamp(1rem, 4vw, 1.5rem);
@@ -115,7 +146,7 @@
         box-shadow: none;
       }
       .game-status {
-        color: #3498db;
+        color: #f39c12;
         font-size: clamp(1.2rem, 3vw, 1.5rem);
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
       }
@@ -213,15 +244,18 @@
       //prettier-ignore
       const { Fragment, setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
 
-      const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+      //prettier-ignore
+      const allDungeons = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX', 'XXXI', 'XXXII', 'XXXIII', 'XXXIV', 'XXXV', 'XXXVI', 'XXXVII', 'XXXVIII', 'XXXIX', 'XL', 'XLI', 'XLII', 'XLIII', 'XLIV', 'XLV', 'XLVI', 'XLVII', 'XLVIII', 'XLIX', 'L'];
 
       const monsterTypes = [
-        { name: 'Goblin', baseHp: 20, baseAtk: 5, baseDef: 2, sinceLevel: 1 },
-        { name: 'Orco', baseHp: 30, baseAtk: 6, baseDef: 4, sinceLevel: 1 },
-        { name: 'Troll', baseHp: 40, baseAtk: 9, baseDef: 2, sinceLevel: 2 },
-        { name: 'Minotauro', baseHp: 50, baseAtk: 12, baseDef: 6, sinceLevel: 3 },
-        { name: 'Dragón', baseHp: 70, baseAtk: 15, baseDef: 8, sinceLevel: 4 },
-        { name: 'Lich', baseHp: 60, baseAtk: 18, baseDef: 5, sinceLevel: 5 },
+        { name: 'Goblin', baseHp: 20, baseAtk: 5, baseDef: 2, baseDex: 5, sinceLevel: 1 },
+        { name: 'Orco', baseHp: 30, baseAtk: 6, baseDef: 4, baseDex: 10, sinceLevel: 5 },
+        { name: 'Troll', baseHp: 40, baseAtk: 9, baseDef: 2, baseDex: 5, sinceLevel: 10 },
+        { name: 'Minotauro', baseHp: 50, baseAtk: 10, baseDef: 10, baseDex: 2, sinceLevel: 15 },
+        { name: 'Demonio', baseHp: 50, baseAtk: 15, baseDef: 3, baseDex: 10, sinceLevel: 15 },
+        { name: 'Horror', baseHp: 20, baseAtk: 10, baseDef: 10, baseDex: 35, sinceLevel: 25 },
+        { name: 'Lich', baseHp: 50, baseAtk: 10, baseDef: 10, baseDex: 20, sinceLevel: 35 },
+        { name: 'Dragón', baseHp: 120, baseAtk: 20, baseDef: 20, baseDex: 5, sinceLevel: 45 },
       ];
 
       function Game() {
@@ -231,29 +265,37 @@
           maxHp: 100,
           atk: 10,
           def: 5,
+          dex: 5,
           exp: 0,
           expToNext: 100,
-          battlesLeft: 100,
+          battlesLeft: 500,
           isDead: false,
           isVictory: false,
         });
 
-        const [currentDungeon, setCurrentDungeon] = setSignal(0);
+        const [currentDungeonIndex, setCurrentDungeonIndex] = setSignal(0);
         const [currentMonsters, setCurrentMonsters] = setSignal([]);
-        const [battleLog, setBattleLog] = setSignal([{ message: 'Nueva partida', className: 'info' }]);
+        const [battleLog, setBattleLog] = setSignal([
+          { message: 'Nueva partida', className: 'info' },
+          { message: 'Explora para empezar', className: 'info' },
+        ]);
         const [showLevelUp, setShowLevelUp] = setSignal(false);
         const [didEscape, setDidEscape] = setSignal(false);
         const [canAdvance, setCanAdvance] = setSignal(false);
 
+        const isInBattle = () => {
+          return currentMonsters().length > 0;
+        };
+
         const generateMonsters = () => {
           const numMonsters = Math.floor(Math.random() * 5) + 1;
           const monsters = [];
-          const currentLevel = currentDungeon() + 1;
+          const currentLevel = currentDungeonIndex() + 1;
 
           for (let i = 0; i < numMonsters; i++) {
             const availableMonsters = monsterTypes.filter(type => type.sinceLevel <= currentLevel);
             const type = availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
-            const modifier = currentLevel;
+            const modifier = 1 + currentDungeonIndex() * 0.35;
 
             monsters.push({
               ...type,
@@ -261,6 +303,7 @@
               maxHp: Math.round(type.baseHp * modifier),
               atk: Math.round(type.baseAtk * modifier),
               def: Math.round(type.baseDef * modifier),
+              dex: Math.round(type.baseDex * modifier),
             });
           }
 
@@ -300,10 +343,11 @@
             return;
           }
 
-          if (currentMonsters().length > 0) {
+          if (isInBattle()) {
             addToLog({
               message: '¡Estás en una batalla!',
-              className: 'error',
+              className: 'warning',
+              dontRepeat: true,
             });
             return;
           }
@@ -312,41 +356,78 @@
           setCurrentMonsters(newMonsters);
           setDidEscape(false);
 
-          const monsterNames = newMonsters.map(m => m.name).join(', ');
+          const monsterNames = newMonsters
+            .map(m => m.name)
+            .join(', ')
+            .replace(/, ([^,]+)$/, ' y $1');
           addToLog({
-            message: `Te has encontrado con: ${monsterNames}`,
+            message: `Te encontraste con ${newMonsters.length} ${newMonsters.length === 1 ? 'monstruo' : 'monstruos'}: ${monsterNames}`,
             className: 'warning',
           });
         };
 
-        const addToLog = message => {
-          const logEntry = typeof message === 'string' ? { message, className: 'info' } : message;
+        const addToLog = ({ message, className, dontRepeat = false }) => {
+          const logEntry = { message, className: className || 'info' };
+          if (dontRepeat && battleLog()[battleLog().length - 1]?.message === message) return;
           setBattleLog([...battleLog(), logEntry]);
         };
 
+        const calculateExp = monster => {
+          const baseExp = monster.maxHp * monster.atk * monster.def;
+          let exp = baseExp / 10;
+
+          const dungeonMultiplier = 1 + currentDungeonIndex() * 0.33;
+          const dungeonLevel = currentDungeonIndex() + 1;
+          exp *= dungeonMultiplier;
+
+          const dungeonMinThreshold = dungeonLevel - 3;
+          const dungeonMaxThreshold = dungeonLevel + 3;
+          if (hero().level < dungeonMinThreshold) exp *= 1.3;
+          else if (hero().level > dungeonMaxThreshold) exp *= 0.7;
+
+          return Math.round(exp);
+        };
+
+        const calculateDamage = (atk, targetDef, dex, isMonsterAttack = false) => {
+          const randomFactor = 0.6 + Math.random() * 0.8;
+          const baseDamage = Math.round(atk * randomFactor);
+
+          const dungeonLevel = currentDungeonIndex() + 1;
+          const critChance = isMonsterAttack ? dex : Math.max(0, dex - currentDungeonIndex() * 3);
+          const isCritical = Math.random() * 100 < critChance;
+
+          const netDamage = isCritical ? baseDamage * 3 : baseDamage;
+
+          const finalDamage = Math.max(1, netDamage - targetDef);
+
+          console.log({ baseDamage, netDamage, finalDamage, isCritical, critChance });
+
+          return { damage: Math.round(finalDamage), isCritical };
+        };
+
         const attack = () => {
-          if (hero().isDead || currentMonsters().length === 0) return;
+          if (hero().isDead || !isInBattle()) {
+            if (!isInBattle())
+              addToLog({
+                message: 'No estas en una batalla. "Explora" primero!',
+                className: 'warning',
+                dontRepeat: true,
+              });
+            return;
+          }
 
           const monster = currentMonsters()[0];
-          const damage = Math.max(1, hero().atk - monster.def);
+          const { damage, isCritical } = calculateDamage(hero().atk, monster.def, hero().dex);
           monster.hp -= damage;
           addToLog({
-            message: `Héroe ataca a ${monster.name} por ${damage} de daño (${monster.hp}/${monster.maxHp} HP)`,
+            message: `${isCritical ? '¡CRÍTICO!' : ''} Héroe ataca a ${monster.name} por ${damage} de daño (${monster.hp}/${
+              monster.maxHp
+            } HP)`,
             className: 'info',
           });
 
-          const monsterDamage = Math.max(1, monster.atk - hero().def);
-          setHero({
-            ...hero(),
-            hp: Math.max(0, hero().hp - monsterDamage),
-          });
-          addToLog({
-            message: `${monster.name} ataca al héroe por ${monsterDamage} de daño`,
-            className: 'warning',
-          });
-
           if (monster.hp <= 0) {
-            const expGained = monster.maxHp * (currentDungeon() + 1);
+            const expGained = calculateExp(monster);
             setHero({
               ...hero(),
               exp: hero().exp + expGained,
@@ -359,25 +440,41 @@
                     }`
                   : ''
               }`,
-              className: 'info',
+              className: 'info-success',
             });
 
             setCurrentMonsters(currentMonsters().filter(m => m !== monster));
 
-            if (currentMonsters().length === 0) {
-              endBattle();
-            }
+            if (currentMonsters().length === 0) endBattle();
+
+            return;
           }
+
+          const { damage: monsterDamage, isCritical: monsterIsCritical } = calculateDamage(monster.atk, hero().def, monster.dex);
+          setHero({
+            ...hero(),
+            hp: Math.max(0, hero().hp - monsterDamage),
+          });
+
+          const damagePercentage = (monsterDamage / hero().maxHp) * 100;
+          let damageClass = 'info';
+          if (damagePercentage > 10) damageClass = 'error';
+          else if (damagePercentage > 3) damageClass = 'warning';
+
+          addToLog({
+            message: `${isCritical ? '¡CRÍTICO!' : ''} ${monster.name} ataca al héroe por ${monsterDamage} de daño.`,
+            className: damageClass,
+          });
 
           checkAndHandleHeroDeath();
         };
 
         const escape = () => {
-          if (hero().isDead || currentMonsters().length === 0) return;
+          if (hero().isDead || !isInBattle()) return;
 
           const baseEscapeChance = 0.9; // 90% base
           const heroLevelBonus = hero().level * 0.1; // +10% por nivel
-          const dungeonPenalty = currentDungeon() * 0.1; // -10% por nivel de mazmorra
+          const dungeonPenalty = currentDungeonIndex() * 0.1; // -10% por nivel de mazmorra
           const monsterCountPenalty = currentMonsters().length * 0.1; // -10% por monstruo
 
           const escapeChance = Math.max(0.1, Math.min(0.9, baseEscapeChance + heroLevelBonus - dungeonPenalty - monsterCountPenalty));
@@ -439,16 +536,27 @@
         };
 
         const advanceDungeon = () => {
+          if (isInBattle()) {
+            addToLog({
+              message: 'No puedes avanzar, estas en una batalla!',
+              className: 'warning',
+              dontRepeat: true,
+            });
+            return;
+          }
+
           if (!canAdvance()) {
             addToLog({
               message: `¡No puedes avanzar a la siguiente mazmorra aún! Debes ganar al menos 1 batalla`,
-              className: 'error',
+              className: 'warning',
+              dontRepeat: true,
             });
             return;
-          } else if (currentDungeon() === 8) {
+          } else if (currentDungeonIndex() === allDungeons.length - 2) {
             addToLog({
               message: `¡Has superado todas las mazmorras! Ganaste el juego, felicidades.`,
               className: 'success',
+              dontRepeat: true,
             });
             setHero({
               ...hero(),
@@ -456,11 +564,12 @@
             });
           } else {
             healHero();
-            setCurrentDungeon(currentDungeon() + 1);
+            setCurrentDungeonIndex(currentDungeonIndex() + 1);
             setCanAdvance(false);
             addToLog({
-              message: `¡Avanzaste a la Mazmorra ${romanNumerals[currentDungeon()]}!`,
+              message: `¡Avanzaste a la Mazmorra ${allDungeons[currentDungeonIndex()]}!`,
               className: 'success',
+              dontRepeat: true,
             });
           }
         };
@@ -503,7 +612,7 @@
             battlesLeft: 100,
             isDead: false,
           });
-          setCurrentDungeon(0);
+          setCurrentDungeonIndex(0);
           setCurrentMonsters([]);
           setBattleLog([]);
           setShowLevelUp(false);
@@ -512,6 +621,7 @@
           addToLog({
             message: 'Nueva partida',
             className: 'info',
+            dontRepeat: true,
           });
         };
 
@@ -529,19 +639,19 @@
                 ? '¡Héroe derrotado! Fin del juego.'
                 : hero().isVictory
                 ? 'Ganaste el juego, felicidades.'
-                : `Mazmorra ${romanNumerals[currentDungeon()]}`
+                : `Mazmorra ${allDungeons[currentDungeonIndex()]} — Batalla ${500 - hero().battlesLeft + 1} de 500`
             ),
             h('div', { className: 'stats' }, [
               h('div', null, () => `Nivel: ${hero().level}`),
               h('div', { className: () => (hero().hp / hero().maxHp <= 0.35 ? 'low-hp' : '') }, () => `HP: ${hero().hp}/${hero().maxHp}`),
               h('div', null, () => `ATK: ${hero().atk}`),
               h('div', null, () => `DEF: ${hero().def}`),
+              h('div', null, () => `DEX: ${hero().dex}`),
               h(
                 'div',
                 { className: () => (hero().exp >= hero().expToNext ? 'ready-to-level' : '') },
                 () => `EXP: ${hero().exp}/${hero().expToNext}`
               ),
-              h('div', null, () => `Batallas: ${hero().battlesLeft}`),
             ]),
             h(
               'div',
@@ -566,24 +676,34 @@
               h('button', { onclick: () => levelUp('hp') }, 'Aumentar HP'),
               h('button', { onclick: () => levelUp('atk') }, 'Aumentar ATK'),
               h('button', { onclick: () => levelUp('def') }, 'Aumentar DEF'),
+              h('button', { onclick: () => levelUp('dex') }, 'Aumentar DEX'),
             ])
           ),
           h('div', { className: 'container info-section' }, [
             h('h2', null, 'Información y Preguntas Frecuentes'),
             h('div', { className: 'info-content' }, [
               h('h3', null, 'Objetivo'),
-              h('p', null, 'Supera las 10 mazmorras antes de agotar tus 100 batallas disponibles.'),
+              h('p', null, 'Supera las 50 mazmorras antes de agotar tus 500 batallas disponibles.'),
               h('h3', null, '¿Cómo jugar?'),
-              h('p', null, '1. Inicia una batalla usando el botón "Iniciar Batalla".'),
-              h('p', null, '2. Cada batalla tiene varios monstruos. Mátalos todos para ganar batallas.'),
-              h('p', null, '3. Gana experiencia y sube de nivel.'),
-              h('p', null, '4. Avanza a mazmorras más difíciles.'),
+              h('p', null, '1. Busca enemigos usando el botón "Explorar".'),
+              h('p', null, '2. Cada batalla tiene varios monstruos. Mátalos todos para ganar la batalla.'),
+              h('p', null, '3. Gana EXP y sube de nivel para mejorar tus stats.'),
+              h('p', null, '4. Gana una batalla en cada mazmorra para avanzar a la siguiente.'),
               h('h3', null, 'Mecánicas importantes'),
+              h(
+                'p',
+                null,
+                '- HP es la vida del héroe. ATK aumenta el daño. DEF disminuye el daño. DEX aumenta la probabilidad de crítico (triple daño)'
+              ),
               h('p', null, '- El héroe se cura sólo al subir de nivel y al avanzar de mazmorra.'),
-              h('p', null, '- La probabilidad de escape depende de tu nivel, la mazmorra y el número de monstruos vivos.'),
+              h('p', null, '- La probabilidad de escape aumenta con tu nivel y baja con la mazmorra y el número de monstruos vivos.'),
               h('p', null, '- El héroe sólo sube de nivel al terminar batallas, ya sea escapando o ganando.'),
+              h('h3', null, 'Otras mecánicas'),
+              h('p', null, '- Ganarás más EXP si tienes 3 niveles menos que la mazmorra.'),
+              h('p', null, '- Ganarás menos EXP si tienes 3 niveles más que la mazmorra.'),
+              h('p', null, '- Subir de mazmorra disminuye la probabilidad de críticos.'),
               h('h3', null, 'Consejos'),
-              h('p', null, '- No subestimes una retirada táctica para seguir con vida.'),
+              h('p', null, '- No subestimes una retirada táctica para seguir con vida. Especialmente útil para activar un level-up.'),
               h(
                 'p',
                 null,
