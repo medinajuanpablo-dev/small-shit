@@ -444,11 +444,10 @@
   <body>
     <script type="module">
       //prettier-ignore
-      const { Fragment, setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+      const { Fragment, setSignal, h, setEffect } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
 
       //prettier-ignore
       const allDungeons = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX', 'XXXI', 'XXXII', 'XXXIII', 'XXXIV', 'XXXV', 'XXXVI', 'XXXVII', 'XXXVIII', 'XXXIX', 'XL', 'XLI', 'XLII', 'XLIII', 'XLIV', 'XLV', 'XLVI', 'XLVII', 'XLVIII', 'XLIX', 'L'];
-
       const monsterTypes = [
         { name: 'Goblin', baseHp: 20, baseAtk: 5, baseDef: 2, baseDex: 5, sinceLevel: 1 },
         { name: 'Orco', baseHp: 30, baseAtk: 6, baseDef: 4, baseDex: 10, sinceLevel: 5 },
@@ -459,7 +458,6 @@
         { name: 'Lich', baseHp: 50, baseAtk: 10, baseDef: 10, baseDex: 20, sinceLevel: 35 },
         { name: 'Dragón', baseHp: 120, baseAtk: 20, baseDef: 20, baseDex: 5, sinceLevel: 45 },
       ];
-
       const defaultHero = {
         level: 1,
         hp: 100,
@@ -476,7 +474,6 @@
         { message: 'Nueva partida', className: 'info' },
         { message: 'Explora para empezar', className: 'info' },
       ];
-
       const dev = {
         isActive: false,
         hero: {
@@ -492,17 +489,68 @@
         },
         dungeonIndex: 5,
       };
+      const data = (() => {
+        const defaultData = {
+          hero: dev.isActive ? dev.hero : defaultHero,
+          currentDungeonIndex: dev.isActive ? dev.dungeonIndex : 0,
+          currentMonsters: [],
+          battleLog: defaultBattleLog,
+          showLevelUp: false,
+          didEscape: false,
+          canAdvance: false,
+          isAutoExploreActive: false,
+        };
+
+        try {
+          const savedData = localStorage.getItem('miniRpgSave');
+          if (!savedData) return defaultData;
+
+          const data = JSON.parse(savedData);
+          return {
+            hero: data.hero || (dev.isActive ? dev.hero : defaultHero),
+            currentDungeonIndex: data.currentDungeonIndex || (dev.isActive ? dev.dungeonIndex : 0),
+            currentMonsters: data.currentMonsters || [],
+            battleLog: [...data.battleLog, { message: 'Resumiendo partida guardada', className: 'info' }] || defaultBattleLog,
+            showLevelUp: data.showLevelUp || false,
+            didEscape: data.didEscape || false,
+            canAdvance: data.canAdvance || false,
+            isAutoExploreActive: data.isAutoExploreActive || false,
+          };
+        } catch (error) {
+          console.error('Error al cargar datos guardados:', error);
+          return defaultData;
+        }
+      })();
 
       function Game() {
-        const [hero, setHero] = setSignal(dev.isActive ? dev.hero : defaultHero);
+        const [hero, setHero] = setSignal(data.hero);
+        const [currentDungeonIndex, setCurrentDungeonIndex] = setSignal(data.currentDungeonIndex);
+        const [currentMonsters, setCurrentMonsters] = setSignal(data.currentMonsters);
+        const [battleLog, setBattleLog] = setSignal(data.battleLog);
+        const [showLevelUp, setShowLevelUp] = setSignal(data.showLevelUp);
+        const [didEscape, setDidEscape] = setSignal(data.didEscape);
+        const [canAdvance, setCanAdvance] = setSignal(data.canAdvance);
+        const [isAutoExploreActive, setIsAutoExploreActive] = setSignal(data.isAutoExploreActive);
+        const [restartFirstClick, setRestartFirstClick] = setSignal(false);
 
-        const [currentDungeonIndex, setCurrentDungeonIndex] = setSignal(dev.isActive ? dev.dungeonIndex : 0);
-        const [currentMonsters, setCurrentMonsters] = setSignal([]);
-        const [battleLog, setBattleLog] = setSignal(defaultBattleLog);
-        const [showLevelUp, setShowLevelUp] = setSignal(false);
-        const [didEscape, setDidEscape] = setSignal(false);
-        const [canAdvance, setCanAdvance] = setSignal(false);
-        const [isAutoExploreActive, setIsAutoExploreActive] = setSignal(false);
+        setEffect(() => {
+          const saveData = {
+            hero: hero(),
+            currentDungeonIndex: currentDungeonIndex(),
+            currentMonsters: currentMonsters(),
+            battleLog: battleLog(),
+            showLevelUp: showLevelUp(),
+            didEscape: didEscape(),
+            canAdvance: canAdvance(),
+            isAutoExploreActive: isAutoExploreActive(),
+          };
+
+          try {
+            localStorage.setItem('miniRpgSave', JSON.stringify(saveData));
+          } catch (error) {
+            console.error('Error al guardar datos:', error);
+          }
+        });
 
         const isInBattle = () => currentMonsters().length > 0;
         const isLevelUp = () => hero().exp >= hero().expToNext;
@@ -776,7 +824,7 @@
             ...hero(),
             level: hero().level + 1,
             exp: hero().exp - hero().expToNext,
-            expToNext: Math.floor(hero().expToNext * 1.35),
+            expToNext: Math.floor(hero().expToNext * 1.25 + hero().level * 15),
             escapesLeft: hero().escapesLeft + 1,
           };
 
@@ -810,6 +858,18 @@
           setShowLevelUp(false);
           setDidEscape(false);
           setCanAdvance(false);
+          setIsAutoExploreActive(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        const handleRestart = () => {
+          if (restartFirstClick()) {
+            resetGame();
+            setRestartFirstClick(false);
+            return;
+          }
+          setRestartFirstClick(true);
+          setTimeout(() => setRestartFirstClick(false), 2000);
         };
 
         return h(
@@ -820,9 +880,7 @@
             { className: 'container' },
             h('h1', { className: 'title' }, 'Mini RPG'),
             h('h2', { className: () => (hero().isDead ? 'game-over' : hero().isVictory ? 'game-victory' : 'game-status') }, () =>
-              hero().isDead
-                ? '¡Héroe derrotado! Fin del juego.'
-                : hero().isVictory
+              hero().isVictory
                 ? 'Ganaste el juego, felicidades.'
                 : `Mazmorra ${allDungeons[currentDungeonIndex()]} — Batalla ${500 - hero().battlesLeft + 1} / 500`
             ),
@@ -893,7 +951,7 @@
             ]),
             h('div', { className: 'auto-explore' }, [
               h('div', { className: 'auto-explore-checkbox' }, [
-                h('input', { type: 'checkbox', id: 'auto-explore', onchange: handleAutoExplore }),
+                h('input', { type: 'checkbox', checked: isAutoExploreActive(), id: 'auto-explore', onchange: handleAutoExplore }),
                 h('label', { for: 'auto-explore' }, 'Auto-Explorar'),
               ]),
               h(
@@ -921,7 +979,10 @@
               h('button', { onclick: () => levelUp('atk') }, 'Aumentar ATK'),
               h('button', { onclick: () => levelUp('def') }, 'Aumentar DEF'),
               h('button', { onclick: () => levelUp('dex') }, 'Aumentar DEX'),
-            ])
+            ]),
+            h('button', { className: 'btn-escape', onclick: handleRestart }, () =>
+              restartFirstClick() ? 'PRESIONA OTRA VEZ PARA CONFIRMAR' : 'BORRAR Y EMPEZAR DE NUEVO'
+            )
           ),
           h('div', { className: 'container info-section' }, [
             h('h2', null, 'Información y Preguntas Frecuentes'),
@@ -933,6 +994,7 @@
               h('p', null, '2. Cada batalla tiene varios monstruos. Mátalos todos para ganar la batalla.'),
               h('p', null, '3. Gana EXP y sube de nivel para mejorar tus stats.'),
               h('p', null, '4. Gana una batalla en cada mazmorra para avanzar a la siguiente.'),
+              h('p', null, '- La partida se guarda automáticamente todo el tiempo. Puedes salir y volver después.'),
               h('h3', null, 'Mecánicas importantes'),
               h(
                 'p',
@@ -941,10 +1003,7 @@
               ),
               h('p', null, '- El héroe se cura al subir de nivel, avanzar de mazmorra o escapar.'),
               h('p', null, '- Obtienes un escape cada vez que subes de nivel. Úsalos sabiamente!'),
-              h('p', null, '- La probabilidad de escape aumenta con tu nivel y baja con la mazmorra y el número de monstruos vivos.'),
               h('p', null, '- El héroe sólo sube de nivel al terminar batallas, ya sea escapando o ganando.'),
-              h('h3', null, 'Otras mecánicas'),
-              h('p', null, '- Cuando el indicador de EXP esté verde, puedes hacerle click para scrollear hasta el selector de level-up.'),
               h('h3', null, 'Consejos'),
               h('p', null, '- No subestimes una retirada táctica para seguir con vida. Especialmente útil para activar un level-up.'),
               h(
