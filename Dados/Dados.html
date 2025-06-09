@@ -44,21 +44,26 @@
       .dice {
         width: clamp(50px, 15vw, 70px);
         height: clamp(50px, 15vw, 70px);
-        background: linear-gradient(145deg, #ff6b6b, #e74c3c);
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
         border-radius: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: clamp(1.2rem, 4vw, 1.8rem);
         font-weight: bold;
-        color: white;
+        color: rgba(0, 0, 0, 0.8);
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
         border: 2px solid rgba(255, 255, 255, 0.2);
+        user-select: none;
       }
       .dice:hover {
         transform: scale(1.15) rotate(5deg);
         box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+      }
+      .hidden {
+        opacity: 0;
+        visibility: hidden !important;
       }
       .input-group {
         margin: 1rem 0;
@@ -131,12 +136,12 @@
       .total {
         margin-top: 1.5rem;
         font-size: clamp(1.2rem, 4vw, 1.5rem);
-        color: #2ecc71;
+        color: #ffffff;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         padding: 1rem;
-        background: rgba(46, 204, 113, 0.1);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
-        border: 2px solid rgba(46, 204, 113, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.2);
       }
     </style>
   </head>
@@ -181,6 +186,7 @@
               value: diceCount(),
               className: () => (isValidDiceCount() ? '' : 'error'),
               onchange: e => setDiceCount(parseInt(e.target.value) || 0),
+              onfocus: e => e.target.select(),
             })
           ),
           h(
@@ -194,12 +200,24 @@
               value: diceSides(),
               className: () => (isValidDiceSides() ? '' : 'error'),
               onchange: e => setDiceSides(parseInt(e.target.value) || 0),
+              onfocus: e => e.target.select(),
             })
           ),
           h('button', { onclick: rollDice, className: () => (isFormValid() ? '' : 'error') }, () =>
             isFormValid() ? 'Tirar Dados' : 'Campos Inválidos'
           ),
-          h('div', { className: 'dice-container' }, () => diceResults().map((result, index) => h('div', { className: 'dice' }, result))),
+          h(
+            'div',
+            {
+              className: () =>
+                diceResults().length > 0 && diceResults().length <= 6 && diceSides() <= 1000 ? 'dice-container' : 'dice-container hidden',
+            },
+            Array.from({ length: 6 }, (_, index) =>
+              h('div', { className: () => (index < diceResults().length ? 'dice' : 'dice hidden') }, () =>
+                index < diceResults().length ? diceResults()[index] : ''
+              )
+            )
+          ),
           h('div', { className: 'total' }, () => `Total: ${total()}`)
         );
       }
