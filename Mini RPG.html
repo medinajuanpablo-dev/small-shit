@@ -66,56 +66,49 @@
         margin-left: -0.3rem;
         background: rgba(52, 152, 219, 0.05);
       }
-      .battle-log .success {
+      .success {
         color: #2ecc71;
       }
       .battle-log .success:nth-child(-n + 2) {
         border-left: 2px solid #2ecc71;
         background: rgba(46, 204, 113, 0.05);
       }
-      .battle-log .error {
-        color: #e74c3c;
-      }
-      .battle-log .error:nth-child(-n + 2) {
-        border-left: 2px solid #e74c3c;
-        background: rgba(231, 76, 60, 0.05);
-      }
-      .battle-log .warning {
+      .warning {
         color: #f1c40f;
       }
       .battle-log .warning:nth-child(-n + 2) {
         border-left: 2px solid #f1c40f;
         background: rgba(241, 196, 15, 0.05);
       }
-      .battle-log .info {
+      .info {
         color: #87ceeb;
       }
       .battle-log .info:nth-child(-n + 2) {
         border-left: 2px solid #87ceeb;
         background: rgba(135, 206, 235, 0.05);
       }
-      .battle-log .info-success {
+      .info-success {
         color: #27c6a3;
       }
       .battle-log .info-success:nth-child(-n + 2) {
         border-left: 2px solid #2ecc71;
         background: rgba(46, 204, 113, 0.05);
       }
-      .battle-log .danger {
+      .danger {
         color: #e74c3c;
       }
       .battle-log .danger:nth-child(-n + 2) {
         border-left: 2px solid #e74c3c;
         background: rgba(231, 76, 60, 0.05);
       }
-      .battle-log .info-danger {
+      .info-danger {
         color: #e67e22;
       }
       .battle-log .info-danger:nth-child(-n + 2) {
         border-left: 2px solid #e67e22;
         background: rgba(230, 126, 34, 0.05);
       }
-      .battle-log .info-warning {
+      .info-warning {
         color: #f5b041;
       }
       .battle-log .info-warning:nth-child(-n + 2) {
@@ -256,7 +249,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
       .hidden {
-        display: none;
+        display: none !important;
       }
 
       .auto-explore {
@@ -473,6 +466,74 @@
           margin-right: 0.2em;
         }
       }
+
+      .difficulty-selection {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .difficulty-selection h3 {
+        color: #3498db;
+        margin-bottom: 1rem;
+        font-size: 1.2em;
+      }
+
+      .difficulty-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.8rem;
+      }
+
+      .btn-difficulty {
+        padding: 1rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-difficulty:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-blessed {
+        background: linear-gradient(145deg, #2ecc71, #27ae60);
+        color: white;
+      }
+
+      .btn-normal {
+        background: linear-gradient(145deg, #3498db, #2980b9);
+        color: white;
+      }
+
+      .btn-heroic {
+        background: linear-gradient(145deg, #f39c12, #e67e22);
+        color: white;
+      }
+
+      .btn-legendary {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+      }
+
+      @media (max-width: 700px) {
+        .difficulty-buttons {
+          grid-template-columns: 1fr;
+        }
+
+        .difficulty-selection {
+          padding: 1rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -492,7 +553,52 @@
         { name: 'Lich 💀', baseHp: 50, baseAtk: 20, baseDef: 15, baseDex: 20, sinceLevel: 11 },
         { name: 'Dragón 🐉', baseHp: 120, baseAtk: 20, baseDef: 20, baseDex: 5, sinceLevel: 13 },
       ];
-
+      const difficultiesConfigs = {
+        blessed: {
+          name: 'Bendecido',
+          statsUpgrades: {
+            atk: [5, 7, 9, 12, 15],
+            def: [5, 7, 9, 12, 15],
+            dex: 5,
+            cres: 15,
+            hp: [50, 85, 125, 200],
+          },
+          className: 'success',
+        },
+        normal: {
+          name: 'Normal',
+          statsUpgrades: {
+            atk: [4, 5, 7, 9, 11],
+            def: [4, 5, 7, 9, 11],
+            dex: 4,
+            cres: 10,
+            hp: [40, 70, 100, 150],
+          },
+          className: 'info',
+        },
+        heroic: {
+          name: 'Heroico',
+          statsUpgrades: {
+            atk: [4, 5, 6, 7, 9],
+            def: [4, 5, 6, 7, 9],
+            dex: 3,
+            cres: 7,
+            hp: [30, 50, 70, 100],
+          },
+          className: 'warning',
+        },
+        legendary: {
+          name: 'Legendario',
+          statsUpgrades: {
+            atk: [3, 4, 5, 6, 7],
+            def: [3, 4, 5, 6, 7],
+            dex: 2,
+            cres: 5,
+            hp: [25, 35, 50, 75],
+          },
+          className: 'danger',
+        },
+      };
       const constants = {
         wonBattleExpBonus: 0.25,
       };
@@ -508,12 +614,10 @@
         expToNext: 10,
         battlesLeft: 150,
       };
-      const defaultBattleLog = [
-        { message: 'Nueva partida', className: 'info' },
-        { message: 'Explora para empezar', className: 'info' },
-      ];
+      const defaultBattleLog = [{ message: 'Nueva partida', className: 'info' }];
       const defaultData = {
         hero: defaultHero,
+        difficulty: null,
         currentDungeonIndex: 0,
         currentMonsters: [],
         battleLog: defaultBattleLog,
@@ -531,6 +635,7 @@
           const data = JSON.parse(savedData);
           return {
             hero: data.hero || defaultHero,
+            difficulty: data.difficulty || null,
             currentDungeonIndex: data.currentDungeonIndex || 0,
             currentMonsters: data.currentMonsters || [],
             battleLog: [...data.battleLog, { message: 'Resumiendo partida guardada', className: 'info' }] || defaultBattleLog,
@@ -550,6 +655,7 @@
 
       function Game() {
         const [hero, setHero] = setSignal(data.hero);
+        const [difficulty, setDifficulty] = setSignal(data.difficulty);
         const [currentDungeonIndex, setCurrentDungeonIndex] = setSignal(data.currentDungeonIndex);
         const [currentMonsters, setCurrentMonsters] = setSignal(data.currentMonsters);
         const [battleLog, setBattleLog] = setSignal(data.battleLog);
@@ -563,6 +669,7 @@
         setEffect(() => {
           const saveData = {
             hero: hero(),
+            difficulty: difficulty(),
             currentDungeonIndex: currentDungeonIndex(),
             currentMonsters: currentMonsters(),
             battleLog: battleLog(),
@@ -678,6 +785,7 @@
         };
 
         const isEndGame = () => hero().isDead || hero().isVictory;
+        const isGameStart = () => !difficulty();
 
         const addToLog = ({ message, className, dontRepeat = false }) => {
           if (dontRepeat && battleLog()[battleLog().length - 1]?.message === message) return;
@@ -855,28 +963,34 @@
         };
 
         const getStatIncrease = (stat, currentValue) => {
+          const currentDifficulty = difficultiesConfigs[difficulty()];
+          const statsUpgrades = currentDifficulty.statsUpgrades;
+
           switch (stat) {
             case 'atk':
-              if (currentValue >= 130) return 7;
-              if (currentValue >= 100) return 6;
-              if (currentValue >= 60) return 5;
-              if (currentValue >= 30) return 4;
-              return 3;
+              const atkUpgrades = statsUpgrades.atk;
+              if (currentValue >= 150) return atkUpgrades[4];
+              if (currentValue >= 100) return atkUpgrades[3];
+              if (currentValue >= 60) return atkUpgrades[2];
+              if (currentValue >= 30) return atkUpgrades[1];
+              return atkUpgrades[0];
             case 'def':
-              if (currentValue >= 120) return 7;
-              if (currentValue >= 90) return 6;
-              if (currentValue >= 50) return 5;
-              if (currentValue >= 20) return 4;
-              return 3;
+              const defUpgrades = statsUpgrades.def;
+              if (currentValue >= 130) return defUpgrades[4];
+              if (currentValue >= 85) return defUpgrades[3];
+              if (currentValue >= 50) return defUpgrades[2];
+              if (currentValue >= 20) return defUpgrades[1];
+              return defUpgrades[0];
             case 'hp':
-              if (currentValue >= 800) return 75;
-              if (currentValue >= 400) return 50;
-              if (currentValue >= 200) return 35;
-              return 25;
+              const hpUpgrades = statsUpgrades.hp;
+              if (currentValue >= 800) return hpUpgrades[3];
+              if (currentValue >= 400) return hpUpgrades[2];
+              if (currentValue >= 200) return hpUpgrades[1];
+              return hpUpgrades[0];
             case 'dex':
-              return 3;
+              return statsUpgrades.dex;
             case 'cres':
-              return 10;
+              return statsUpgrades.cres;
             default:
               return 0;
           }
@@ -909,6 +1023,7 @@
 
         const resetGame = () => {
           setHero(defaultData.hero);
+          setDifficulty(defaultData.difficulty);
           setCurrentDungeonIndex(defaultData.currentDungeonIndex);
           setCurrentMonsters(defaultData.currentMonsters);
           setBattleLog(defaultData.battleLog);
@@ -933,13 +1048,30 @@
           setTimeout(() => setRestartFirstClick(false), 2000);
         };
 
+        const selectDifficulty = selectedDifficulty => {
+          setDifficulty(selectedDifficulty);
+
+          addToLog({
+            message: `Dificultad seleccionada: ${difficultiesConfigs[selectedDifficulty].name}`,
+            className: difficultiesConfigs[selectedDifficulty].className,
+          });
+          addToLog({
+            message: 'Explora para empezar',
+            className: 'info',
+          });
+        };
+
         return h(
           Fragment,
           null,
           h(
             'div',
             { className: 'container' },
-            h('h1', { className: 'title' }, 'Mini RPG'),
+            h(
+              'h1',
+              { className: () => (difficulty() ? `title ${difficultiesConfigs[difficulty()].className}` : 'title') },
+              () => `Mini RPG${difficulty() ? ` - ${difficultiesConfigs[difficulty()].name}` : ''}`
+            ),
             h('h2', { className: () => (hero().isDead ? 'game-over' : hero().isVictory ? 'game-victory' : 'game-status') }, () =>
               hero().isVictory
                 ? 'Ganaste el juego, felicidades.'
@@ -965,9 +1097,20 @@
                 () => `HP: ${hero().hp}/${hero().maxHp}`
               ),
             ]),
+            h('div', { className: () => (isGameStart() ? 'battle-log' : 'battle-log hidden') }, [
+              h('div', { className: 'difficulty-selection' }, [
+                h('h3', { style: 'color: white; text-decoration: underline;' }, 'Selecciona la dificultad'),
+                h('div', { className: 'difficulty-buttons' }, [
+                  h('button', { className: 'btn-difficulty btn-blessed', onclick: () => selectDifficulty('blessed') }, 'Bendecido'),
+                  h('button', { className: 'btn-difficulty btn-normal', onclick: () => selectDifficulty('normal') }, 'Normal'),
+                  h('button', { className: 'btn-difficulty btn-heroic', onclick: () => selectDifficulty('heroic') }, 'Heroico'),
+                  h('button', { className: 'btn-difficulty btn-legendary', onclick: () => selectDifficulty('legendary') }, 'Legendario'),
+                ]),
+              ]),
+            ]),
             h(
               'div',
-              { className: 'battle-log' },
+              { className: () => (!isGameStart() ? 'battle-log' : 'battle-log hidden') },
               Array.from({ length: 100 }, (_, i) =>
                 h(
                   'div',
@@ -980,7 +1123,10 @@
               h('div', { className: 'actions-row' }, [
                 h(
                   'button',
-                  { className: () => (isEndGame() || !isInBattle() ? 'disabled btn-attack' : 'btn-attack'), onclick: attack },
+                  {
+                    className: () => (isEndGame() || !isInBattle() || isGameStart() ? 'disabled btn-attack' : 'btn-attack'),
+                    onclick: attack,
+                  },
                   'Atacar'
                 ),
               ]),
@@ -988,7 +1134,7 @@
                 h(
                   'button',
                   {
-                    className: () => (isEndGame() || !isInBattle() ? 'disabled btn-escape' : 'btn-escape'),
+                    className: () => (isEndGame() || !isInBattle() || isGameStart() ? 'disabled btn-escape' : 'btn-escape'),
                     onclick: escape,
                   },
                   () => `Escapar`
@@ -996,7 +1142,8 @@
                 h(
                   'button',
                   {
-                    className: () => (isInBattle() || isEndGame() || isAutoExploreActive() ? 'disabled btn-explore' : 'btn-explore'),
+                    className: () =>
+                      isInBattle() || isEndGame() || isAutoExploreActive() || isGameStart() ? 'disabled btn-explore' : 'btn-explore',
                     onclick: startBattle,
                   },
                   'Explorar'
@@ -1007,7 +1154,9 @@
                   'button',
                   {
                     className: () =>
-                      isInBattle() || isEndGame() || isAutoExploreActive() || !canAdvance() ? 'disabled btn-advance' : 'btn-advance',
+                      isInBattle() || isEndGame() || isAutoExploreActive() || !canAdvance() || isGameStart()
+                        ? 'disabled btn-advance'
+                        : 'btn-advance',
                     onclick: advanceDungeon,
                   },
                   'Avanzar Mazmorra'
@@ -1015,9 +1164,15 @@
               ]),
               h('button', { className: () => (isEndGame() ? 'btn-reset' : 'hidden'), onclick: resetGame }, 'Empezar de nuevo'),
             ]),
-            h('div', { className: 'auto-explore' }, [
+            h('div', { className: () => (isGameStart() ? 'auto-explore hidden' : 'auto-explore') }, [
               h('div', { className: 'auto-explore-checkbox' }, [
-                h('input', { type: 'checkbox', value: false, id: 'auto-explore', onchange: handleAutoExplore }),
+                h('input', {
+                  type: 'checkbox',
+                  value: false,
+                  id: 'auto-explore',
+                  onchange: handleAutoExplore,
+                  disabled: () => isGameStart(),
+                }),
                 h('label', { for: 'auto-explore' }, 'Auto-Explorar'),
               ]),
               h(
