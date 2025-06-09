@@ -10,7 +10,7 @@
         color: #4a148c;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         padding: 10px;
-        min-height: 85vh;
+        min-height: 92vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -105,6 +105,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        min-height: 350px;
       }
 
       .tab-content {
@@ -186,7 +187,7 @@
         box-shadow: 0 2px 8px rgba(0, 200, 83, 0.3);
       }
 
-      /* PARTICIPANTS TABLE */
+      /* TABLES */
       .participants-table-wrapper {
         max-height: 320px;
         overflow-y: auto;
@@ -246,6 +247,15 @@
         background: rgba(0, 172, 193, 0.05);
       }
 
+      .participants-table tbody tr.clickable-row {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .participants-table tbody tr.clickable-row:hover {
+        background: rgba(0, 172, 193, 0.1);
+      }
+
       .participant-name-cell {
         font-weight: 600;
       }
@@ -290,6 +300,10 @@
 
       .delete-participant-btn:active {
         transform: scale(0.95);
+      }
+
+      .contributions-table th {
+        background: linear-gradient(145deg, #00c853, #009624);
       }
 
       /* MODAL */
@@ -719,11 +733,13 @@
         openContribModal,
         closeContribModal,
         handleContribSubmit,
+        editingContribution,
+        setEditingContribution,
       }) {
         const modalContent = h(
           'form',
           { className: 'modal-form', onsubmit: handleContribSubmit },
-          h('h3', { className: 'modal-title' }, 'Agregar Contribución'),
+          h('h3', { className: 'modal-title' }, editingContribution() ? 'Editar Contribución' : 'Agregar Contribución'),
           h('input', {
             className: 'modal-input',
             type: 'text',
@@ -743,21 +759,21 @@
             'div',
             { className: 'modal-buttons' },
             h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeContribModal }, 'Cancelar'),
-            h('button', { type: 'submit', className: 'modal-btn modal-btn-primary' }, 'Agregar')
+            h('button', { type: 'submit', className: 'modal-btn modal-btn-primary' }, editingContribution() ? 'Guardar' : 'Agregar')
           )
         );
 
         return h(
           'div',
           { className: 'tab-content' },
-          h('button', { className: 'add-contribution-btn', onclick: openContribModal }, '+ Agregar Contribución'),
+          h('button', { className: 'add-contribution-btn', onclick: () => openContribModal() }, '+ Agregar Contribución'),
           contributions().length > 0 &&
             h(
               'div',
               { className: 'participants-table-wrapper' },
               h(
                 'table',
-                { className: 'participants-table' },
+                { className: 'participants-table contributions-table' },
                 h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Participantes'), h('th', null, 'Monto'))),
                 h(
                   'tbody',
@@ -765,7 +781,12 @@
                   ...contributions().map(contribution =>
                     h(
                       'tr',
-                      { key: contribution.id },
+                      {
+                        key: contribution.id,
+                        className: 'clickable-row',
+                        onclick: () => openContribModal(contribution),
+                        title: 'Clic para editar',
+                      },
                       h('td', { className: 'participant-name-cell' }, contribution.name),
                       h('td', { className: 'participant-amount-cell' }, contribution.participants),
                       h(
@@ -804,6 +825,7 @@
         isContribModalOpen: false,
         contributionName: '',
         contributionAmount: '',
+        editingContribution: null,
       };
 
       const loadSavedData = () => {
@@ -821,6 +843,7 @@
             isContribModalOpen: defaultData.isContribModalOpen,
             contributionName: defaultData.contributionName,
             contributionAmount: defaultData.contributionAmount,
+            editingContribution: defaultData.editingContribution,
           };
         } catch (error) {
           console.error('Error loading saved data:', error);
@@ -841,6 +864,7 @@
         const [contributionAmount, setContributionAmount] = setSignal(savedData.contributionAmount);
         const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
         const [participantToDelete, setParticipantToDelete] = setSignal(null);
+        const [editingContribution, setEditingContribution] = setSignal(savedData.editingContribution);
 
         setEffect(() => {
           const saveData = {
@@ -870,11 +894,24 @@
           }
         };
 
-        const openContribModal = () => setIsContribModalOpen(true);
+        const openContribModal = (contribution = null) => {
+          if (contribution) {
+            setEditingContribution(contribution);
+            setContributionName(contribution.name);
+            setContributionAmount(contribution.amount);
+          } else {
+            setEditingContribution(null);
+            setContributionName('');
+            setContributionAmount('');
+          }
+          setIsContribModalOpen(true);
+        };
+
         const closeContribModal = () => {
           setIsContribModalOpen(false);
           setContributionName('');
           setContributionAmount('');
+          setEditingContribution(null);
         };
 
         const handleContribSubmit = e => {
@@ -882,7 +919,12 @@
           const name = contributionName().trim();
           const amount = parseFloat(contributionAmount()) || 0;
           if (name) {
-            setContributions([...contributions(), { id: Date.now(), name, amount, participants: 'Placeholder' }]);
+            const editing = editingContribution();
+            if (editing) {
+              setContributions(contributions().map(c => (c.id === editing.id ? { ...c, name, amount } : c)));
+            } else {
+              setContributions([...contributions(), { id: Date.now(), name, amount, participants: 'Placeholder' }]);
+            }
             closeContribModal();
           }
         };
@@ -943,6 +985,8 @@
                 openContribModal,
                 closeContribModal,
                 handleContribSubmit,
+                editingContribution,
+                setEditingContribution,
               })
             ),
 
