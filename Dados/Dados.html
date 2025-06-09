@@ -156,8 +156,8 @@
         const [diceResults, setDiceResults] = setSignal([]);
         const [total, setTotal] = setSignal(0);
 
-        const isValidDiceCount = () => diceCount() > 0 && diceCount() <= 99999;
-        const isValidDiceSides = () => diceSides() > 0 && diceSides() <= 99999;
+        const isValidDiceCount = () => diceCount() > 0 && diceCount() <= 999;
+        const isValidDiceSides = () => diceSides() > 0 && diceSides() <= 9999;
         const isFormValid = () => isValidDiceCount() && isValidDiceSides();
 
         const rollDice = () => {
