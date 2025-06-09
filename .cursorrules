@@ -1,0 +1,12 @@
+- Se está usando un mini framework ubicado justo abajo de la etiqueta de apertura `<script>`
+
+  - Se pueden usar componentes pero sólo con layout/renderizado: sin lógica, signals o handlers dentro. Todos los signals deben ir en el componente principal/padre.
+
+- Si se va a usar una signal, sea donde sea siempre debe estar dentro de una función.
+
+  - Ejemplo: si un componente usa signals dentro, debe usarse como `() => Componente(...props)`.
+  - Si no usa signals no es necesario; ejemplo: `h('p', null, 'Texto fijo')`.
+
+- Siempre usar clases de CSS, NUNCA usar estilos en línea con styles.
+
+- Objetos siempre escribirlos en una sola línea, nunca escribirlos en varias líneas.

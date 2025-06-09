@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cuanto Hay Que Poner</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        color: #4a148c;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 10px;
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: clamp(1rem, 3vw, 1.5rem);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 95%;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(142, 36, 170, 0.2);
+      }
+
+      h1 {
+        color: #4a148c;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: clamp(1.4rem, 4vw, 2rem);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+      }
+
+      /* TABS */
+      .tabs-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid rgba(142, 36, 170, 0.2);
+        gap: clamp(0.5rem, 2vw, 1rem);
+      }
+
+      .tab {
+        padding: clamp(0.6rem, 1.5vw, 0.8rem) clamp(0.8rem, 2.5vw, 1.5rem);
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        color: #666;
+        font-size: clamp(0.85rem, 2vw, 1rem);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+        flex: 1;
+        min-width: fit-content;
+        white-space: nowrap;
+      }
+
+      .tab:hover {
+        color: #4a148c;
+        background: rgba(142, 36, 170, 0.1);
+      }
+
+      .tab.active {
+        color: #4a148c;
+        border-bottom-color: #8e24aa;
+        background: rgba(142, 36, 170, 0.1);
+        font-weight: bold;
+      }
+
+      .tab.active.participantes,
+      .tab:hover.participantes {
+        color: #00695c;
+        border-bottom-color: #00acc1;
+        background: rgba(0, 172, 193, 0.1);
+      }
+
+      .tab.active.contribuciones,
+      .tab:hover.contribuciones {
+        color: #1b5e20;
+        border-bottom-color: #00c853;
+        background: rgba(0, 200, 83, 0.1);
+      }
+
+      .tab.active.gastos,
+      .tab:hover.gastos {
+        color: #e65100;
+        border-bottom-color: #ff9800;
+        background: rgba(255, 152, 0, 0.1);
+      }
+
+      /* CONTENT */
+      .content-box {
+        background: rgba(142, 36, 170, 0.05);
+        padding: clamp(1rem, 3vw, 1.5rem);
+        border-radius: 15px;
+        border: 2px solid rgba(142, 36, 170, 0.1);
+        min-height: clamp(200px, 35vh, 250px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .tab-content {
+        text-align: center;
+        color: #4a148c;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .tab-content h2 {
+        margin-bottom: 0.8rem;
+        color: #6a1b9a;
+        font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+      }
+
+      .tab-content p {
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        line-height: 1.5;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .tab-section {
+        display: block;
+      }
+
+      .tab-section.hidden {
+        display: none;
+      }
+
+      /* BUTTONS */
+      .add-participant-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        background: linear-gradient(145deg, #00acc1, #00838f);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 172, 193, 0.3);
+      }
+
+      .add-participant-btn:hover {
+        background: linear-gradient(145deg, #00838f, #006064);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 172, 193, 0.4);
+      }
+
+      .add-participant-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 172, 193, 0.3);
+      }
+
+      /* PARTICIPANTS TABLE */
+      .participants-table-wrapper {
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: 10px;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 172, 193, 0.1);
+      }
+
+      .participants-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        table-layout: fixed;
+      }
+
+      .participants-table th,
+      .participants-table td {
+        padding: 0.8rem;
+        text-align: center;
+      }
+
+      .participants-table th:first-child,
+      .participants-table td:first-child {
+        width: 33.33%;
+      }
+
+      .participants-table th:last-child,
+      .participants-table td:last-child {
+        width: 66.67%;
+      }
+
+      .participants-table th {
+        background: linear-gradient(145deg, #00acc1, #00838f);
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .participants-table td {
+        border-bottom: 1px solid rgba(0, 172, 193, 0.1);
+        color: #00695c;
+        font-size: 0.9rem;
+      }
+
+      .participants-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .participants-table tbody tr:hover {
+        background: rgba(0, 172, 193, 0.05);
+      }
+
+      .participant-name-cell {
+        font-weight: 600;
+      }
+
+      .participant-amount-cell {
+        font-style: italic;
+        color: #00838f;
+      }
+
+      /* MODAL */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(3px);
+      }
+
+      .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        animation: modalSlideIn 0.3s ease;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+
+      .modal-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+
+      .modal-title {
+        color: #4a148c;
+        margin-bottom: 1.5rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      .modal-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .modal-input {
+        padding: 0.8rem;
+        border: 2px solid rgba(142, 36, 170, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .modal-input:focus {
+        outline: none;
+        border-color: #8e24aa;
+        box-shadow: 0 0 0 3px rgba(142, 36, 170, 0.1);
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+
+      .modal-btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .modal-btn-primary {
+        background: linear-gradient(145deg, #8e24aa, #7b1fa2);
+        color: white;
+      }
+
+      .modal-btn-primary:hover {
+        background: linear-gradient(145deg, #7b1fa2, #6a1b9a);
+        transform: translateY(-1px);
+      }
+
+      .modal-btn-secondary {
+        background: #f5f5f5;
+        color: #666;
+      }
+
+      .modal-btn-secondary:hover {
+        background: #eeeeee;
+        color: #333;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        .tabs-container {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .tab {
+          border-bottom: 1px solid rgba(142, 36, 170, 0.2);
+          border-right: none;
+          max-width: none;
+          text-align: center;
+          padding: 1rem;
+        }
+
+        .tab.active {
+          border-bottom-color: #8e24aa;
+        }
+
+        .tab:last-child {
+          border-bottom: none;
+        }
+
+        .participants-table-wrapper {
+          margin-top: 1rem;
+        }
+
+        .participants-table th,
+        .participants-table td {
+          padding: 0.8rem 0.5rem;
+          font-size: 0.9rem;
+        }
+
+        .participants-table th {
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 1rem;
+          width: 98%;
+        }
+
+        .tab {
+          font-size: 0.9rem;
+          padding: 0.8rem;
+        }
+
+        .add-participant-btn {
+          padding: 0.8rem 1.5rem;
+          font-size: 1rem;
+          margin-top: 1rem;
+        }
+
+        .participants-table th,
+        .participants-table td {
+          padding: 0.6rem 0.3rem;
+          font-size: 0.85rem;
+        }
+
+        .participants-table th {
+          font-size: 0.9rem;
+        }
+
+        .participant-amount-cell {
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .participants-table th,
+        .participants-table td {
+          padding: 0.5rem 0.2rem;
+          font-size: 0.75rem;
+        }
+
+        .participants-table th {
+          font-size: 0.8rem;
+        }
+
+        .participant-amount-cell {
+          font-size: 0.7rem;
+        }
+
+        .add-participant-btn {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      //prettier-ignore
+      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+
+      function Modal({ isOpen, onClose, children }) {
+        if (!isOpen) return null;
+
+        const handleOverlayClick = e => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        };
+
+        return h(
+          'div',
+          { className: 'modal-overlay', onclick: handleOverlayClick },
+          h('div', { className: 'modal-content' }, h('button', { className: 'modal-close', onclick: onClose }, '×'), children)
+        );
+      }
+
+      function ParticipantesSection({
+        participants,
+        setParticipants,
+        isModalOpen,
+        setParticipantName,
+        openModal,
+        closeModal,
+        handleSubmit,
+      }) {
+        const modalContent = h(
+          'form',
+          { className: 'modal-form', onsubmit: handleSubmit },
+          h('h3', { className: 'modal-title' }, 'Agregar Participante'),
+          h('input', {
+            className: 'modal-input',
+            type: 'text',
+            placeholder: 'Nombre del participante',
+            oninput: e => setParticipantName(e.target.value),
+            required: true,
+            autofocus: true,
+          }),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeModal }, 'Cancelar'),
+            h('button', { type: 'submit', className: 'modal-btn modal-btn-primary' }, 'Agregar')
+          )
+        );
+
+        return h(
+          'div',
+          { className: 'tab-content' },
+          h('button', { className: 'add-participant-btn', onclick: openModal }, '+ Agregar Participante'),
+          participants().length > 0 &&
+            h(
+              'div',
+              { className: 'participants-table-wrapper' },
+              h(
+                'table',
+                { className: 'participants-table' },
+                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'))),
+                h(
+                  'tbody',
+                  null,
+                  ...participants().map(participant =>
+                    h(
+                      'tr',
+                      { key: participant.id },
+                      h('td', { className: 'participant-name-cell' }, participant.name),
+                      h('td', { className: 'participant-amount-cell' }, 'cuanto tiene que poner')
+                    )
+                  )
+                )
+              )
+            ),
+          () => Modal({ isOpen: isModalOpen(), onClose: closeModal, children: modalContent })
+        );
+      }
+
+      function ContribucionesSection() {
+        return h(
+          'div',
+          { className: 'tab-content' },
+          h('h2', null, '💰 Contribuciones'),
+          h('p', null, 'Registra las contribuciones que cada persona ha hecho al fondo común del grupo.')
+        );
+      }
+
+      function GastosSection() {
+        return h(
+          'div',
+          { className: 'tab-content' },
+          h('h2', null, '💸 Gastos'),
+          h('p', null, 'Aquí podrás registrar todos los gastos del grupo. Cada persona puede agregar gastos individuales o grupales.')
+        );
+      }
+
+      function CHQPApp() {
+        const [activeTab, setActiveTab] = setSignal('participantes');
+        const [participants, setParticipants] = setSignal([
+          { id: 1, name: 'Juan Pérez' },
+          { id: 2, name: 'María García' },
+          { id: 3, name: 'Carlos López' },
+          { id: 4, name: 'Ana Martínez' },
+          { id: 5, name: 'Roberto Sánchez' },
+          { id: 6, name: 'Laura Fernández' },
+          { id: 7, name: 'Miguel Rodríguez' },
+          { id: 8, name: 'Sofía Díaz' },
+          { id: 9, name: 'Diego Torres' },
+          { id: 10, name: 'Elena Ruiz' },
+        ]);
+        const [isModalOpen, setIsModalOpen] = setSignal(false);
+        const [participantName, setParticipantName] = setSignal('');
+
+        const openModal = () => setIsModalOpen(true);
+        const closeModal = () => {
+          setIsModalOpen(false);
+          setParticipantName('');
+        };
+
+        const handleSubmit = e => {
+          e.preventDefault();
+          if (participantName().trim()) {
+            setParticipants([...participants(), { id: Date.now(), name: participantName().trim() }]);
+            closeModal();
+          }
+        };
+
+        const tabs = [
+          {
+            id: 'participantes',
+            label: '👥 Participantes',
+          },
+          {
+            id: 'contribuciones',
+            label: '💰 Contribuciones',
+          },
+          {
+            id: 'gastos',
+            label: '💸 Gastos',
+          },
+        ];
+
+        return h(
+          'div',
+          { className: 'container' },
+
+          h('h1', null, '¿Cuánto Hay Que Poner?'),
+
+          h(
+            'div',
+            { className: 'tabs-container' },
+            ...tabs.map(tab =>
+              h(
+                'button',
+                { className: () => `tab ${tab.id} ${activeTab() === tab.id ? 'active' : ''}`, onclick: () => setActiveTab(tab.id) },
+                tab.label
+              )
+            )
+          ),
+
+          h(
+            'div',
+            { className: 'content-box' },
+            h('div', { className: () => `tab-section ${activeTab() === 'participantes' ? '' : 'hidden'}` }, () =>
+              ParticipantesSection({
+                participants,
+                setParticipants,
+                isModalOpen,
+                participantName,
+                setParticipantName,
+                openModal,
+                closeModal,
+                handleSubmit,
+              })
+            ),
+
+            h('div', { className: () => `tab-section ${activeTab() === 'contribuciones' ? '' : 'hidden'}` }, ContribucionesSection()),
+
+            h('div', { className: () => `tab-section ${activeTab() === 'gastos' ? '' : 'hidden'}` }, GastosSection())
+          )
+        );
+      }
+
+      const root = document.body;
+      root.appendChild(CHQPApp());
+    </script>
+  </body>
+</html>
