@@ -210,7 +210,6 @@
 
       .participants-table td {
         border-bottom: 1px solid rgba(0, 172, 193, 0.1);
-        color: #00695c;
         font-size: 0.9rem;
       }
 
@@ -229,6 +228,17 @@
       .participant-amount-cell {
         font-style: italic;
         color: #00838f;
+        font-weight: bold;
+      }
+
+      .participant-amount-positive {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .participant-amount-zero-negative {
+        color: #27ae60;
+        font-weight: bold;
       }
 
       .delete-participant-btn {
@@ -628,7 +638,17 @@
                       'tr',
                       { key: participant.id },
                       h('td', { className: 'participant-name-cell' }, participant.name),
-                      h('td', { className: 'participant-amount-cell' }, 'cuanto tiene que poner'),
+                      h(
+                        'td',
+                        {
+                          className: `participant-amount-cell ${
+                            (participant.amount || 0) > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
+                          }`,
+                        },
+                        `${participant.amount > 0 ? 'Debe' : participant.amount < 0 ? 'Le deben' : ''} $ ${
+                          Math.abs(participant.amount) || '0'
+                        }`
+                      ),
                       h(
                         'td',
                         null,
@@ -733,24 +753,15 @@
         const handleSubmit = e => {
           e.preventDefault();
           if (participantName().trim()) {
-            setParticipants([...participants(), { id: Date.now(), name: participantName().trim() }]);
+            setParticipants([...participants(), { id: Date.now(), name: participantName().trim(), amount: 0 }]);
             closeModal();
           }
         };
 
         const tabs = [
-          {
-            id: 'participantes',
-            label: '👥 Participantes',
-          },
-          {
-            id: 'contribuciones',
-            label: '💰 Contribuciones',
-          },
-          {
-            id: 'gastos',
-            label: '💸 Gastos',
-          },
+          { id: 'participantes', label: '👥 Participantes' },
+          { id: 'contribuciones', label: '💰 Contribuciones' },
+          { id: 'gastos', label: '💸 Gastos' },
         ];
 
         return h(
