@@ -1205,7 +1205,7 @@
             )
           ),
           h('div', { className: 'container info-section' }, [
-            h('h2', null, 'Información y Preguntas Frecuentes'),
+            h('h2', null, 'Información'),
             h('div', { className: 'info-content' }, [
               h('h3', null, 'Objetivo'),
               h(
@@ -1230,12 +1230,12 @@
               ),
               h('p', null, `- Ganar una batalla te da un bonus de +${constants.wonBattleExpBonus * 100}% EXP ganada durante la misma.`),
               h('h3', null, 'Stats'),
-              h('p', null, 'A medida que HP, ATK y DEF aumentan, cada level-up da más de ese stat.'),
               h('p', null, '- ATK: Aumenta el daño que haces.'),
               h('p', null, '- DEF: Disminuye el daño que recibes.'),
               h('p', null, '- CRIT: Aumenta la probabilidad de hacer daño crítico.'),
               h('p', null, '- CRES: Disminuye el CRIT de los enemigos.'),
               h('p', null, '- HP: Es tu vida; si llega a cero, game over.'),
+              h('p', null, 'A medida que HP, ATK y DEF aumentan, cada level-up da más de ese stat. CRIT y CRES aumentan de forma fija.'),
             ]),
           ])
         );
