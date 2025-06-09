@@ -161,6 +161,31 @@
         box-shadow: 0 2px 8px rgba(0, 172, 193, 0.3);
       }
 
+      .add-contribution-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        background: linear-gradient(145deg, #00c853, #1b5e20);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+      }
+
+      .add-contribution-btn:hover {
+        background: linear-gradient(145deg, #1b5e20, #2e7d32);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 200, 83, 0.4);
+      }
+
+      .add-contribution-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 200, 83, 0.3);
+      }
+
       /* PARTICIPANTS TABLE */
       .participants-table-wrapper {
         max-height: 320px;
@@ -185,12 +210,12 @@
 
       .participants-table th:first-child,
       .participants-table td:first-child {
-        width: 33.33%;
+        width: 20%;
       }
 
       .participants-table th:nth-child(2),
       .participants-table td:nth-child(2) {
-        width: 56.67%;
+        width: auto;
       }
 
       .participants-table th:last-child,
@@ -226,7 +251,6 @@
       }
 
       .participant-amount-cell {
-        font-style: italic;
         color: #00838f;
         font-weight: bold;
       }
@@ -451,8 +475,14 @@
         }
 
         .add-participant-btn {
-          padding: 0.8rem 1.5rem;
-          font-size: 1rem;
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        .add-contribution-btn {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
           margin-top: 1rem;
         }
 
@@ -468,17 +498,17 @@
 
         .participants-table th:first-child,
         .participants-table td:first-child {
-          width: 30%;
+          width: 25%;
         }
 
         .participants-table th:nth-child(2),
         .participants-table td:nth-child(2) {
-          width: 55%;
+          width: auto;
         }
 
         .participants-table th:last-child,
         .participants-table td:last-child {
-          width: 15%;
+          width: 25%;
         }
 
         .participant-amount-cell {
@@ -499,17 +529,17 @@
 
         .participants-table th:first-child,
         .participants-table td:first-child {
-          width: 28%;
+          width: 25%;
         }
 
         .participants-table th:nth-child(2),
         .participants-table td:nth-child(2) {
-          width: 52%;
+          width: auto;
         }
 
         .participants-table th:last-child,
         .participants-table td:last-child {
-          width: 20%;
+          width: 25%;
         }
 
         .participant-amount-cell {
@@ -678,12 +708,81 @@
         );
       }
 
-      function ContribucionesSection() {
+      function ContribucionesSection({
+        contributions,
+        setContributions,
+        isContribModalOpen,
+        contributionName,
+        setContributionName,
+        contributionAmount,
+        setContributionAmount,
+        openContribModal,
+        closeContribModal,
+        handleContribSubmit,
+      }) {
+        const modalContent = h(
+          'form',
+          { className: 'modal-form', onsubmit: handleContribSubmit },
+          h('h3', { className: 'modal-title' }, 'Agregar Contribución'),
+          h('input', {
+            className: 'modal-input',
+            type: 'text',
+            placeholder: 'Nombre de la contribución',
+            oninput: e => setContributionName(e.target.value),
+            required: true,
+            autofocus: true,
+          }),
+          h('input', {
+            className: 'modal-input',
+            type: 'number',
+            placeholder: 'Monto de la contribución',
+            oninput: e => setContributionAmount(e.target.value),
+            required: true,
+          }),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeContribModal }, 'Cancelar'),
+            h('button', { type: 'submit', className: 'modal-btn modal-btn-primary' }, 'Agregar')
+          )
+        );
+
         return h(
           'div',
           { className: 'tab-content' },
-          h('h2', null, '💰 Contribuciones'),
-          h('p', null, 'Registra las contribuciones que cada persona ha hecho al fondo común del grupo.')
+          h('button', { className: 'add-contribution-btn', onclick: openContribModal }, '+ Agregar Contribución'),
+          contributions().length > 0 &&
+            h(
+              'div',
+              { className: 'participants-table-wrapper' },
+              h(
+                'table',
+                { className: 'participants-table' },
+                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Participantes'), h('th', null, 'Monto'))),
+                h(
+                  'tbody',
+                  null,
+                  ...contributions().map(contribution =>
+                    h(
+                      'tr',
+                      { key: contribution.id },
+                      h('td', { className: 'participant-name-cell' }, contribution.name),
+                      h('td', { className: 'participant-amount-cell' }, contribution.participants),
+                      h(
+                        'td',
+                        {
+                          className: `participant-amount-cell ${
+                            contribution.amount > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
+                          }`,
+                        },
+                        `$ ${Math.abs(contribution.amount) || '0'}`
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+          () => Modal({ isOpen: isContribModalOpen(), onClose: closeContribModal, children: modalContent })
         );
       }
 
@@ -698,9 +797,13 @@
 
       const defaultData = {
         participants: [],
+        contributions: [],
         activeTab: 'participantes',
         isModalOpen: false,
         participantName: '',
+        isContribModalOpen: false,
+        contributionName: '',
+        contributionAmount: '',
       };
 
       const loadSavedData = () => {
@@ -711,9 +814,13 @@
           const data = JSON.parse(savedData);
           return {
             participants: data.participants || defaultData.participants,
+            contributions: data.contributions || defaultData.contributions,
             activeTab: data.activeTab || defaultData.activeTab,
             isModalOpen: defaultData.isModalOpen, // Always start with modal closed
             participantName: defaultData.participantName, // Always start with empty name
+            isContribModalOpen: defaultData.isContribModalOpen,
+            contributionName: defaultData.contributionName,
+            contributionAmount: defaultData.contributionAmount,
           };
         } catch (error) {
           console.error('Error loading saved data:', error);
@@ -726,14 +833,19 @@
 
         const [activeTab, setActiveTab] = setSignal(savedData.activeTab);
         const [participants, setParticipants] = setSignal(savedData.participants);
+        const [contributions, setContributions] = setSignal(savedData.contributions);
         const [isModalOpen, setIsModalOpen] = setSignal(savedData.isModalOpen);
         const [participantName, setParticipantName] = setSignal(savedData.participantName);
+        const [isContribModalOpen, setIsContribModalOpen] = setSignal(savedData.isContribModalOpen);
+        const [contributionName, setContributionName] = setSignal(savedData.contributionName);
+        const [contributionAmount, setContributionAmount] = setSignal(savedData.contributionAmount);
         const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
         const [participantToDelete, setParticipantToDelete] = setSignal(null);
 
         setEffect(() => {
           const saveData = {
             participants: participants(),
+            contributions: contributions(),
             activeTab: activeTab(),
           };
 
@@ -755,6 +867,23 @@
           if (participantName().trim()) {
             setParticipants([...participants(), { id: Date.now(), name: participantName().trim(), amount: 0 }]);
             closeModal();
+          }
+        };
+
+        const openContribModal = () => setIsContribModalOpen(true);
+        const closeContribModal = () => {
+          setIsContribModalOpen(false);
+          setContributionName('');
+          setContributionAmount('');
+        };
+
+        const handleContribSubmit = e => {
+          e.preventDefault();
+          const name = contributionName().trim();
+          const amount = parseFloat(contributionAmount()) || 0;
+          if (name) {
+            setContributions([...contributions(), { id: Date.now(), name, amount, participants: 'Placeholder' }]);
+            closeContribModal();
           }
         };
 
@@ -802,7 +931,20 @@
               })
             ),
 
-            h('div', { className: () => `tab-section ${activeTab() === 'contribuciones' ? '' : 'hidden'}` }, ContribucionesSection()),
+            h('div', { className: () => `tab-section ${activeTab() === 'contribuciones' ? '' : 'hidden'}` }, () =>
+              ContribucionesSection({
+                contributions,
+                setContributions,
+                isContribModalOpen,
+                contributionName,
+                setContributionName,
+                contributionAmount,
+                setContributionAmount,
+                openContribModal,
+                closeContribModal,
+                handleContribSubmit,
+              })
+            ),
 
             h('div', { className: () => `tab-section ${activeTab() === 'gastos' ? '' : 'hidden'}` }, GastosSection())
           )
