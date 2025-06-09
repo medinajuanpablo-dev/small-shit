@@ -97,7 +97,7 @@
       /* CONTENT */
       .content-box {
         background: rgba(142, 36, 170, 0.05);
-        padding: clamp(1rem, 3vw, 1.5rem);
+        padding: clamp(0.5rem, 3vw, 1.5rem);
         border-radius: 15px;
         border: 2px solid rgba(142, 36, 170, 0.1);
         min-height: clamp(200px, 35vh, 250px);
@@ -163,7 +163,7 @@
 
       /* PARTICIPANTS TABLE */
       .participants-table-wrapper {
-        max-height: 300px;
+        max-height: 320px;
         overflow-y: auto;
         border-radius: 10px;
         margin-top: 1.5rem;
@@ -188,9 +188,14 @@
         width: 33.33%;
       }
 
+      .participants-table th:nth-child(2),
+      .participants-table td:nth-child(2) {
+        width: 56.67%;
+      }
+
       .participants-table th:last-child,
       .participants-table td:last-child {
-        width: 66.67%;
+        width: 10%;
       }
 
       .participants-table th {
@@ -224,6 +229,33 @@
       .participant-amount-cell {
         font-style: italic;
         color: #00838f;
+      }
+
+      .delete-participant-btn {
+        margin: 0 auto;
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .delete-participant-btn:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+        transform: scale(1.1);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .delete-participant-btn:active {
+        transform: scale(0.95);
       }
 
       /* MODAL */
@@ -341,6 +373,13 @@
         color: #333;
       }
 
+      .confirm-warning-text {
+        text-align: center;
+        margin: 0;
+        color: #4a148c;
+        font-size: 1.1rem;
+      }
+
       @keyframes modalSlideIn {
         from {
           opacity: 0;
@@ -381,7 +420,7 @@
 
         .participants-table th,
         .participants-table td {
-          padding: 0.8rem 0.5rem;
+          padding: 0.6rem 0.3rem;
           font-size: 0.9rem;
         }
 
@@ -392,8 +431,8 @@
 
       @media (max-width: 480px) {
         .container {
-          padding: 1rem;
-          width: 98%;
+          padding: 0.5rem;
+          width: 100%;
         }
 
         .tab {
@@ -409,12 +448,27 @@
 
         .participants-table th,
         .participants-table td {
-          padding: 0.6rem 0.3rem;
+          padding: 0.4rem 0.15rem;
           font-size: 0.85rem;
         }
 
         .participants-table th {
           font-size: 0.9rem;
+        }
+
+        .participants-table th:first-child,
+        .participants-table td:first-child {
+          width: 30%;
+        }
+
+        .participants-table th:nth-child(2),
+        .participants-table td:nth-child(2) {
+          width: 55%;
+        }
+
+        .participants-table th:last-child,
+        .participants-table td:last-child {
+          width: 15%;
         }
 
         .participant-amount-cell {
@@ -425,12 +479,27 @@
       @media (max-width: 360px) {
         .participants-table th,
         .participants-table td {
-          padding: 0.5rem 0.2rem;
+          padding: 0.3rem 0.1rem;
           font-size: 0.75rem;
         }
 
         .participants-table th {
           font-size: 0.8rem;
+        }
+
+        .participants-table th:first-child,
+        .participants-table td:first-child {
+          width: 28%;
+        }
+
+        .participants-table th:nth-child(2),
+        .participants-table td:nth-child(2) {
+          width: 52%;
+        }
+
+        .participants-table th:last-child,
+        .participants-table td:last-child {
+          width: 20%;
         }
 
         .participant-amount-cell {
@@ -441,13 +510,19 @@
           padding: 0.7rem 1.2rem;
           font-size: 0.9rem;
         }
+
+        .delete-participant-btn {
+          width: 20px;
+          height: 20px;
+          font-size: 0.7rem;
+        }
       }
     </style>
   </head>
   <body>
     <script type="module">
       //prettier-ignore
-      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+      const { setSignal, setEffect, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
 
       function Modal({ isOpen, onClose, children }) {
         if (!isOpen) return null;
@@ -465,15 +540,54 @@
         );
       }
 
+      function ConfirmWarning({ isOpen, onClose, onConfirm, participantName }) {
+        const confirmContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '⚠️ Confirmar Eliminación'),
+          h('p', { className: 'confirm-warning-text' }, `¿Estás seguro que deseas eliminar a ${participantName}?`),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-primary', onclick: onConfirm }, 'Eliminar')
+          )
+        );
+
+        return Modal({ isOpen, onClose, children: confirmContent });
+      }
+
       function ParticipantesSection({
         participants,
         setParticipants,
         isModalOpen,
+        participantName,
         setParticipantName,
         openModal,
         closeModal,
         handleSubmit,
+        isConfirmOpen,
+        setIsConfirmOpen,
+        participantToDelete,
+        setParticipantToDelete,
       }) {
+        const showDeleteConfirm = participant => {
+          setParticipantToDelete(participant);
+          setIsConfirmOpen(true);
+        };
+
+        const closeDeleteConfirm = () => {
+          setIsConfirmOpen(false);
+          setParticipantToDelete(null);
+        };
+
+        const confirmDelete = () => {
+          if (participantToDelete()) {
+            setParticipants(participants().filter(p => p.id !== participantToDelete().id));
+          }
+          closeDeleteConfirm();
+        };
+
         const modalContent = h(
           'form',
           { className: 'modal-form', onsubmit: handleSubmit },
@@ -505,7 +619,7 @@
               h(
                 'table',
                 { className: 'participants-table' },
-                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'))),
+                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'), h('th', null, 'Borrar'))),
                 h(
                   'tbody',
                   null,
@@ -514,13 +628,33 @@
                       'tr',
                       { key: participant.id },
                       h('td', { className: 'participant-name-cell' }, participant.name),
-                      h('td', { className: 'participant-amount-cell' }, 'cuanto tiene que poner')
+                      h('td', { className: 'participant-amount-cell' }, 'cuanto tiene que poner'),
+                      h(
+                        'td',
+                        null,
+                        h(
+                          'button',
+                          {
+                            className: 'delete-participant-btn',
+                            onclick: () => showDeleteConfirm(participant),
+                            title: 'Eliminar participante',
+                          },
+                          '✕'
+                        )
+                      )
                     )
                   )
                 )
               )
             ),
-          () => Modal({ isOpen: isModalOpen(), onClose: closeModal, children: modalContent })
+          () => Modal({ isOpen: isModalOpen(), onClose: closeModal, children: modalContent }),
+          () =>
+            ConfirmWarning({
+              isOpen: isConfirmOpen(),
+              onClose: closeDeleteConfirm,
+              onConfirm: confirmDelete,
+              participantName: participantToDelete()?.name || '',
+            })
         );
       }
 
@@ -542,22 +676,53 @@
         );
       }
 
+      const defaultData = {
+        participants: [],
+        activeTab: 'participantes',
+        isModalOpen: false,
+        participantName: '',
+      };
+
+      const loadSavedData = () => {
+        try {
+          const savedData = localStorage.getItem('chqpSave');
+          if (!savedData) return defaultData;
+
+          const data = JSON.parse(savedData);
+          return {
+            participants: data.participants || defaultData.participants,
+            activeTab: data.activeTab || defaultData.activeTab,
+            isModalOpen: defaultData.isModalOpen, // Always start with modal closed
+            participantName: defaultData.participantName, // Always start with empty name
+          };
+        } catch (error) {
+          console.error('Error loading saved data:', error);
+          return defaultData;
+        }
+      };
+
       function CHQPApp() {
-        const [activeTab, setActiveTab] = setSignal('participantes');
-        const [participants, setParticipants] = setSignal([
-          { id: 1, name: 'Juan Pérez' },
-          { id: 2, name: 'María García' },
-          { id: 3, name: 'Carlos López' },
-          { id: 4, name: 'Ana Martínez' },
-          { id: 5, name: 'Roberto Sánchez' },
-          { id: 6, name: 'Laura Fernández' },
-          { id: 7, name: 'Miguel Rodríguez' },
-          { id: 8, name: 'Sofía Díaz' },
-          { id: 9, name: 'Diego Torres' },
-          { id: 10, name: 'Elena Ruiz' },
-        ]);
-        const [isModalOpen, setIsModalOpen] = setSignal(false);
-        const [participantName, setParticipantName] = setSignal('');
+        const savedData = loadSavedData();
+
+        const [activeTab, setActiveTab] = setSignal(savedData.activeTab);
+        const [participants, setParticipants] = setSignal(savedData.participants);
+        const [isModalOpen, setIsModalOpen] = setSignal(savedData.isModalOpen);
+        const [participantName, setParticipantName] = setSignal(savedData.participantName);
+        const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
+        const [participantToDelete, setParticipantToDelete] = setSignal(null);
+
+        setEffect(() => {
+          const saveData = {
+            participants: participants(),
+            activeTab: activeTab(),
+          };
+
+          try {
+            localStorage.setItem('chqpSave', JSON.stringify(saveData));
+          } catch (error) {
+            console.error('Error saving data:', error);
+          }
+        });
 
         const openModal = () => setIsModalOpen(true);
         const closeModal = () => {
@@ -619,6 +784,10 @@
                 openModal,
                 closeModal,
                 handleSubmit,
+                isConfirmOpen,
+                setIsConfirmOpen,
+                participantToDelete,
+                setParticipantToDelete,
               })
             ),
 
