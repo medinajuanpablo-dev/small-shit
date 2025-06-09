@@ -550,12 +550,23 @@
         { name: 'Zombie 🧟‍♂️', baseHp: 20, baseAtk: 12, baseDef: 12, baseDex: 2, sinceLevel: 5, untilLevel: 10 },
         { name: 'Demonio 😈', baseHp: 50, baseAtk: 15, baseDef: 5, baseDex: 15, sinceLevel: 7 },
         { name: 'Horror ▓', baseHp: 20, baseAtk: 17, baseDef: 10, baseDex: 33, sinceLevel: 9 },
-        { name: 'Lich 💀', baseHp: 50, baseAtk: 20, baseDef: 15, baseDex: 20, sinceLevel: 11 },
-        { name: 'Dragón 🐉', baseHp: 120, baseAtk: 20, baseDef: 20, baseDex: 5, sinceLevel: 13 },
+        { name: 'Lich 💀', baseHp: 35, baseAtk: 20, baseDef: 10, baseDex: 20, sinceLevel: 11 },
+        { name: 'Dragón 🐉', baseHp: 100, baseAtk: 20, baseDef: 15, baseDex: 5, sinceLevel: 13 },
       ];
       const difficultiesConfigs = {
         blessed: {
           name: 'Bendecido',
+          statsUpgrades: {
+            atk: [7, 9, 11, 14, 18],
+            def: [7, 9, 11, 14, 18],
+            dex: 7,
+            cres: 20,
+            hp: [70, 100, 150, 225],
+          },
+          className: 'success',
+        },
+        normal: {
+          name: 'Normal',
           statsUpgrades: {
             atk: [5, 7, 9, 12, 15],
             def: [5, 7, 9, 12, 15],
@@ -563,10 +574,10 @@
             cres: 15,
             hp: [50, 85, 125, 200],
           },
-          className: 'success',
+          className: 'info',
         },
-        normal: {
-          name: 'Normal',
+        heroic: {
+          name: 'Heroico',
           statsUpgrades: {
             atk: [4, 5, 7, 9, 11],
             def: [4, 5, 7, 9, 11],
@@ -574,27 +585,16 @@
             cres: 10,
             hp: [40, 70, 100, 150],
           },
-          className: 'info',
+          className: 'warning',
         },
-        heroic: {
-          name: 'Heroico',
+        legendary: {
+          name: 'Legendario',
           statsUpgrades: {
             atk: [4, 5, 6, 7, 9],
             def: [4, 5, 6, 7, 9],
             dex: 3,
             cres: 7,
             hp: [30, 50, 70, 100],
-          },
-          className: 'warning',
-        },
-        legendary: {
-          name: 'Legendario',
-          statsUpgrades: {
-            atk: [3, 4, 5, 6, 7],
-            def: [3, 4, 5, 6, 7],
-            dex: 2,
-            cres: 5,
-            hp: [25, 35, 50, 75],
           },
           className: 'danger',
         },
@@ -798,7 +798,7 @@
 
         const calculateExp = monster => {
           const baseExp = monster.maxHp * monster.atk * monster.def * Math.max(1, monster.dex / 10);
-          let exp = baseExp / 100;
+          let exp = baseExp / 85;
 
           console.log('calculateExp', { monster, baseExp, exp });
 
@@ -1196,8 +1196,8 @@
               ),
               h('button', { onclick: () => levelUp('atk') }, 'Aumentar ATK'),
               h('button', { onclick: () => levelUp('def') }, 'Aumentar DEF'),
-              h('button', { onclick: () => levelUp('dex') }, 'Aumentar CRIT'),
-              h('button', { onclick: () => levelUp('cres') }, 'Aumentar CRES'),
+              h('button', { className: () => (hero().dex >= 100 ? 'hidden' : ''), onclick: () => levelUp('dex') }, 'Aumentar CRIT'),
+              h('button', { className: () => (hero().cres >= 100 ? 'hidden' : ''), onclick: () => levelUp('cres') }, 'Aumentar CRES'),
               h('button', { onclick: () => levelUp('hp') }, 'Aumentar HP'),
             ]),
             h('button', { className: 'btn-escape', onclick: handleRestart }, () =>
@@ -1233,7 +1233,7 @@
               h('p', null, '- ATK: Aumenta el daño que haces.'),
               h('p', null, '- DEF: Disminuye el daño que recibes.'),
               h('p', null, '- CRIT: Aumenta la probabilidad de hacer daño crítico.'),
-              h('p', null, '- CRES: Disminuye el CRIT de los enemigos.'),
+              h('p', null, '- CRES: Disminuye la probabilidad de que un enemigo realice un ataque crítico.'),
               h('p', null, '- HP: Es tu vida; si llega a cero, game over.'),
               h('p', null, 'A medida que HP, ATK y DEF aumentan, cada level-up da más de ese stat. CRIT y CRES aumentan de forma fija.'),
             ]),

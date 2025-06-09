@@ -571,6 +571,62 @@
           font-size: 0.7rem;
         }
       }
+
+      .participants-selector {
+        margin: 1rem 0;
+      }
+
+      .participants-label {
+        display: block;
+        color: #4a148c;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+      }
+
+      .participants-checkboxes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-height: 150px;
+        overflow-y: auto;
+        padding: 0.5rem;
+        border: 2px solid rgba(142, 36, 170, 0.2);
+        border-radius: 8px;
+        background: rgba(142, 36, 170, 0.05);
+      }
+
+      .participant-checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.3rem;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+      }
+
+      .participant-checkbox-label:hover {
+        background: rgba(142, 36, 170, 0.1);
+      }
+
+      .participant-checkbox-label input[type='checkbox'] {
+        width: 16px;
+        height: 16px;
+        accent-color: #8e24aa;
+      }
+
+      .participant-checkbox-label span {
+        color: #4a148c;
+        font-weight: 500;
+      }
+
+      .no-participants {
+        color: #666;
+        font-style: italic;
+        text-align: center;
+        margin: 0.5rem 0;
+      }
     </style>
   </head>
   <body>
@@ -735,12 +791,22 @@
         handleContribSubmit,
         editingContribution,
         setEditingContribution,
+        contributionParticipants,
+        setContributionParticipants,
+        participants,
       }) {
+        const getParticipantNames = participantIds => {
+          if (!participantIds || participantIds.length === 0) return 'Ninguno';
+          const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
+          return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
+        };
+
         const modalContent = h(
           'form',
           { className: 'modal-form', onsubmit: handleContribSubmit },
           h('h3', { className: 'modal-title' }, editingContribution() ? 'Editar Contribución' : 'Agregar Contribución'),
           h('input', {
+            id: 'contribution-name',
             className: 'modal-input',
             type: 'text',
             placeholder: 'Nombre de la contribución',
@@ -749,12 +815,44 @@
             autofocus: true,
           }),
           h('input', {
+            id: 'contribution-amount',
             className: 'modal-input',
             type: 'number',
             placeholder: 'Monto de la contribución',
             oninput: e => setContributionAmount(e.target.value),
             required: true,
           }),
+          h(
+            'div',
+            { className: 'participants-selector' },
+            h('label', { className: 'participants-label' }, 'Participantes:'),
+            participants().length > 0
+              ? h(
+                  'div',
+                  { className: 'participants-checkboxes' },
+                  ...participants().map(participant =>
+                    h(
+                      'label',
+                      { className: 'participant-checkbox-label' },
+                      h('input', {
+                        id: `participant-checkbox-${participant.id}`,
+                        type: 'checkbox',
+                        onchange: e => {
+                          const isChecked = e.target.checked;
+                          const currentSelected = contributionParticipants();
+                          if (isChecked) {
+                            setContributionParticipants([...currentSelected, participant.id]);
+                          } else {
+                            setContributionParticipants(currentSelected.filter(id => id !== participant.id));
+                          }
+                        },
+                      }),
+                      h('span', null, participant.name)
+                    )
+                  )
+                )
+              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles')
+          ),
           h(
             'div',
             { className: 'modal-buttons' },
@@ -788,7 +886,7 @@
                         title: 'Clic para editar',
                       },
                       h('td', { className: 'participant-name-cell' }, contribution.name),
-                      h('td', { className: 'participant-amount-cell' }, contribution.participants),
+                      h('td', { className: 'participant-amount-cell' }, getParticipantNames(contribution.participants)),
                       h(
                         'td',
                         {
@@ -825,6 +923,7 @@
         isContribModalOpen: false,
         contributionName: '',
         contributionAmount: '',
+        contributionParticipants: [],
         editingContribution: null,
       };
 
@@ -843,6 +942,7 @@
             isContribModalOpen: defaultData.isContribModalOpen,
             contributionName: defaultData.contributionName,
             contributionAmount: defaultData.contributionAmount,
+            contributionParticipants: defaultData.contributionParticipants,
             editingContribution: defaultData.editingContribution,
           };
         } catch (error) {
@@ -862,6 +962,7 @@
         const [isContribModalOpen, setIsContribModalOpen] = setSignal(savedData.isContribModalOpen);
         const [contributionName, setContributionName] = setSignal(savedData.contributionName);
         const [contributionAmount, setContributionAmount] = setSignal(savedData.contributionAmount);
+        const [contributionParticipants, setContributionParticipants] = setSignal(savedData.contributionParticipants);
         const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
         const [participantToDelete, setParticipantToDelete] = setSignal(null);
         const [editingContribution, setEditingContribution] = setSignal(savedData.editingContribution);
@@ -899,10 +1000,12 @@
             setEditingContribution(contribution);
             setContributionName(contribution.name);
             setContributionAmount(contribution.amount);
+            setContributionParticipants(contribution.participants || []);
           } else {
             setEditingContribution(null);
             setContributionName('');
             setContributionAmount('');
+            setContributionParticipants([]);
           }
           setIsContribModalOpen(true);
         };
@@ -911,6 +1014,7 @@
           setIsContribModalOpen(false);
           setContributionName('');
           setContributionAmount('');
+          setContributionParticipants([]);
           setEditingContribution(null);
         };
 
@@ -918,16 +1022,39 @@
           e.preventDefault();
           const name = contributionName().trim();
           const amount = parseFloat(contributionAmount()) || 0;
+          const selectedParticipants = contributionParticipants();
           if (name) {
             const editing = editingContribution();
             if (editing) {
-              setContributions(contributions().map(c => (c.id === editing.id ? { ...c, name, amount } : c)));
+              setContributions(
+                contributions().map(c => (c.id === editing.id ? { ...c, name, amount, participants: selectedParticipants } : c))
+              );
             } else {
-              setContributions([...contributions(), { id: Date.now(), name, amount, participants: 'Placeholder' }]);
+              setContributions([...contributions(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
             }
             closeContribModal();
           }
         };
+
+        // Effect para sincronizar modal de contribuciones
+        setEffect(() => {
+          if (isContribModalOpen()) {
+            setTimeout(() => {
+              const contributionNameInput = document.querySelector('#contribution-name');
+              const contributionAmountInput = document.querySelector('#contribution-amount');
+              const checkboxes = document.querySelectorAll('[id^="participant-checkbox-"]');
+
+              if (contributionNameInput && contributionAmountInput) {
+                contributionNameInput.value = contributionName();
+                contributionAmountInput.value = contributionAmount();
+                checkboxes.forEach(checkbox => {
+                  const participantId = parseInt(checkbox.id.replace('participant-checkbox-', ''));
+                  checkbox.checked = contributionParticipants().includes(participantId);
+                });
+              }
+            }, 10);
+          }
+        });
 
         const tabs = [
           { id: 'participantes', label: '👥 Participantes' },
@@ -987,6 +1114,9 @@
                 handleContribSubmit,
                 editingContribution,
                 setEditingContribution,
+                contributionParticipants,
+                setContributionParticipants,
+                participants,
               })
             ),
 
