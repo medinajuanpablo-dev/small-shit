@@ -187,6 +187,31 @@
         box-shadow: 0 2px 8px rgba(0, 200, 83, 0.3);
       }
 
+      .add-gasto-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        background: linear-gradient(145deg, #ff9800, #e65100);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+      }
+
+      .add-gasto-btn:hover {
+        background: linear-gradient(145deg, #e65100, #d84315);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+      }
+
+      .add-gasto-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+      }
+
       /* TABLES */
       .participants-table-wrapper {
         max-height: 320px;
@@ -275,35 +300,12 @@
         font-weight: bold;
       }
 
-      .delete-participant-btn {
-        margin: 0 auto;
-        background: linear-gradient(145deg, #e74c3c, #c0392b);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .delete-participant-btn:hover {
-        background: linear-gradient(145deg, #c0392b, #a93226);
-        transform: scale(1.1);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-      }
-
-      .delete-participant-btn:active {
-        transform: scale(0.95);
-      }
-
       .contributions-table th {
         background: linear-gradient(145deg, #00c853, #009624);
+      }
+
+      .gastos-table th {
+        background: linear-gradient(145deg, #ff9800, #e65100);
       }
 
       /* MODAL */
@@ -514,6 +516,12 @@
           margin-top: 1rem;
         }
 
+        .add-gasto-btn {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
         .participants-table th,
         .participants-table td {
           padding: 0.4rem 0.15rem;
@@ -581,12 +589,6 @@
         .add-participant-btn {
           padding: 0.7rem 1.2rem;
           font-size: 0.9rem;
-        }
-
-        .delete-participant-btn {
-          width: 20px;
-          height: 20px;
-          font-size: 0.7rem;
         }
       }
 
@@ -712,6 +714,14 @@
         setIsConfirmOpen,
         participantToDelete,
         setParticipantToDelete,
+        openParticipantDetail,
+        isParticipantDetailOpen,
+        selectedParticipant,
+        closeParticipantDetail,
+        showParticipantDeleteConfirm,
+        isParticipantConfirmOpen,
+        closeParticipantDeleteConfirm,
+        confirmParticipantDelete,
       }) {
         const showDeleteConfirm = participant => {
           setParticipantToDelete(participant);
@@ -766,14 +776,19 @@
               h(
                 'table',
                 { className: 'participants-table' },
-                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'), h('th', null, 'Borrar'))),
+                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'))),
                 h(
                   'tbody',
                   null,
                   ...participants().map(participant =>
                     h(
                       'tr',
-                      { key: participant.id },
+                      {
+                        key: participant.id,
+                        className: 'clickable-row',
+                        onclick: () => openParticipantDetail(participant),
+                        title: 'Clic para ver detalles',
+                      },
                       h('td', { className: 'participant-name-cell' }, participant.name),
                       h(
                         'td',
@@ -785,19 +800,6 @@
                         `${participant.amount > 0 ? 'Debe' : participant.amount < 0 ? 'Le deben' : ''} $ ${
                           Math.abs(participant.amount) || '0'
                         }`
-                      ),
-                      h(
-                        'td',
-                        null,
-                        h(
-                          'button',
-                          {
-                            className: 'delete-participant-btn',
-                            onclick: () => showDeleteConfirm(participant),
-                            title: 'Eliminar participante',
-                          },
-                          '✕'
-                        )
                       )
                     )
                   )
@@ -811,6 +813,36 @@
               onClose: closeDeleteConfirm,
               onConfirm: confirmDelete,
               participantName: participantToDelete()?.name || '',
+            }),
+          () =>
+            selectedParticipant() &&
+            Modal({
+              isOpen: isParticipantDetailOpen(),
+              onClose: closeParticipantDetail,
+              children: h(
+                'div',
+                { className: 'modal-form' },
+                h('h3', { className: 'modal-title' }, `📊 Detalles de ${selectedParticipant()?.name}`),
+                h('p', null, 'Contribuciones y gastos de este participante:'),
+                h('p', { className: 'confirm-warning-text' }, '[Tabla placeholder - próximamente]'),
+                h(
+                  'div',
+                  { className: 'modal-buttons' },
+                  h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeParticipantDetail }, 'Cerrar'),
+                  h(
+                    'button',
+                    { type: 'button', className: 'modal-btn modal-btn-delete', onclick: showParticipantDeleteConfirm },
+                    'Eliminar Participante'
+                  )
+                )
+              ),
+            }),
+          () =>
+            ConfirmWarning({
+              isOpen: isParticipantConfirmOpen(),
+              onClose: closeParticipantDeleteConfirm,
+              onConfirm: confirmParticipantDelete,
+              participantName: selectedParticipant()?.name || '',
             })
         );
       }
@@ -967,26 +999,164 @@
         );
       }
 
-      function GastosSection() {
+      function GastosSection({
+        gastos,
+        setGastos,
+        isGastoModalOpen,
+        gastoName,
+        setGastoName,
+        gastoAmount,
+        setGastoAmount,
+        openGastoModal,
+        closeGastoModal,
+        handleGastoSubmit,
+        editingGasto,
+        setEditingGasto,
+        gastoParticipants,
+        setGastoParticipants,
+        participants,
+        showGastoDeleteConfirm,
+        isGastoConfirmOpen,
+        closeGastoDeleteConfirm,
+        confirmGastoDelete,
+      }) {
+        const getParticipantNames = participantIds => {
+          if (!participantIds || participantIds.length === 0) return 'Ninguno';
+          const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
+          return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
+        };
+
+        const isGastoFormValid = () => {
+          const name = gastoName().trim();
+          const amount = parseFloat(gastoAmount()) || 0;
+          const selectedParticipants = gastoParticipants();
+
+          return name.length > 0 && amount >= 1 && selectedParticipants.length > 0;
+        };
+
+        const modalContent = h(
+          'form',
+          { className: 'modal-form', onsubmit: handleGastoSubmit },
+          h('h3', { className: 'modal-title' }, editingGasto() ? 'Editar Gasto' : 'Agregar Gasto'),
+          h('input', {
+            id: 'gasto-name',
+            className: 'modal-input',
+            type: 'text',
+            placeholder: 'Nombre del gasto',
+            oninput: e => setGastoName(e.target.value),
+            required: true,
+            maxlength: 20,
+          }),
+          h('input', {
+            id: 'gasto-amount',
+            className: 'modal-input',
+            type: 'number',
+            placeholder: 'Monto del gasto',
+            oninput: e => setGastoAmount(e.target.value),
+            required: true,
+          }),
+          h(
+            'div',
+            { className: 'participants-selector' },
+            h('label', { className: 'participants-label' }, 'Incluidos:'),
+            participants().length > 0
+              ? h(
+                  'div',
+                  { className: 'participants-checkboxes' },
+                  ...participants().map(participant =>
+                    h(
+                      'label',
+                      { className: 'participant-checkbox-label' },
+                      h('input', {
+                        id: `gasto-participant-checkbox-${participant.id}`,
+                        type: 'checkbox',
+                        onchange: e => {
+                          const isChecked = e.target.checked;
+                          const currentSelected = gastoParticipants();
+                          if (isChecked) {
+                            setGastoParticipants([...currentSelected, participant.id]);
+                          } else {
+                            setGastoParticipants(currentSelected.filter(id => id !== participant.id));
+                          }
+                        },
+                      }),
+                      h('span', null, participant.name)
+                    )
+                  )
+                )
+              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles')
+          ),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeGastoModal }, 'Cancelar'),
+            editingGasto() &&
+              h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: showGastoDeleteConfirm }, 'Eliminar'),
+            h(
+              'button',
+              {
+                type: 'submit',
+                className: () => `modal-btn modal-btn-primary ${!isGastoFormValid() ? 'disabled' : ''}`,
+              },
+              editingGasto() ? 'Guardar' : 'Agregar'
+            )
+          )
+        );
+
         return h(
           'div',
           { className: 'tab-content' },
-          h('h2', null, '💸 Gastos'),
-          h('p', null, 'Aquí podrás registrar todos los gastos del grupo. Cada persona puede agregar gastos individuales o grupales.')
+          h('button', { className: 'add-gasto-btn', onclick: () => openGastoModal() }, '+ Agregar Gasto'),
+          () =>
+            gastos().length > 0
+              ? h(
+                  'div',
+                  { className: 'participants-table-wrapper' },
+                  h(
+                    'table',
+                    { className: 'participants-table gastos-table' },
+                    h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Incluidos'), h('th', null, 'Monto'))),
+                    h(
+                      'tbody',
+                      null,
+                      ...gastos().map(gasto =>
+                        h(
+                          'tr',
+                          {
+                            key: gasto.id,
+                            className: 'clickable-row',
+                            onclick: () => openGastoModal(gasto),
+                            title: 'Clic para editar',
+                          },
+                          h('td', { className: 'participant-name-cell' }, gasto.name),
+                          h('td', { className: 'participant-amount-cell' }, getParticipantNames(gasto.participants)),
+                          h(
+                            'td',
+                            { className: `participant-amount-cell participant-amount-zero-negative` },
+                            `$ ${Math.abs(gasto.amount) || '0'}`
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              : null,
+          () => Modal({ isOpen: isGastoModalOpen(), onClose: closeGastoModal, children: modalContent }),
+          () =>
+            ConfirmWarning({
+              isOpen: isGastoConfirmOpen(),
+              onClose: closeGastoDeleteConfirm,
+              onConfirm: confirmGastoDelete,
+              participantName: editingGasto()?.name || '',
+            })
         );
       }
 
       const defaultData = {
         participants: [],
         contributions: [],
+        gastos: [],
         activeTab: 'participantes',
-        isModalOpen: false,
-        participantName: '',
-        isContribModalOpen: false,
-        contributionName: '',
-        contributionAmount: '',
-        contributionParticipants: [],
-        editingContribution: null,
       };
 
       const loadSavedData = () => {
@@ -998,14 +1168,8 @@
           return {
             participants: data.participants || defaultData.participants,
             contributions: data.contributions || defaultData.contributions,
+            gastos: data.gastos || defaultData.gastos,
             activeTab: data.activeTab || defaultData.activeTab,
-            isModalOpen: defaultData.isModalOpen, // Always start with modal closed
-            participantName: defaultData.participantName, // Always start with empty name
-            isContribModalOpen: defaultData.isContribModalOpen,
-            contributionName: defaultData.contributionName,
-            contributionAmount: defaultData.contributionAmount,
-            contributionParticipants: defaultData.contributionParticipants,
-            editingContribution: defaultData.editingContribution,
           };
         } catch (error) {
           console.error('Error loading saved data:', error);
@@ -1016,24 +1180,42 @@
       function CHQPApp() {
         const savedData = loadSavedData();
 
+        // Datos principales que se persisten
         const [activeTab, setActiveTab] = setSignal(savedData.activeTab);
         const [participants, setParticipants] = setSignal(savedData.participants);
         const [contributions, setContributions] = setSignal(savedData.contributions);
-        const [isModalOpen, setIsModalOpen] = setSignal(savedData.isModalOpen);
-        const [participantName, setParticipantName] = setSignal(savedData.participantName);
-        const [isContribModalOpen, setIsContribModalOpen] = setSignal(savedData.isContribModalOpen);
-        const [contributionName, setContributionName] = setSignal(savedData.contributionName);
-        const [contributionAmount, setContributionAmount] = setSignal(savedData.contributionAmount);
-        const [contributionParticipants, setContributionParticipants] = setSignal(savedData.contributionParticipants);
+        const [gastos, setGastos] = setSignal(savedData.gastos);
+
+        // Estados de modales y formularios (siempre empiezan vacíos/cerrados)
+        const [isModalOpen, setIsModalOpen] = setSignal(false);
+        const [participantName, setParticipantName] = setSignal('');
         const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
         const [participantToDelete, setParticipantToDelete] = setSignal(null);
-        const [editingContribution, setEditingContribution] = setSignal(savedData.editingContribution);
+        const [isParticipantDetailOpen, setIsParticipantDetailOpen] = setSignal(false);
+        const [selectedParticipant, setSelectedParticipant] = setSignal(null);
+        const [isParticipantConfirmOpen, setIsParticipantConfirmOpen] = setSignal(false);
+
+        // Estados de contribuciones
+        const [isContribModalOpen, setIsContribModalOpen] = setSignal(false);
+        const [contributionName, setContributionName] = setSignal('');
+        const [contributionAmount, setContributionAmount] = setSignal('');
+        const [contributionParticipants, setContributionParticipants] = setSignal([]);
+        const [editingContribution, setEditingContribution] = setSignal(null);
         const [isContribConfirmOpen, setIsContribConfirmOpen] = setSignal(false);
+
+        // Estados de gastos
+        const [isGastoModalOpen, setIsGastoModalOpen] = setSignal(false);
+        const [gastoName, setGastoName] = setSignal('');
+        const [gastoAmount, setGastoAmount] = setSignal('');
+        const [gastoParticipants, setGastoParticipants] = setSignal([]);
+        const [editingGasto, setEditingGasto] = setSignal(null);
+        const [isGastoConfirmOpen, setIsGastoConfirmOpen] = setSignal(false);
 
         setEffect(() => {
           const saveData = {
             participants: participants(),
             contributions: contributions(),
+            gastos: gastos(),
             activeTab: activeTab(),
           };
 
@@ -1045,6 +1227,34 @@
         });
 
         const openModal = () => setIsModalOpen(true);
+
+        const openParticipantDetail = participant => {
+          setSelectedParticipant(participant);
+          setIsParticipantDetailOpen(true);
+        };
+
+        const closeParticipantDetail = () => {
+          setIsParticipantDetailOpen(false);
+          setSelectedParticipant(null);
+        };
+
+        const showParticipantDeleteConfirm = () => {
+          setIsParticipantConfirmOpen(true);
+        };
+
+        const closeParticipantDeleteConfirm = () => {
+          setIsParticipantConfirmOpen(false);
+        };
+
+        const confirmParticipantDelete = () => {
+          const selected = selectedParticipant();
+          if (selected) {
+            setParticipants(participants().filter(p => p.id !== selected.id));
+            closeParticipantDetail();
+          }
+          closeParticipantDeleteConfirm();
+        };
+
         const closeModal = () => {
           setIsModalOpen(false);
           setParticipantName('');
@@ -1137,6 +1347,81 @@
           }
         });
 
+        // Effect para sincronizar modal de gastos
+        setEffect(() => {
+          if (isGastoModalOpen()) {
+            setTimeout(() => {
+              const gastoNameInput = document.querySelector('#gasto-name');
+              const gastoAmountInput = document.querySelector('#gasto-amount');
+              const checkboxes = document.querySelectorAll('[id^="gasto-participant-checkbox-"]');
+
+              if (gastoNameInput && gastoAmountInput) {
+                if (editingGasto()) {
+                  gastoNameInput.value = editingGasto().name;
+                  gastoAmountInput.value = editingGasto().amount;
+                  checkboxes.forEach(checkbox => {
+                    const participantId = parseInt(checkbox.id.replace('gasto-participant-checkbox-', ''));
+                    checkbox.checked = editingGasto().participants.includes(participantId);
+                  });
+                }
+              }
+            }, 10);
+          }
+        });
+
+        const openGastoModal = (gasto = null) => {
+          if (gasto) {
+            setEditingGasto(gasto);
+            setGastoName(gasto.name);
+            setGastoAmount(gasto.amount);
+            setGastoParticipants(gasto.participants || []);
+          } else {
+            setEditingGasto(null);
+            setGastoName('');
+            setGastoAmount('');
+            setGastoParticipants([]);
+          }
+          setIsGastoModalOpen(true);
+        };
+
+        const closeGastoModal = () => {
+          setIsGastoModalOpen(false);
+          setGastoName('');
+          setGastoAmount('');
+          setGastoParticipants([]);
+          setEditingGasto(null);
+        };
+
+        const handleGastoSubmit = e => {
+          e.preventDefault();
+          const name = gastoName().trim();
+          const amount = parseFloat(gastoAmount()) || 0;
+          const selectedParticipants = gastoParticipants();
+
+          if (name.length === 0 || name.length > 20) return;
+          if (amount < 1 || amount > 1000000) return;
+          if (selectedParticipants.length === 0) return;
+
+          const editing = editingGasto();
+          if (editing) {
+            setGastos(gastos().map(g => (g.id === editing.id ? { ...g, name, amount, participants: selectedParticipants } : g)));
+          } else {
+            setGastos([...gastos(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
+          }
+          closeGastoModal();
+        };
+
+        const showGastoDeleteConfirm = () => setIsGastoConfirmOpen(true);
+        const closeGastoDeleteConfirm = () => setIsGastoConfirmOpen(false);
+        const confirmGastoDelete = () => {
+          const editing = editingGasto();
+          if (editing) {
+            setGastos(gastos().filter(g => g.id !== editing.id));
+            closeGastoModal();
+          }
+          closeGastoDeleteConfirm();
+        };
+
         const tabs = [
           { id: 'participantes', label: '👥 Participantes' },
           { id: 'contribuciones', label: '💰 Contribuciones' },
@@ -1178,6 +1463,14 @@
                 setIsConfirmOpen,
                 participantToDelete,
                 setParticipantToDelete,
+                openParticipantDetail,
+                isParticipantDetailOpen,
+                selectedParticipant,
+                closeParticipantDetail,
+                showParticipantDeleteConfirm,
+                isParticipantConfirmOpen,
+                closeParticipantDeleteConfirm,
+                confirmParticipantDelete,
               })
             ),
 
@@ -1205,7 +1498,29 @@
               })
             ),
 
-            h('div', { className: () => `tab-section ${activeTab() === 'gastos' ? '' : 'hidden'}` }, GastosSection())
+            h('div', { className: () => `tab-section ${activeTab() === 'gastos' ? '' : 'hidden'}` }, () =>
+              GastosSection({
+                gastos,
+                setGastos,
+                isGastoModalOpen,
+                gastoName,
+                setGastoName,
+                gastoAmount,
+                setGastoAmount,
+                openGastoModal,
+                closeGastoModal,
+                handleGastoSubmit,
+                editingGasto,
+                setEditingGasto,
+                gastoParticipants,
+                setGastoParticipants,
+                participants,
+                showGastoDeleteConfirm,
+                isGastoConfirmOpen,
+                closeGastoDeleteConfirm,
+                confirmGastoDelete,
+              })
+            )
           )
         );
       }
