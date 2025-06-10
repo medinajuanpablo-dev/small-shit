@@ -879,6 +879,36 @@
           font-size: 1.2rem;
           margin-bottom: 0.3rem;
         }
+
+        .help-float-btn {
+          width: 50px;
+          height: 50px;
+          font-size: 0.85rem;
+          bottom: 1.5rem;
+          right: 1.5rem;
+        }
+
+        .collapsible-header {
+          padding: 0.8rem;
+        }
+
+        .collapsible-title {
+          font-size: 0.9rem;
+        }
+
+        .collapsible-arrow {
+          font-size: 1rem;
+        }
+
+        .collapsible-body {
+          padding: 0.8rem;
+          font-size: 0.9rem;
+        }
+
+        .instructions-title {
+          font-size: 1.3rem;
+          margin-bottom: 1rem;
+        }
       }
 
       @media (max-width: 360px) {
@@ -902,6 +932,125 @@
           padding: 0.7rem 1.2rem;
           font-size: 0.9rem;
         }
+      }
+
+      /* ================================================
+         BOTÓN FLOTANTE DE AYUDA
+         ================================================ */
+      .help-float-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: linear-gradient(145deg, #8e24aa, #7b1fa2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(142, 36, 170, 0.4);
+        transition: all 0.3s ease;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+      }
+
+      .help-float-btn:hover {
+        background: linear-gradient(145deg, #7b1fa2, #6a1b9a);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(142, 36, 170, 0.6);
+      }
+
+      .help-float-btn:active {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(142, 36, 170, 0.4);
+      }
+
+      /* ================================================
+         COMPONENTES COLAPSABLES
+         ================================================ */
+      .collapsible-container {
+        margin-bottom: 1rem;
+        border: 2px solid rgba(142, 36, 170, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+      }
+
+      .collapsible-header {
+        background: rgba(142, 36, 170, 0.1);
+        padding: 1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s ease;
+        user-select: none;
+      }
+
+      .collapsible-header:hover {
+        background: rgba(142, 36, 170, 0.15);
+      }
+
+      .collapsible-title {
+        color: #4a148c;
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0;
+      }
+
+      .collapsible-arrow {
+        color: #8e24aa;
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+        font-weight: bold;
+      }
+
+      .collapsible-arrow.expanded {
+        transform: rotate(90deg);
+      }
+
+      .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .collapsible-content.expanded {
+        max-height: 500px;
+      }
+
+      .collapsible-body {
+        padding: 1rem;
+        color: #4a148c;
+        line-height: 1.6;
+      }
+
+      .collapsible-body p {
+        margin: 0 0 0.8rem 0;
+      }
+
+      .collapsible-body p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ================================================
+         MODAL DE INSTRUCCIONES
+         ================================================ */
+      .instructions-modal .modal-content {
+        max-width: 600px;
+        max-height: 85vh;
+      }
+
+      .instructions-title {
+        color: #4a148c;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
       }
     </style>
   </head>
@@ -929,6 +1078,24 @@
           'div',
           { className: 'modal-overlay', onclick: handleOverlayClick },
           h('div', { className: 'modal-content' }, h('button', { className: 'modal-close', onclick: onClose }, '×'), children)
+        );
+      }
+
+      function Collapsible({ title, children, isExpanded, onToggle }) {
+        return h(
+          'div',
+          { className: 'collapsible-container' },
+          h(
+            'div',
+            { className: 'collapsible-header', onclick: onToggle },
+            h('h4', { className: 'collapsible-title' }, title),
+            h('span', { className: () => `collapsible-arrow ${isExpanded() ? 'expanded' : ''}` }, '▶')
+          ),
+          h(
+            'div',
+            { className: () => `collapsible-content ${isExpanded() ? 'expanded' : ''}` },
+            h('div', { className: 'collapsible-body' }, children)
+          )
         );
       }
 
@@ -969,6 +1136,102 @@
         );
 
         return Modal({ isOpen, onClose, children: confirmContent });
+      }
+
+      function InstructionsModal({
+        isOpen,
+        onClose,
+        collapsible1Expanded,
+        collapsible2Expanded,
+        collapsible3Expanded,
+        collapsible4Expanded,
+        toggleCollapsible1,
+        toggleCollapsible2,
+        toggleCollapsible3,
+        toggleCollapsible4,
+      }) {
+        const instructionsContent = h(
+          'div',
+          { className: 'instructions-modal' },
+          h('h3', { className: 'instructions-title' }, '📋 ¿Cómo usar la aplicación?'),
+
+          Collapsible({
+            title: '👥 Agrega a los Participantes',
+            isExpanded: collapsible1Expanded,
+            onToggle: toggleCollapsible1,
+            children: h(
+              'div',
+              null,
+              h('p', null, 'Empieza agregando a las personas que participarán en los gastos, consumiciones, eventos, servicios, etc...'),
+              h('p', null, 'No hace falta que agregues a todos ahora, puedes agregar más gente en cualquier momento.')
+            ),
+          }),
+
+          Collapsible({
+            title: '💰 Gastos',
+            isExpanded: collapsible2Expanded,
+            onToggle: toggleCollapsible2,
+            children: h(
+              'div',
+              null,
+              h(
+                'p',
+                null,
+                'Agrega las consumiciones o gastos que tengan los participantes del grupo. Por ejemplo, si algunos toman bebidas, agrega cuánto costó y quiénes toman/tomaron.'
+              ),
+              h('p', null, 'Puedes ir agregando o editando gastos en cualquier momento, no hace falta que los agregues todos de una vez.')
+            ),
+          }),
+
+          Collapsible({
+            title: '💵 Contribuciones',
+            isExpanded: collapsible3Expanded,
+            onToggle: toggleCollapsible3,
+            children: h(
+              'div',
+              null,
+              h(
+                'p',
+                null,
+                'Si alguien pagó un gasto y los demás "después le devuelven", agrega aquí esa contribución indicando quiénes fueron los contribuyentes.'
+              ),
+              h(
+                'p',
+                null,
+                'Para ahorrarte tiempo, si ya existe un gasto igual a la contribución, presiona sobre el gasto y luego "Agregar como Contribución".'
+              )
+            ),
+          }),
+
+          Collapsible({
+            title: '📶 Balances',
+            isExpanded: collapsible4Expanded,
+            onToggle: toggleCollapsible4,
+            children: h(
+              'div',
+              null,
+              h(
+                'p',
+                null,
+                'En "Participantes" puedes ver cuánto tiene que poner cada uno, o cuánto le deben (los que tienen que poner). Presiona un participante para ver sus gastos y contribuciones.'
+              ),
+              h('p', null, 'Se actualiza automáticamente en todo momento, cada vez que agregas o cambias un gasto o contribución.'),
+              h(
+                'p',
+                null,
+                'Los gastos/contribuciones se reparten en partes iguales entre las personas incluidas. Para repartirlo de otra forma, es mejor separarlo en más gastos/contribuciones.'
+              )
+            ),
+          }),
+
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-primary', onclick: onClose }, 'Entendido')
+          )
+        );
+
+        return Modal({ isOpen, onClose, children: instructionsContent });
       }
 
       // ================================================
@@ -1147,6 +1410,7 @@
           { className: 'modal-form', onsubmit: handleSubmit },
           h('h3', { className: 'modal-title' }, 'Agregar Participante'),
           h('input', {
+            id: 'participant-name',
             className: 'modal-input',
             type: 'text',
             placeholder: 'Nombre del participante',
@@ -1542,7 +1806,7 @@
           h(
             'div',
             { className: 'participants-selector' },
-            h('label', { className: 'participants-label' }, 'Incluidos:'),
+            h('label', { className: 'participants-label' }, 'Consumidores:'),
             participants().length > 0
               ? h(
                   'div',
@@ -1613,7 +1877,7 @@
                   h(
                     'table',
                     { className: 'participants-table gastos-table' },
-                    h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Incluidos'), h('th', null, 'Monto'))),
+                    h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Consumidores'), h('th', null, 'Monto'))),
                     h(
                       'tbody',
                       null,
@@ -1690,6 +1954,13 @@
         // ====== SIGNAL DE REINICIO ======
         const [isResetConfirmOpen, setIsResetConfirmOpen] = setSignal(false);
 
+        // ====== SIGNALS DE INSTRUCCIONES ======
+        const [isInstructionsOpen, setIsInstructionsOpen] = setSignal(false);
+        const [collapsible1Expanded, setCollapsible1Expanded] = setSignal(false);
+        const [collapsible2Expanded, setCollapsible2Expanded] = setSignal(false);
+        const [collapsible3Expanded, setCollapsible3Expanded] = setSignal(false);
+        const [collapsible4Expanded, setCollapsible4Expanded] = setSignal(false);
+
         // ====== PERSISTENCIA EN LOCALSTORAGE ======
         setEffect(() => {
           const saveData = {
@@ -1719,6 +1990,7 @@
           const name = participantName().trim();
           if (name.length === 0 || name.length > 10) return;
           setParticipants([...participants(), { id: Date.now(), name, amount: 0 }]);
+          setParticipantName('');
           closeModal();
         };
 
@@ -1790,6 +2062,9 @@
             );
           } else {
             setContributions([...contributions(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
+            setContributionName('');
+            setContributionAmount('');
+            setContributionParticipants([]);
           }
           closeContribModal();
         };
@@ -1865,6 +2140,9 @@
             setGastos(gastos().map(g => (g.id === editing.id ? { ...g, name, amount, participants: selectedParticipants } : g)));
           } else {
             setGastos([...gastos(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
+            setGastoName('');
+            setGastoAmount('');
+            setGastoParticipants([]); // Limpiar los campos después de agregar exitosamente
           }
           closeGastoModal();
         };
@@ -1934,7 +2212,36 @@
           closeResetConfirm();
         };
 
+        // ====== FUNCIONES DE INSTRUCCIONES ======
+        const openInstructions = () => setIsInstructionsOpen(true);
+
+        const closeInstructions = () => {
+          setIsInstructionsOpen(false);
+          setCollapsible1Expanded(false);
+          setCollapsible2Expanded(false);
+          setCollapsible3Expanded(false);
+          setCollapsible4Expanded(false);
+        };
+
+        const toggleCollapsible1 = () => setCollapsible1Expanded(!collapsible1Expanded());
+        const toggleCollapsible2 = () => setCollapsible2Expanded(!collapsible2Expanded());
+        const toggleCollapsible3 = () => setCollapsible3Expanded(!collapsible3Expanded());
+        const toggleCollapsible4 = () => setCollapsible4Expanded(!collapsible4Expanded());
+
         // ====== EFFECTS PARA SINCRONIZACIÓN DE MODALES ======
+
+        // Effect para sincronizar modal de participantes
+        setEffect(() => {
+          if (isModalOpen()) {
+            setTimeout(() => {
+              const participantNameInput = document.querySelector('#participant-name');
+              if (participantNameInput) {
+                participantNameInput.value = '';
+              }
+            }, 100);
+          }
+        });
+
         // Effect para sincronizar modal de contribuciones
         setEffect(() => {
           if (isContribModalOpen()) {
@@ -1951,6 +2258,9 @@
                     const participantId = parseInt(checkbox.id.replace('participant-checkbox-', ''));
                     checkbox.checked = editingContribution().participants.includes(participantId);
                   });
+                } else {
+                  contributionNameInput.value = '';
+                  contributionAmountInput.value = '';
                 }
               }
             }, 10);
@@ -1973,6 +2283,9 @@
                     const participantId = parseInt(checkbox.id.replace('gasto-participant-checkbox-', ''));
                     checkbox.checked = editingGasto().participants.includes(participantId);
                   });
+                } else {
+                  gastoNameInput.value = '';
+                  gastoAmountInput.value = '';
                 }
               }
             }, 10);
@@ -2095,11 +2408,28 @@
             { className: 'reset-app-container' },
             h('button', { className: 'reset-app-btn', onclick: showResetConfirm }, '🔄 Reiniciar Todo')
           ),
+
+          // ====== BOTÓN FLOTANTE DE AYUDA ======
+          h('button', { className: 'help-float-btn', onclick: openInstructions }, '⁇'),
+
           () =>
             ConfirmReset({
               isOpen: isResetConfirmOpen(),
               onClose: closeResetConfirm,
               onConfirm: confirmResetApp,
+            }),
+          () =>
+            InstructionsModal({
+              isOpen: isInstructionsOpen(),
+              onClose: closeInstructions,
+              collapsible1Expanded,
+              collapsible2Expanded,
+              collapsible3Expanded,
+              collapsible4Expanded,
+              toggleCollapsible1,
+              toggleCollapsible2,
+              toggleCollapsible3,
+              toggleCollapsible4,
             })
         );
       }
