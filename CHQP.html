@@ -411,6 +411,20 @@
         transform: translateY(-1px);
       }
 
+      .modal-btn-primary.disabled {
+        background: #cccccc;
+        color: #999999;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .modal-btn-primary.disabled:hover {
+        background: #cccccc;
+        transform: none;
+        box-shadow: none;
+      }
+
       .modal-btn-secondary {
         background: #f5f5f5;
         color: #666;
@@ -528,6 +542,10 @@
         .participant-amount-cell {
           font-size: 0.8rem;
         }
+
+        .modal-btn {
+          padding: 0.6rem 1rem;
+        }
       }
 
       @media (max-width: 360px) {
@@ -627,6 +645,20 @@
         text-align: center;
         margin: 0.5rem 0;
       }
+
+      .modal-btn-delete {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+        border: 2px solid #c0392b;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      }
+
+      .modal-btn-delete:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+      }
     </style>
   </head>
   <body>
@@ -708,13 +740,17 @@
             placeholder: 'Nombre del participante',
             oninput: e => setParticipantName(e.target.value),
             required: true,
-            autofocus: true,
+            maxlength: 10,
           }),
           h(
             'div',
             { className: 'modal-buttons' },
             h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeModal }, 'Cancelar'),
-            h('button', { type: 'submit', className: 'modal-btn modal-btn-primary' }, 'Agregar')
+            h(
+              'button',
+              { type: 'submit', className: () => `modal-btn modal-btn-primary ${participantName().trim().length === 0 ? 'disabled' : ''}` },
+              'Agregar'
+            )
           )
         );
 
@@ -722,7 +758,8 @@
           'div',
           { className: 'tab-content' },
           h('button', { className: 'add-participant-btn', onclick: openModal }, '+ Agregar Participante'),
-          participants().length > 0 &&
+          () =>
+            participants().length > 0 &&
             h(
               'div',
               { className: 'participants-table-wrapper' },
@@ -794,11 +831,23 @@
         contributionParticipants,
         setContributionParticipants,
         participants,
+        showContribDeleteConfirm,
+        isContribConfirmOpen,
+        closeContribDeleteConfirm,
+        confirmContribDelete,
       }) {
         const getParticipantNames = participantIds => {
           if (!participantIds || participantIds.length === 0) return 'Ninguno';
           const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
           return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
+        };
+
+        const isContribFormValid = () => {
+          const name = contributionName().trim();
+          const amount = parseFloat(contributionAmount()) || 0;
+          const selectedParticipants = contributionParticipants();
+
+          return name.length > 0 && amount >= 1 && selectedParticipants.length > 0;
         };
 
         const modalContent = h(
@@ -812,7 +861,7 @@
             placeholder: 'Nombre de la contribución',
             oninput: e => setContributionName(e.target.value),
             required: true,
-            autofocus: true,
+            maxlength: 20,
           }),
           h('input', {
             id: 'contribution-amount',
@@ -825,7 +874,7 @@
           h(
             'div',
             { className: 'participants-selector' },
-            h('label', { className: 'participants-label' }, 'Participantes:'),
+            h('label', { className: 'participants-label' }, 'Contribuyentes:'),
             participants().length > 0
               ? h(
                   'div',
@@ -857,7 +906,16 @@
             'div',
             { className: 'modal-buttons' },
             h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeContribModal }, 'Cancelar'),
-            h('button', { type: 'submit', className: 'modal-btn modal-btn-primary' }, editingContribution() ? 'Guardar' : 'Agregar')
+            editingContribution() &&
+              h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: showContribDeleteConfirm }, 'Eliminar'),
+            h(
+              'button',
+              {
+                type: 'submit',
+                className: () => `modal-btn modal-btn-primary ${!isContribFormValid() ? 'disabled' : ''}`,
+              },
+              editingContribution() ? 'Guardar' : 'Agregar'
+            )
           )
         );
 
@@ -865,14 +923,15 @@
           'div',
           { className: 'tab-content' },
           h('button', { className: 'add-contribution-btn', onclick: () => openContribModal() }, '+ Agregar Contribución'),
-          contributions().length > 0 &&
+          () =>
+            contributions().length > 0 &&
             h(
               'div',
               { className: 'participants-table-wrapper' },
               h(
                 'table',
                 { className: 'participants-table contributions-table' },
-                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Participantes'), h('th', null, 'Monto'))),
+                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Contribuyentes'), h('th', null, 'Monto'))),
                 h(
                   'tbody',
                   null,
@@ -889,11 +948,7 @@
                       h('td', { className: 'participant-amount-cell' }, getParticipantNames(contribution.participants)),
                       h(
                         'td',
-                        {
-                          className: `participant-amount-cell ${
-                            contribution.amount > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
-                          }`,
-                        },
+                        { className: `participant-amount-cell participant-amount-zero-negative` },
                         `$ ${Math.abs(contribution.amount) || '0'}`
                       )
                     )
@@ -901,7 +956,14 @@
                 )
               )
             ),
-          () => Modal({ isOpen: isContribModalOpen(), onClose: closeContribModal, children: modalContent })
+          () => Modal({ isOpen: isContribModalOpen(), onClose: closeContribModal, children: modalContent }),
+          () =>
+            ConfirmWarning({
+              isOpen: isContribConfirmOpen(),
+              onClose: closeContribDeleteConfirm,
+              onConfirm: confirmContribDelete,
+              participantName: editingContribution()?.name || '',
+            })
         );
       }
 
@@ -966,6 +1028,7 @@
         const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
         const [participantToDelete, setParticipantToDelete] = setSignal(null);
         const [editingContribution, setEditingContribution] = setSignal(savedData.editingContribution);
+        const [isContribConfirmOpen, setIsContribConfirmOpen] = setSignal(false);
 
         setEffect(() => {
           const saveData = {
@@ -989,10 +1052,12 @@
 
         const handleSubmit = e => {
           e.preventDefault();
-          if (participantName().trim()) {
-            setParticipants([...participants(), { id: Date.now(), name: participantName().trim(), amount: 0 }]);
-            closeModal();
-          }
+          const name = participantName().trim();
+
+          if (name.length === 0 || name.length > 10) return;
+
+          setParticipants([...participants(), { id: Date.now(), name, amount: 0 }]);
+          closeModal();
         };
 
         const openContribModal = (contribution = null) => {
@@ -1018,22 +1083,36 @@
           setEditingContribution(null);
         };
 
+        const showContribDeleteConfirm = () => setIsContribConfirmOpen(true);
+        const closeContribDeleteConfirm = () => setIsContribConfirmOpen(false);
+        const confirmContribDelete = () => {
+          const editing = editingContribution();
+          if (editing) {
+            setContributions(contributions().filter(c => c.id !== editing.id));
+            closeContribModal();
+          }
+          closeContribDeleteConfirm();
+        };
+
         const handleContribSubmit = e => {
           e.preventDefault();
           const name = contributionName().trim();
           const amount = parseFloat(contributionAmount()) || 0;
           const selectedParticipants = contributionParticipants();
-          if (name) {
-            const editing = editingContribution();
-            if (editing) {
-              setContributions(
-                contributions().map(c => (c.id === editing.id ? { ...c, name, amount, participants: selectedParticipants } : c))
-              );
-            } else {
-              setContributions([...contributions(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
-            }
-            closeContribModal();
+
+          if (name.length === 0 || name.length > 20) return;
+          if (amount < 1 || amount > 1000000) return;
+          if (selectedParticipants.length === 0) return;
+
+          const editing = editingContribution();
+          if (editing) {
+            setContributions(
+              contributions().map(c => (c.id === editing.id ? { ...c, name, amount, participants: selectedParticipants } : c))
+            );
+          } else {
+            setContributions([...contributions(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
           }
+          closeContribModal();
         };
 
         // Effect para sincronizar modal de contribuciones
@@ -1045,12 +1124,14 @@
               const checkboxes = document.querySelectorAll('[id^="participant-checkbox-"]');
 
               if (contributionNameInput && contributionAmountInput) {
-                contributionNameInput.value = contributionName();
-                contributionAmountInput.value = contributionAmount();
-                checkboxes.forEach(checkbox => {
-                  const participantId = parseInt(checkbox.id.replace('participant-checkbox-', ''));
-                  checkbox.checked = contributionParticipants().includes(participantId);
-                });
+                if (editingContribution()) {
+                  contributionNameInput.value = editingContribution().name;
+                  contributionAmountInput.value = editingContribution().amount;
+                  checkboxes.forEach(checkbox => {
+                    const participantId = parseInt(checkbox.id.replace('participant-checkbox-', ''));
+                    checkbox.checked = editingContribution().participants.includes(participantId);
+                  });
+                }
               }
             }, 10);
           }
@@ -1117,6 +1198,10 @@
                 contributionParticipants,
                 setContributionParticipants,
                 participants,
+                showContribDeleteConfirm,
+                isContribConfirmOpen,
+                closeContribDeleteConfirm,
+                confirmContribDelete,
               })
             ),
 
