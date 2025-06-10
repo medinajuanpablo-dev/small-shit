@@ -763,6 +763,37 @@
         color: #666;
       }
 
+      .reset-app-container {
+        margin-top: 2rem;
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 2px solid rgba(142, 36, 170, 0.2);
+      }
+
+      .reset-app-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      }
+
+      .reset-app-btn:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+      }
+
+      .reset-app-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      }
+
       .modal-btn-delete {
         background: linear-gradient(145deg, #e74c3c, #c0392b);
         color: white;
@@ -810,6 +841,28 @@
             { className: 'modal-buttons' },
             h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
             h('button', { type: 'button', className: 'modal-btn modal-btn-primary', onclick: onConfirm }, 'Eliminar')
+          )
+        );
+
+        return Modal({ isOpen, onClose, children: confirmContent });
+      }
+
+      function ConfirmReset({ isOpen, onClose, onConfirm }) {
+        const confirmContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '🔄 Confirmar Reinicio'),
+          h('p', { className: 'confirm-warning-text' }, '¿Estás seguro que deseas reiniciar TODA la aplicación?'),
+          h(
+            'p',
+            { className: 'confirm-warning-text', style: 'font-size: 0.9rem; color: #e74c3c; margin-top: 1rem;' },
+            'Se eliminarán TODOS los participantes, contribuciones y gastos. Esta acción NO se puede deshacer.'
+          ),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: onConfirm }, 'Sí, Reiniciar Todo')
           )
         );
 
@@ -923,42 +976,43 @@
           { className: 'tab-content' },
           h('button', { className: 'add-participant-btn', onclick: openModal }, '+ Agregar Participante'),
           () =>
-            participants().length > 0 &&
-            h(
-              'div',
-              { className: 'participants-table-wrapper' },
-              h(
-                'table',
-                { className: 'participants-table' },
-                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'))),
-                h(
-                  'tbody',
-                  null,
-                  ...participants().map(participant => {
-                    const balance = calculateParticipantBalance(participant);
-                    return h(
-                      'tr',
-                      {
-                        key: participant.id,
-                        className: 'clickable-row',
-                        onclick: () => openParticipantDetail(participant),
-                        title: 'Clic para ver detalles',
-                      },
-                      h('td', { className: 'participant-name-cell' }, participant.name),
-                      h(
-                        'td',
-                        {
-                          className: `participant-amount-cell ${
-                            balance > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
-                          }`,
-                        },
-                        balance > 0 ? `Debe $ ${Math.abs(balance)}` : balance < 0 ? `Le deben $ ${Math.abs(balance)}` : 'Está al día'
-                      )
-                    );
-                  })
+            participants().length > 0
+              ? h(
+                  'div',
+                  { className: 'participants-table-wrapper' },
+                  h(
+                    'table',
+                    { className: 'participants-table' },
+                    h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Cuánto tiene que poner'))),
+                    h(
+                      'tbody',
+                      null,
+                      ...participants().map(participant => {
+                        const balance = calculateParticipantBalance(participant);
+                        return h(
+                          'tr',
+                          {
+                            key: participant.id,
+                            className: 'clickable-row',
+                            onclick: () => openParticipantDetail(participant),
+                            title: 'Clic para ver detalles',
+                          },
+                          h('td', { className: 'participant-name-cell' }, participant.name),
+                          h(
+                            'td',
+                            {
+                              className: `participant-amount-cell ${
+                                balance > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
+                              }`,
+                            },
+                            balance > 0 ? `Debe $ ${Math.abs(balance)}` : balance < 0 ? `Le deben $ ${Math.abs(balance)}` : 'Está al día'
+                          )
+                        );
+                      })
+                    )
+                  )
                 )
-              )
-            ),
+              : null,
           () => Modal({ isOpen: isModalOpen(), onClose: closeModal, children: modalContent }),
           () =>
             ConfirmWarning({
@@ -1030,7 +1084,7 @@
                             )
                           )
                         )
-                      : h('p', { className: 'no-participant-data' }, 'Este participante no tiene contribuciones ni gastos registrados')
+                      : h('p', { className: 'no-participant-data' }, 'Sin contribuciones ni gastos registrados')
                   );
                 },
                 h(
@@ -1165,38 +1219,39 @@
           { className: 'tab-content' },
           h('button', { className: 'add-contribution-btn', onclick: () => openContribModal() }, '+ Agregar Contribución'),
           () =>
-            contributions().length > 0 &&
-            h(
-              'div',
-              { className: 'participants-table-wrapper' },
-              h(
-                'table',
-                { className: 'participants-table contributions-table' },
-                h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Contribuyentes'), h('th', null, 'Monto'))),
-                h(
-                  'tbody',
-                  null,
-                  ...contributions().map(contribution =>
+            contributions().length > 0
+              ? h(
+                  'div',
+                  { className: 'participants-table-wrapper' },
+                  h(
+                    'table',
+                    { className: 'participants-table contributions-table' },
+                    h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Contribuyentes'), h('th', null, 'Monto'))),
                     h(
-                      'tr',
-                      {
-                        key: contribution.id,
-                        className: 'clickable-row',
-                        onclick: () => openContribModal(contribution),
-                        title: 'Clic para editar',
-                      },
-                      h('td', { className: 'participant-name-cell' }, contribution.name),
-                      h('td', { className: 'participant-amount-cell' }, getParticipantNames(contribution.participants)),
-                      h(
-                        'td',
-                        { className: `participant-amount-cell participant-amount-zero-negative` },
-                        `$ ${Math.abs(contribution.amount) || '0'}`
+                      'tbody',
+                      null,
+                      ...contributions().map(contribution =>
+                        h(
+                          'tr',
+                          {
+                            key: contribution.id,
+                            className: 'clickable-row',
+                            onclick: () => openContribModal(contribution),
+                            title: 'Clic para editar',
+                          },
+                          h('td', { className: 'participant-name-cell' }, contribution.name),
+                          h('td', { className: 'participant-amount-cell' }, getParticipantNames(contribution.participants)),
+                          h(
+                            'td',
+                            { className: `participant-amount-cell participant-amount-zero-negative` },
+                            `$ ${Math.abs(contribution.amount) || '0'}`
+                          )
+                        )
                       )
                     )
                   )
                 )
-              )
-            ),
+              : null,
           () => Modal({ isOpen: isContribModalOpen(), onClose: closeContribModal, children: modalContent }),
           () =>
             ConfirmWarning({
@@ -1421,6 +1476,9 @@
         const [editingGasto, setEditingGasto] = setSignal(null);
         const [isGastoConfirmOpen, setIsGastoConfirmOpen] = setSignal(false);
 
+        // Estado para reiniciar aplicación
+        const [isResetConfirmOpen, setIsResetConfirmOpen] = setSignal(false);
+
         setEffect(() => {
           const saveData = {
             participants: participants(),
@@ -1632,10 +1690,51 @@
           closeGastoDeleteConfirm();
         };
 
+        // Funciones para reiniciar aplicación
+        const showResetConfirm = () => setIsResetConfirmOpen(true);
+        const closeResetConfirm = () => setIsResetConfirmOpen(false);
+        const confirmResetApp = () => {
+          // Limpiar localStorage
+          localStorage.removeItem('chqpSave');
+
+          // Resetear todas las signals a valores por defecto
+          setActiveTab('participantes');
+          setParticipants([]);
+          setContributions([]);
+          setGastos([]);
+
+          // Cerrar modal y todos los modales abiertos
+          setIsModalOpen(false);
+          setIsContribModalOpen(false);
+          setIsGastoModalOpen(false);
+          setIsParticipantDetailOpen(false);
+          setIsConfirmOpen(false);
+          setIsContribConfirmOpen(false);
+          setIsGastoConfirmOpen(false);
+          setIsParticipantConfirmOpen(false);
+
+          // Limpiar formularios
+          setParticipantName('');
+          setContributionName('');
+          setContributionAmount('');
+          setContributionParticipants([]);
+          setGastoName('');
+          setGastoAmount('');
+          setGastoParticipants([]);
+
+          // Limpiar estados de edición
+          setEditingContribution(null);
+          setEditingGasto(null);
+          setSelectedParticipant(null);
+          setParticipantToDelete(null);
+
+          closeResetConfirm();
+        };
+
         const tabs = [
           { id: 'participantes', label: '👥 Participantes' },
-          { id: 'contribuciones', label: '💰 Contribuciones' },
           { id: 'gastos', label: '💸 Gastos' },
+          { id: 'contribuciones', label: '💰 Contribuciones' },
         ];
 
         return h(
@@ -1733,7 +1832,22 @@
                 confirmGastoDelete,
               })
             )
-          )
+          ),
+
+          // Botón de reiniciar todo
+          h(
+            'div',
+            { className: 'reset-app-container' },
+            h('button', { className: 'reset-app-btn', onclick: showResetConfirm }, '🔄 Reiniciar Todo')
+          ),
+
+          // Modal de confirmación para reiniciar
+          () =>
+            ConfirmReset({
+              isOpen: isResetConfirmOpen(),
+              onClose: closeResetConfirm,
+              onConfirm: confirmResetApp,
+            })
         );
       }
 
