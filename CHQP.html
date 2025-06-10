@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cuanto Hay Que Poner</title>
     <style>
+      /* ================================================
+         LAYOUT GENERAL Y ESTRUCTURA BASE
+         ================================================ */
       body {
         background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
         color: #4a148c;
@@ -37,7 +40,9 @@
         font-weight: bold;
       }
 
-      /* TABS */
+      /* ================================================
+         SISTEMA DE PESTAÑAS (TABS)
+         ================================================ */
       .tabs-container {
         display: flex;
         justify-content: center;
@@ -73,6 +78,7 @@
         font-weight: bold;
       }
 
+      /* Colores específicos por pestaña */
       .tab.active.participantes,
       .tab:hover.participantes {
         color: #00695c;
@@ -94,18 +100,19 @@
         background: rgba(255, 152, 0, 0.1);
       }
 
-      /* CONTENT */
+      /* ================================================
+         CONTENIDO PRINCIPAL
+         ================================================ */
       .content-box {
         background: rgba(142, 36, 170, 0.05);
         padding: clamp(0.5rem, 3vw, 1.5rem);
         border-radius: 15px;
         border: 2px solid rgba(142, 36, 170, 0.1);
-        min-height: clamp(200px, 35vh, 250px);
+        min-height: 350px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 350px;
       }
 
       .tab-content {
@@ -136,11 +143,14 @@
         display: none;
       }
 
-      /* BUTTONS */
-      .add-participant-btn {
+      /* ================================================
+         BOTONES PRINCIPALES (ADD BUTTONS)
+         ================================================ */
+      .add-participant-btn,
+      .add-contribution-btn,
+      .add-gasto-btn {
         padding: 0.8rem 1.5rem;
         font-size: 1rem;
-        background: linear-gradient(145deg, #00acc1, #00838f);
         color: white;
         border: none;
         border-radius: 10px;
@@ -148,6 +158,10 @@
         margin-top: 1rem;
         transition: all 0.3s ease;
         font-weight: 600;
+      }
+
+      .add-participant-btn {
+        background: linear-gradient(145deg, #00acc1, #00838f);
         box-shadow: 0 4px 12px rgba(0, 172, 193, 0.3);
       }
 
@@ -157,22 +171,8 @@
         box-shadow: 0 6px 16px rgba(0, 172, 193, 0.4);
       }
 
-      .add-participant-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(0, 172, 193, 0.3);
-      }
-
       .add-contribution-btn {
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
         background: linear-gradient(145deg, #00c853, #1b5e20);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        margin-top: 1rem;
-        transition: all 0.3s ease;
-        font-weight: 600;
         box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
       }
 
@@ -182,22 +182,8 @@
         box-shadow: 0 6px 16px rgba(0, 200, 83, 0.4);
       }
 
-      .add-contribution-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(0, 200, 83, 0.3);
-      }
-
       .add-gasto-btn {
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
         background: linear-gradient(145deg, #ff9800, #e65100);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        margin-top: 1rem;
-        transition: all 0.3s ease;
-        font-weight: 600;
         box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
       }
 
@@ -207,12 +193,15 @@
         box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
       }
 
+      .add-participant-btn:active,
+      .add-contribution-btn:active,
       .add-gasto-btn:active {
         transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
       }
 
-      /* TABLES */
+      /* ================================================
+         TABLAS PRINCIPALES
+         ================================================ */
       .participants-table-wrapper {
         max-height: 320px;
         overflow-y: auto;
@@ -228,27 +217,6 @@
         table-layout: fixed;
       }
 
-      .participants-table th,
-      .participants-table td {
-        padding: 0.8rem;
-        text-align: center;
-      }
-
-      .participants-table th:first-child,
-      .participants-table td:first-child {
-        width: 20%;
-      }
-
-      .participants-table th:nth-child(2),
-      .participants-table td:nth-child(2) {
-        width: auto;
-      }
-
-      .participants-table th:last-child,
-      .participants-table td:last-child {
-        width: 10%;
-      }
-
       .participants-table th {
         background: linear-gradient(145deg, #00acc1, #00838f);
         color: white;
@@ -257,11 +225,15 @@
         position: sticky;
         top: 0;
         z-index: 10;
+        padding: 0.8rem;
+        text-align: center;
       }
 
       .participants-table td {
         border-bottom: 1px solid rgba(0, 172, 193, 0.1);
         font-size: 0.9rem;
+        padding: 0.8rem;
+        text-align: center;
       }
 
       .participants-table tbody tr:last-child td {
@@ -281,6 +253,16 @@
         background: rgba(0, 172, 193, 0.1);
       }
 
+      /* Colores específicos para tablas de contribuciones y gastos */
+      .contributions-table th {
+        background: linear-gradient(145deg, #00c853, #009624);
+      }
+
+      .gastos-table th {
+        background: linear-gradient(145deg, #ff9800, #e65100);
+      }
+
+      /* Celdas de tabla */
       .participant-name-cell {
         font-weight: 600;
       }
@@ -300,15 +282,9 @@
         font-weight: bold;
       }
 
-      .contributions-table th {
-        background: linear-gradient(145deg, #00c853, #009624);
-      }
-
-      .gastos-table th {
-        background: linear-gradient(145deg, #ff9800, #e65100);
-      }
-
-      /* MODAL */
+      /* ================================================
+         MODALES Y OVERLAYS
+         ================================================ */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -386,6 +362,9 @@
         box-shadow: 0 0 0 3px rgba(142, 36, 170, 0.1);
       }
 
+      /* ================================================
+         BOTONES DE MODAL
+         ================================================ */
       .modal-buttons {
         display: flex;
         gap: 1rem;
@@ -437,6 +416,20 @@
         color: #333;
       }
 
+      .modal-btn-delete {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+        border: 2px solid #c0392b;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      }
+
+      .modal-btn-delete:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+      }
+
       .confirm-warning-text {
         text-align: center;
         margin: 0;
@@ -444,154 +437,9 @@
         font-size: 1.1rem;
       }
 
-      @keyframes modalSlideIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px) scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      /* RESPONSIVE */
-      @media (max-width: 768px) {
-        .tabs-container {
-          flex-direction: column;
-          gap: 0;
-        }
-
-        .tab {
-          border-bottom: 1px solid rgba(142, 36, 170, 0.2);
-          border-right: none;
-          max-width: none;
-          text-align: center;
-          padding: 1rem;
-        }
-
-        .tab.active {
-          border-bottom-color: #8e24aa;
-        }
-
-        .tab:last-child {
-          border-bottom: none;
-        }
-
-        .participants-table-wrapper {
-          margin-top: 1rem;
-        }
-
-        .participants-table th,
-        .participants-table td {
-          padding: 0.6rem 0.3rem;
-          font-size: 0.9rem;
-        }
-
-        .participants-table th {
-          font-size: 1rem;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .container {
-          padding: 0.5rem;
-          width: 100%;
-        }
-
-        .tab {
-          font-size: 0.9rem;
-          padding: 0.8rem;
-        }
-
-        .add-participant-btn {
-          padding: 0.7rem 1.2rem;
-          font-size: 0.9rem;
-          margin-top: 1rem;
-        }
-
-        .add-contribution-btn {
-          padding: 0.7rem 1.2rem;
-          font-size: 0.9rem;
-          margin-top: 1rem;
-        }
-
-        .add-gasto-btn {
-          padding: 0.7rem 1.2rem;
-          font-size: 0.9rem;
-          margin-top: 1rem;
-        }
-
-        .participants-table th,
-        .participants-table td {
-          padding: 0.4rem 0.15rem;
-          font-size: 0.85rem;
-        }
-
-        .participants-table th {
-          font-size: 0.9rem;
-        }
-
-        .participants-table th:first-child,
-        .participants-table td:first-child {
-          width: 25%;
-        }
-
-        .participants-table th:nth-child(2),
-        .participants-table td:nth-child(2) {
-          width: auto;
-        }
-
-        .participants-table th:last-child,
-        .participants-table td:last-child {
-          width: 25%;
-        }
-
-        .participant-amount-cell {
-          font-size: 0.8rem;
-        }
-
-        .modal-btn {
-          padding: 0.6rem 1rem;
-        }
-      }
-
-      @media (max-width: 360px) {
-        .participants-table th,
-        .participants-table td {
-          padding: 0.3rem 0.1rem;
-          font-size: 0.75rem;
-        }
-
-        .participants-table th {
-          font-size: 0.8rem;
-        }
-
-        .participants-table th:first-child,
-        .participants-table td:first-child {
-          width: 25%;
-        }
-
-        .participants-table th:nth-child(2),
-        .participants-table td:nth-child(2) {
-          width: auto;
-        }
-
-        .participants-table th:last-child,
-        .participants-table td:last-child {
-          width: 25%;
-        }
-
-        .participant-amount-cell {
-          font-size: 0.7rem;
-        }
-
-        .add-participant-btn {
-          padding: 0.7rem 1.2rem;
-          font-size: 0.9rem;
-        }
-      }
-
+      /* ================================================
+         SELECTOR DE PARTICIPANTES
+         ================================================ */
       .participants-selector {
         margin: 1rem 0;
       }
@@ -656,6 +504,9 @@
         font-style: italic;
       }
 
+      /* ================================================
+         TABLA DE DETALLES DE PARTICIPANTE
+         ================================================ */
       .participant-detail-table {
         width: 100%;
         border-collapse: collapse;
@@ -729,6 +580,9 @@
         margin: 1rem 0;
       }
 
+      /* ================================================
+         RESUMEN DE BALANCE DE PARTICIPANTE
+         ================================================ */
       .participant-balance-summary {
         margin-bottom: 1rem;
         padding: 1rem;
@@ -763,6 +617,9 @@
         color: #666;
       }
 
+      /* ================================================
+         BOTÓN DE REINICIO
+         ================================================ */
       .reset-app-container {
         margin-top: 2rem;
         text-align: center;
@@ -794,26 +651,133 @@
         box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
       }
 
-      .modal-btn-delete {
-        background: linear-gradient(145deg, #e74c3c, #c0392b);
-        color: white;
-        border: 2px solid #c0392b;
-        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      /* ================================================
+         ANIMACIONES
+         ================================================ */
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
 
-      .modal-btn-delete:hover {
-        background: linear-gradient(145deg, #c0392b, #a93226);
-        color: white;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+      /* ================================================
+         RESPONSIVE DESIGN
+         ================================================ */
+      @media (max-width: 768px) {
+        .tabs-container {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .tab {
+          border-bottom: 1px solid rgba(142, 36, 170, 0.2);
+          border-right: none;
+          max-width: none;
+          text-align: center;
+          padding: 1rem;
+        }
+
+        .tab.active {
+          border-bottom-color: #8e24aa;
+        }
+
+        .tab:last-child {
+          border-bottom: none;
+        }
+
+        .participants-table-wrapper {
+          margin-top: 1rem;
+        }
+
+        .participants-table th,
+        .participants-table td {
+          padding: 0.6rem 0.3rem;
+          font-size: 0.9rem;
+        }
+
+        .participants-table th {
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 0.5rem;
+          width: 100%;
+        }
+
+        .tab {
+          font-size: 0.9rem;
+          padding: 0.8rem;
+        }
+
+        .add-participant-btn,
+        .add-contribution-btn,
+        .add-gasto-btn {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+          margin-top: 1rem;
+        }
+
+        .participants-table th,
+        .participants-table td {
+          padding: 0.4rem 0.15rem;
+          font-size: 0.85rem;
+        }
+
+        .participants-table th {
+          font-size: 0.9rem;
+        }
+
+        .participant-amount-cell {
+          font-size: 0.8rem;
+        }
+
+        .modal-btn {
+          padding: 0.6rem 1rem;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .participants-table th,
+        .participants-table td {
+          padding: 0.3rem 0.1rem;
+          font-size: 0.75rem;
+        }
+
+        .participants-table th {
+          font-size: 0.8rem;
+        }
+
+        .participant-amount-cell {
+          font-size: 0.7rem;
+        }
+
+        .add-participant-btn,
+        .add-contribution-btn,
+        .add-gasto-btn {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+        }
       }
     </style>
   </head>
   <body>
     <script type="module">
+      // ================================================
+      // MINI FRAMEWORK (SIGNALS Y REACTIVOS)
+      // ================================================
       //prettier-ignore
       const { setSignal, setEffect, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
 
+      // ================================================
+      // COMPONENTES DE MODAL
+      // ================================================
       function Modal({ isOpen, onClose, children }) {
         if (!isOpen) return null;
 
@@ -869,6 +833,81 @@
         return Modal({ isOpen, onClose, children: confirmContent });
       }
 
+      // ================================================
+      // GESTIÓN DE DATOS Y LOCALSTORAGE
+      // ================================================
+      const defaultData = {
+        participants: [],
+        contributions: [],
+        gastos: [],
+        activeTab: 'participantes',
+      };
+
+      const loadSavedData = () => {
+        try {
+          const savedData = localStorage.getItem('chqpSave');
+          if (!savedData) return defaultData;
+
+          const data = JSON.parse(savedData);
+          return {
+            participants: data.participants || defaultData.participants,
+            contributions: data.contributions || defaultData.contributions,
+            gastos: data.gastos || defaultData.gastos,
+            activeTab: data.activeTab || defaultData.activeTab,
+          };
+        } catch (error) {
+          console.error('Error loading saved data:', error);
+          return defaultData;
+        }
+      };
+
+      // ================================================
+      // UTILIDADES DE CÁLCULO
+      // ================================================
+      const getParticipantNames = (participantIds, participants) => {
+        if (!participantIds || participantIds.length === 0) return 'Ninguno';
+        const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
+        return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
+      };
+
+      const getParticipantData = (participant, contributions, gastos) => {
+        if (!participant) return [];
+
+        const participantContributions = contributions()
+          .filter(c => c.participants && c.participants.includes(participant.id))
+          .map(c => ({
+            id: c.id,
+            name: c.name,
+            amount: Math.round(c.amount / c.participants.length),
+            type: 'contribution',
+          }));
+
+        const participantGastos = gastos()
+          .filter(g => g.participants && g.participants.includes(participant.id))
+          .map(g => ({
+            id: g.id,
+            name: g.name,
+            amount: Math.round(g.amount / g.participants.length),
+            type: 'gasto',
+          }));
+
+        return [...participantContributions, ...participantGastos].sort((a, b) => a.name.localeCompare(b.name));
+      };
+
+      const calculateParticipantBalance = (participant, contributions, gastos) => {
+        if (!participant) return 0;
+
+        const participantData = getParticipantData(participant, contributions, gastos);
+        const totalContributions = participantData.filter(item => item.type === 'contribution').reduce((sum, item) => sum + item.amount, 0);
+
+        const totalGastos = participantData.filter(item => item.type === 'gasto').reduce((sum, item) => sum + item.amount, 0);
+
+        return totalGastos - totalContributions; // Gastos menos contribuciones = lo que debe poner
+      };
+
+      // ================================================
+      // COMPONENTES DE SECCIONES
+      // ================================================
       function ParticipantesSection({
         participants,
         setParticipants,
@@ -908,43 +947,6 @@
             setParticipants(participants().filter(p => p.id !== participantToDelete().id));
           }
           closeDeleteConfirm();
-        };
-
-        const getParticipantData = participant => {
-          if (!participant) return [];
-
-          const participantContributions = contributions()
-            .filter(c => c.participants && c.participants.includes(participant.id))
-            .map(c => ({
-              id: c.id,
-              name: c.name,
-              amount: Math.round(c.amount / c.participants.length),
-              type: 'contribution',
-            }));
-
-          const participantGastos = gastos()
-            .filter(g => g.participants && g.participants.includes(participant.id))
-            .map(g => ({
-              id: g.id,
-              name: g.name,
-              amount: Math.round(g.amount / g.participants.length),
-              type: 'gasto',
-            }));
-
-          return [...participantContributions, ...participantGastos].sort((a, b) => a.name.localeCompare(b.name));
-        };
-
-        const calculateParticipantBalance = participant => {
-          if (!participant) return 0;
-
-          const participantData = getParticipantData(participant);
-          const totalContributions = participantData
-            .filter(item => item.type === 'contribution')
-            .reduce((sum, item) => sum + item.amount, 0);
-
-          const totalGastos = participantData.filter(item => item.type === 'gasto').reduce((sum, item) => sum + item.amount, 0);
-
-          return totalGastos - totalContributions; // Gastos menos contribuciones = lo que debe poner
         };
 
         const modalContent = h(
@@ -988,7 +990,7 @@
                       'tbody',
                       null,
                       ...participants().map(participant => {
-                        const balance = calculateParticipantBalance(participant);
+                        const balance = calculateParticipantBalance(participant, contributions, gastos);
                         return h(
                           'tr',
                           {
@@ -1031,16 +1033,14 @@
                 { className: 'modal-form' },
                 h('h3', { className: 'modal-title' }, `📊 Detalles de ${selectedParticipant()?.name}`),
                 () => {
-                  const participantData = getParticipantData(selectedParticipant());
-                  const balance = calculateParticipantBalance(selectedParticipant());
+                  const participantData = getParticipantData(selectedParticipant(), contributions, gastos);
+                  const balance = calculateParticipantBalance(selectedParticipant(), contributions, gastos);
                   return h(
                     'div',
                     null,
                     h(
                       'div',
-                      {
-                        className: 'participant-balance-summary',
-                      },
+                      { className: 'participant-balance-summary' },
                       h('h4', null, 'Balance:'),
                       h(
                         'p',
@@ -1130,17 +1130,10 @@
         closeContribDeleteConfirm,
         confirmContribDelete,
       }) {
-        const getParticipantNames = participantIds => {
-          if (!participantIds || participantIds.length === 0) return 'Ninguno';
-          const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
-          return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
-        };
-
         const isContribFormValid = () => {
           const name = contributionName().trim();
           const amount = parseFloat(contributionAmount()) || 0;
           const selectedParticipants = contributionParticipants();
-
           return name.length > 0 && amount >= 1 && selectedParticipants.length > 0;
         };
 
@@ -1240,7 +1233,7 @@
                             title: 'Clic para editar',
                           },
                           h('td', { className: 'participant-name-cell' }, contribution.name),
-                          h('td', { className: 'participant-amount-cell' }, getParticipantNames(contribution.participants)),
+                          h('td', { className: 'participant-amount-cell' }, getParticipantNames(contribution.participants, participants)),
                           h(
                             'td',
                             { className: `participant-amount-cell participant-amount-zero-negative` },
@@ -1284,17 +1277,10 @@
         closeGastoDeleteConfirm,
         confirmGastoDelete,
       }) {
-        const getParticipantNames = participantIds => {
-          if (!participantIds || participantIds.length === 0) return 'Ninguno';
-          const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
-          return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
-        };
-
         const isGastoFormValid = () => {
           const name = gastoName().trim();
           const amount = parseFloat(gastoAmount()) || 0;
           const selectedParticipants = gastoParticipants();
-
           return name.length > 0 && amount >= 1 && selectedParticipants.length > 0;
         };
 
@@ -1394,7 +1380,7 @@
                             title: 'Clic para editar',
                           },
                           h('td', { className: 'participant-name-cell' }, gasto.name),
-                          h('td', { className: 'participant-amount-cell' }, getParticipantNames(gasto.participants)),
+                          h('td', { className: 'participant-amount-cell' }, getParticipantNames(gasto.participants, participants)),
                           h(
                             'td',
                             { className: `participant-amount-cell participant-amount-zero-negative` },
@@ -1417,41 +1403,19 @@
         );
       }
 
-      const defaultData = {
-        participants: [],
-        contributions: [],
-        gastos: [],
-        activeTab: 'participantes',
-      };
-
-      const loadSavedData = () => {
-        try {
-          const savedData = localStorage.getItem('chqpSave');
-          if (!savedData) return defaultData;
-
-          const data = JSON.parse(savedData);
-          return {
-            participants: data.participants || defaultData.participants,
-            contributions: data.contributions || defaultData.contributions,
-            gastos: data.gastos || defaultData.gastos,
-            activeTab: data.activeTab || defaultData.activeTab,
-          };
-        } catch (error) {
-          console.error('Error loading saved data:', error);
-          return defaultData;
-        }
-      };
-
+      // ================================================
+      // COMPONENTE PRINCIPAL DE LA APLICACIÓN
+      // ================================================
       function CHQPApp() {
         const savedData = loadSavedData();
 
-        // Datos principales que se persisten
+        // ====== SIGNALS PRINCIPALES ======
         const [activeTab, setActiveTab] = setSignal(savedData.activeTab);
         const [participants, setParticipants] = setSignal(savedData.participants);
         const [contributions, setContributions] = setSignal(savedData.contributions);
         const [gastos, setGastos] = setSignal(savedData.gastos);
 
-        // Estados de modales y formularios (siempre empiezan vacíos/cerrados)
+        // ====== SIGNALS DE PARTICIPANTES ======
         const [isModalOpen, setIsModalOpen] = setSignal(false);
         const [participantName, setParticipantName] = setSignal('');
         const [isConfirmOpen, setIsConfirmOpen] = setSignal(false);
@@ -1460,7 +1424,7 @@
         const [selectedParticipant, setSelectedParticipant] = setSignal(null);
         const [isParticipantConfirmOpen, setIsParticipantConfirmOpen] = setSignal(false);
 
-        // Estados de contribuciones
+        // ====== SIGNALS DE CONTRIBUCIONES ======
         const [isContribModalOpen, setIsContribModalOpen] = setSignal(false);
         const [contributionName, setContributionName] = setSignal('');
         const [contributionAmount, setContributionAmount] = setSignal('');
@@ -1468,7 +1432,7 @@
         const [editingContribution, setEditingContribution] = setSignal(null);
         const [isContribConfirmOpen, setIsContribConfirmOpen] = setSignal(false);
 
-        // Estados de gastos
+        // ====== SIGNALS DE GASTOS ======
         const [isGastoModalOpen, setIsGastoModalOpen] = setSignal(false);
         const [gastoName, setGastoName] = setSignal('');
         const [gastoAmount, setGastoAmount] = setSignal('');
@@ -1476,9 +1440,10 @@
         const [editingGasto, setEditingGasto] = setSignal(null);
         const [isGastoConfirmOpen, setIsGastoConfirmOpen] = setSignal(false);
 
-        // Estado para reiniciar aplicación
+        // ====== SIGNAL DE REINICIO ======
         const [isResetConfirmOpen, setIsResetConfirmOpen] = setSignal(false);
 
+        // ====== PERSISTENCIA EN LOCALSTORAGE ======
         setEffect(() => {
           const saveData = {
             participants: participants(),
@@ -1494,7 +1459,21 @@
           }
         });
 
+        // ====== FUNCIONES DE PARTICIPANTES ======
         const openModal = () => setIsModalOpen(true);
+
+        const closeModal = () => {
+          setIsModalOpen(false);
+          setParticipantName('');
+        };
+
+        const handleSubmit = e => {
+          e.preventDefault();
+          const name = participantName().trim();
+          if (name.length === 0 || name.length > 10) return;
+          setParticipants([...participants(), { id: Date.now(), name, amount: 0 }]);
+          closeModal();
+        };
 
         const openParticipantDetail = participant => {
           setSelectedParticipant(participant);
@@ -1523,21 +1502,7 @@
           closeParticipantDeleteConfirm();
         };
 
-        const closeModal = () => {
-          setIsModalOpen(false);
-          setParticipantName('');
-        };
-
-        const handleSubmit = e => {
-          e.preventDefault();
-          const name = participantName().trim();
-
-          if (name.length === 0 || name.length > 10) return;
-
-          setParticipants([...participants(), { id: Date.now(), name, amount: 0 }]);
-          closeModal();
-        };
-
+        // ====== FUNCIONES DE CONTRIBUCIONES ======
         const openContribModal = (contribution = null) => {
           if (contribution) {
             setEditingContribution(contribution);
@@ -1561,17 +1526,6 @@
           setEditingContribution(null);
         };
 
-        const showContribDeleteConfirm = () => setIsContribConfirmOpen(true);
-        const closeContribDeleteConfirm = () => setIsContribConfirmOpen(false);
-        const confirmContribDelete = () => {
-          const editing = editingContribution();
-          if (editing) {
-            setContributions(contributions().filter(c => c.id !== editing.id));
-            closeContribModal();
-          }
-          closeContribDeleteConfirm();
-        };
-
         const handleContribSubmit = e => {
           e.preventDefault();
           const name = contributionName().trim();
@@ -1593,6 +1547,119 @@
           closeContribModal();
         };
 
+        const showContribDeleteConfirm = () => setIsContribConfirmOpen(true);
+
+        const closeContribDeleteConfirm = () => setIsContribConfirmOpen(false);
+
+        const confirmContribDelete = () => {
+          const editing = editingContribution();
+          if (editing) {
+            setContributions(contributions().filter(c => c.id !== editing.id));
+            closeContribModal();
+          }
+          closeContribDeleteConfirm();
+        };
+
+        // ====== FUNCIONES DE GASTOS ======
+        const openGastoModal = (gasto = null) => {
+          if (gasto) {
+            setEditingGasto(gasto);
+            setGastoName(gasto.name);
+            setGastoAmount(gasto.amount);
+            setGastoParticipants(gasto.participants || []);
+          } else {
+            setEditingGasto(null);
+            setGastoName('');
+            setGastoAmount('');
+            setGastoParticipants([]);
+          }
+          setIsGastoModalOpen(true);
+        };
+
+        const closeGastoModal = () => {
+          setIsGastoModalOpen(false);
+          setGastoName('');
+          setGastoAmount('');
+          setGastoParticipants([]);
+          setEditingGasto(null);
+        };
+
+        const handleGastoSubmit = e => {
+          e.preventDefault();
+          const name = gastoName().trim();
+          const amount = parseFloat(gastoAmount()) || 0;
+          const selectedParticipants = gastoParticipants();
+
+          if (name.length === 0 || name.length > 20) return;
+          if (amount < 1 || amount > 1000000) return;
+          if (selectedParticipants.length === 0) return;
+
+          const editing = editingGasto();
+          if (editing) {
+            setGastos(gastos().map(g => (g.id === editing.id ? { ...g, name, amount, participants: selectedParticipants } : g)));
+          } else {
+            setGastos([...gastos(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
+          }
+          closeGastoModal();
+        };
+
+        const showGastoDeleteConfirm = () => setIsGastoConfirmOpen(true);
+
+        const closeGastoDeleteConfirm = () => setIsGastoConfirmOpen(false);
+
+        const confirmGastoDelete = () => {
+          const editing = editingGasto();
+          if (editing) {
+            setGastos(gastos().filter(g => g.id !== editing.id));
+            closeGastoModal();
+          }
+          closeGastoDeleteConfirm();
+        };
+
+        // ====== FUNCIONES DE REINICIO ======
+        const showResetConfirm = () => setIsResetConfirmOpen(true);
+
+        const closeResetConfirm = () => setIsResetConfirmOpen(false);
+
+        const confirmResetApp = () => {
+          // Limpiar localStorage
+          localStorage.removeItem('chqpSave');
+
+          // Resetear todas las signals a valores por defecto
+          setActiveTab('participantes');
+          setParticipants([]);
+          setContributions([]);
+          setGastos([]);
+
+          // Cerrar todos los modales
+          setIsModalOpen(false);
+          setIsContribModalOpen(false);
+          setIsGastoModalOpen(false);
+          setIsParticipantDetailOpen(false);
+          setIsConfirmOpen(false);
+          setIsContribConfirmOpen(false);
+          setIsGastoConfirmOpen(false);
+          setIsParticipantConfirmOpen(false);
+
+          // Limpiar formularios
+          setParticipantName('');
+          setContributionName('');
+          setContributionAmount('');
+          setContributionParticipants([]);
+          setGastoName('');
+          setGastoAmount('');
+          setGastoParticipants([]);
+
+          // Limpiar estados de edición
+          setEditingContribution(null);
+          setEditingGasto(null);
+          setSelectedParticipant(null);
+          setParticipantToDelete(null);
+
+          closeResetConfirm();
+        };
+
+        // ====== EFFECTS PARA SINCRONIZACIÓN DE MODALES ======
         // Effect para sincronizar modal de contribuciones
         setEffect(() => {
           if (isContribModalOpen()) {
@@ -1637,106 +1704,14 @@
           }
         });
 
-        const openGastoModal = (gasto = null) => {
-          if (gasto) {
-            setEditingGasto(gasto);
-            setGastoName(gasto.name);
-            setGastoAmount(gasto.amount);
-            setGastoParticipants(gasto.participants || []);
-          } else {
-            setEditingGasto(null);
-            setGastoName('');
-            setGastoAmount('');
-            setGastoParticipants([]);
-          }
-          setIsGastoModalOpen(true);
-        };
-
-        const closeGastoModal = () => {
-          setIsGastoModalOpen(false);
-          setGastoName('');
-          setGastoAmount('');
-          setGastoParticipants([]);
-          setEditingGasto(null);
-        };
-
-        const handleGastoSubmit = e => {
-          e.preventDefault();
-          const name = gastoName().trim();
-          const amount = parseFloat(gastoAmount()) || 0;
-          const selectedParticipants = gastoParticipants();
-
-          if (name.length === 0 || name.length > 20) return;
-          if (amount < 1 || amount > 1000000) return;
-          if (selectedParticipants.length === 0) return;
-
-          const editing = editingGasto();
-          if (editing) {
-            setGastos(gastos().map(g => (g.id === editing.id ? { ...g, name, amount, participants: selectedParticipants } : g)));
-          } else {
-            setGastos([...gastos(), { id: Date.now(), name, amount, participants: selectedParticipants }]);
-          }
-          closeGastoModal();
-        };
-
-        const showGastoDeleteConfirm = () => setIsGastoConfirmOpen(true);
-        const closeGastoDeleteConfirm = () => setIsGastoConfirmOpen(false);
-        const confirmGastoDelete = () => {
-          const editing = editingGasto();
-          if (editing) {
-            setGastos(gastos().filter(g => g.id !== editing.id));
-            closeGastoModal();
-          }
-          closeGastoDeleteConfirm();
-        };
-
-        // Funciones para reiniciar aplicación
-        const showResetConfirm = () => setIsResetConfirmOpen(true);
-        const closeResetConfirm = () => setIsResetConfirmOpen(false);
-        const confirmResetApp = () => {
-          // Limpiar localStorage
-          localStorage.removeItem('chqpSave');
-
-          // Resetear todas las signals a valores por defecto
-          setActiveTab('participantes');
-          setParticipants([]);
-          setContributions([]);
-          setGastos([]);
-
-          // Cerrar modal y todos los modales abiertos
-          setIsModalOpen(false);
-          setIsContribModalOpen(false);
-          setIsGastoModalOpen(false);
-          setIsParticipantDetailOpen(false);
-          setIsConfirmOpen(false);
-          setIsContribConfirmOpen(false);
-          setIsGastoConfirmOpen(false);
-          setIsParticipantConfirmOpen(false);
-
-          // Limpiar formularios
-          setParticipantName('');
-          setContributionName('');
-          setContributionAmount('');
-          setContributionParticipants([]);
-          setGastoName('');
-          setGastoAmount('');
-          setGastoParticipants([]);
-
-          // Limpiar estados de edición
-          setEditingContribution(null);
-          setEditingGasto(null);
-          setSelectedParticipant(null);
-          setParticipantToDelete(null);
-
-          closeResetConfirm();
-        };
-
+        // ====== CONFIGURACIÓN DE PESTAÑAS ======
         const tabs = [
           { id: 'participantes', label: '👥 Participantes' },
           { id: 'gastos', label: '💸 Gastos' },
           { id: 'contribuciones', label: '💰 Contribuciones' },
         ];
 
+        // ====== RENDER PRINCIPAL ======
         return h(
           'div',
           { className: 'container' },
@@ -1834,14 +1809,11 @@
             )
           ),
 
-          // Botón de reiniciar todo
           h(
             'div',
             { className: 'reset-app-container' },
             h('button', { className: 'reset-app-btn', onclick: showResetConfirm }, '🔄 Reiniciar Todo')
           ),
-
-          // Modal de confirmación para reiniciar
           () =>
             ConfirmReset({
               isOpen: isResetConfirmOpen(),
@@ -1851,6 +1823,9 @@
         );
       }
 
+      // ================================================
+      // INICIALIZACIÓN DE LA APLICACIÓN
+      // ================================================
       const root = document.body;
       root.appendChild(CHQPApp());
     </script>
