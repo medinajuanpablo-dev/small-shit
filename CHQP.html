@@ -108,7 +108,7 @@
         padding: clamp(0.5rem, 3vw, 1.5rem);
         border-radius: 15px;
         border: 2px solid rgba(142, 36, 170, 0.1);
-        min-height: 350px;
+        min-height: 300px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -301,7 +301,7 @@
 
       .modal-content {
         background: white;
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 15px;
         max-width: 500px;
         width: 90%;
@@ -345,14 +345,14 @@
       .modal-form {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.8rem;
       }
 
       .modal-input {
-        padding: 0.8rem;
+        padding: 0.6rem;
         border: 2px solid rgba(142, 36, 170, 0.2);
         border-radius: 8px;
-        font-size: 1rem;
+        font-size: 0.9rem;
         transition: border-color 0.3s ease;
       }
 
@@ -373,10 +373,10 @@
       }
 
       .modal-btn {
-        padding: 0.8rem 1.5rem;
+        padding: 0.6rem 1.2rem;
         border: none;
         border-radius: 8px;
-        font-size: 1rem;
+        font-size: 0.9rem;
         cursor: pointer;
         transition: all 0.3s ease;
         font-weight: 500;
@@ -416,6 +416,54 @@
         color: #333;
       }
 
+      .modal-btn-convert-gasto {
+        background: linear-gradient(145deg, #ff9800, #e65100);
+        color: white;
+        border: 2px solid #ff9800;
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .modal-btn-convert-gasto:hover {
+        background: linear-gradient(145deg, #e65100, #d84315);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+      }
+
+      .modal-btn-convert-contribution {
+        background: linear-gradient(145deg, #00c853, #1b5e20);
+        color: white;
+        border: 2px solid #00c853;
+        box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .modal-btn-convert-contribution:hover {
+        background: linear-gradient(145deg, #1b5e20, #2e7d32);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 200, 83, 0.4);
+      }
+
+      .convert-button-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid rgba(142, 36, 170, 0.1);
+      }
+
       .modal-btn-delete {
         background: linear-gradient(145deg, #e74c3c, #c0392b);
         color: white;
@@ -441,7 +489,7 @@
          SELECTOR DE PARTICIPANTES
          ================================================ */
       .participants-selector {
-        margin: 1rem 0;
+        margin: 0.8rem 0;
       }
 
       .participants-label {
@@ -455,10 +503,10 @@
       .participants-checkboxes {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem;
         max-height: 150px;
         overflow-y: auto;
-        padding: 0.5rem;
+        padding: 0.4rem;
         border: 2px solid rgba(142, 36, 170, 0.2);
         border-radius: 8px;
         background: rgba(142, 36, 170, 0.05);
@@ -467,9 +515,9 @@
       .participant-checkbox-label {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         cursor: pointer;
-        padding: 0.3rem;
+        padding: 0.2rem;
         border-radius: 4px;
         transition: background-color 0.2s ease;
       }
@@ -502,6 +550,34 @@
         text-align: center;
         margin-top: 1rem;
         font-style: italic;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+      }
+
+      .select-all-btn {
+        background: linear-gradient(145deg, #8e24aa, #7b1fa2);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .select-all-btn:hover {
+        background: linear-gradient(145deg, #7b1fa2, #6a1b9a);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(142, 36, 170, 0.3);
+      }
+
+      .select-all-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(142, 36, 170, 0.3);
       }
 
       /* ================================================
@@ -741,6 +817,68 @@
         .modal-btn {
           padding: 0.6rem 1rem;
         }
+
+        .modal-content {
+          padding: 1rem;
+          width: 95%;
+          max-height: 90vh;
+        }
+
+        .modal-form {
+          gap: 0.6rem;
+        }
+
+        .modal-input {
+          padding: 0.5rem;
+          font-size: 0.85rem;
+        }
+
+        .modal-btn {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.85rem;
+        }
+
+        .modal-btn-convert-gasto,
+        .modal-btn-convert-contribution {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.85rem;
+        }
+
+        .convert-button-container {
+          margin-bottom: 0.8rem;
+          padding-bottom: 0.6rem;
+        }
+
+        .participants-selector {
+          margin: 0.6rem 0;
+        }
+
+        .participants-checkboxes {
+          max-height: 150px;
+          gap: 0.3rem;
+          padding: 0.3rem;
+        }
+
+        .participant-checkbox-label {
+          gap: 0.3rem;
+          padding: 0.1rem;
+          font-size: 0.85rem;
+        }
+
+        .participants-legend {
+          font-size: 0.75rem;
+          margin-top: 0.8rem;
+        }
+
+        .select-all-btn {
+          padding: 0.25rem 0.5rem;
+          font-size: 0.65rem;
+        }
+
+        .modal-title {
+          font-size: 1.2rem;
+          margin-bottom: 0.3rem;
+        }
       }
 
       @media (max-width: 360px) {
@@ -866,8 +1004,31 @@
       // ================================================
       const getParticipantNames = (participantIds, participants) => {
         if (!participantIds || participantIds.length === 0) return 'Ninguno';
-        const names = participantIds.map(id => participants().find(p => p.id === id)?.name).filter(name => name);
+
+        const allParticipants = participants();
+        const selectedCount = participantIds.length;
+        const totalCount = allParticipants.length;
+
+        // Si están todos seleccionados, mostrar "Todos"
+        if (selectedCount === totalCount && totalCount > 0) {
+          return 'Todos';
+        }
+
+        // Si no están todos, mostrar los nombres como antes
+        const names = participantIds.map(id => allParticipants.find(p => p.id === id)?.name).filter(name => name);
         return names.length > 0 ? names.join(', ') : 'Participantes eliminados';
+      };
+
+      const selectAllUnchecked = prefix => {
+        // Buscar todos los checkboxes del modal actual que empiecen con el prefijo dado
+        const checkboxes = document.querySelectorAll(`[id^="${prefix}"]`);
+
+        // Filtrar y hacer click en los que NO están checked
+        checkboxes.forEach(checkbox => {
+          if (!checkbox.checked) {
+            checkbox.click(); // Esto disparará el evento onchange naturalmente
+          }
+        });
       };
 
       const getParticipantData = (participant, contributions, gastos) => {
@@ -903,6 +1064,38 @@
         const totalGastos = participantData.filter(item => item.type === 'gasto').reduce((sum, item) => sum + item.amount, 0);
 
         return totalGastos - totalContributions; // Gastos menos contribuciones = lo que debe poner
+      };
+
+      // Función genérica para convertir entre contribución y gasto
+      const convertItem = (item, fromType, toType, setFromArray, fromArray, setToArray, toArray, setActiveTab, openModalFunction) => {
+        // Crear el nuevo item con los mismos datos
+        const newItem = {
+          id: Date.now(), // Nuevo ID para evitar conflictos
+          name: item.name,
+          amount: item.amount,
+          participants: [...item.participants], // Copia del array
+        };
+
+        // Agregar al array destino
+        setToArray([...toArray(), newItem]);
+
+        // Cambiar a la pestaña correspondiente
+        setActiveTab(toType === 'contribution' ? 'contribuciones' : 'gastos');
+
+        // Esperar un momento para que la pestaña se active y luego abrir el modal
+        setTimeout(() => {
+          openModalFunction(newItem);
+        }, 100);
+      };
+
+      // Función para verificar si ya existe una contribución con el mismo nombre
+      const contributionExists = (name, contributions) => {
+        return contributions().some(contribution => contribution.name.toLowerCase().trim() === name.toLowerCase().trim());
+      };
+
+      // Función para verificar si ya existe un gasto con el mismo nombre
+      const gastoExists = (name, gastos) => {
+        return gastos().some(gasto => gasto.name.toLowerCase().trim() === name.toLowerCase().trim());
       };
 
       // ================================================
@@ -1129,6 +1322,9 @@
         isContribConfirmOpen,
         closeContribDeleteConfirm,
         confirmContribDelete,
+        convertContributionToGasto,
+        gastos,
+        gastoExists,
       }) {
         const isContribFormValid = () => {
           const name = contributionName().trim();
@@ -1141,6 +1337,17 @@
           'form',
           { className: 'modal-form', onsubmit: handleContribSubmit },
           h('h3', { className: 'modal-title' }, editingContribution() ? 'Editar Contribución' : 'Agregar Contribución'),
+          editingContribution() &&
+            !gastoExists(editingContribution().name, gastos) &&
+            h(
+              'div',
+              { className: 'convert-button-container' },
+              h(
+                'button',
+                { type: 'button', className: 'modal-btn-convert-gasto', onclick: convertContributionToGasto },
+                '💸 Agregar como Gasto'
+              )
+            ),
           h('input', {
             id: 'contribution-name',
             className: 'modal-input',
@@ -1188,7 +1395,20 @@
                   )
                 )
               : h('p', { className: 'no-participants' }, 'No hay participantes disponibles'),
-            h('p', { className: 'participants-legend' }, 'Se reparte en partes iguales')
+            h(
+              'div',
+              { className: 'participants-legend' },
+              h('span', null, 'Se reparte en partes iguales'),
+              h(
+                'button',
+                {
+                  className: 'select-all-btn',
+                  type: 'button',
+                  onclick: () => selectAllUnchecked('participant-checkbox-'),
+                },
+                'Seleccionar todos'
+              )
+            )
           ),
           h(
             'div',
@@ -1276,6 +1496,9 @@
         isGastoConfirmOpen,
         closeGastoDeleteConfirm,
         confirmGastoDelete,
+        convertGastoToContribution,
+        contributions,
+        contributionExists,
       }) {
         const isGastoFormValid = () => {
           const name = gastoName().trim();
@@ -1288,6 +1511,17 @@
           'form',
           { className: 'modal-form', onsubmit: handleGastoSubmit },
           h('h3', { className: 'modal-title' }, editingGasto() ? 'Editar Gasto' : 'Agregar Gasto'),
+          editingGasto() &&
+            !contributionExists(editingGasto().name, contributions) &&
+            h(
+              'div',
+              { className: 'convert-button-container' },
+              h(
+                'button',
+                { type: 'button', className: 'modal-btn-convert-contribution', onclick: convertGastoToContribution },
+                '💰 Agregar como Contribución'
+              )
+            ),
           h('input', {
             id: 'gasto-name',
             className: 'modal-input',
@@ -1335,7 +1569,20 @@
                   )
                 )
               : h('p', { className: 'no-participants' }, 'No hay participantes disponibles'),
-            h('p', { className: 'participants-legend' }, 'Se reparte en partes iguales')
+            h(
+              'div',
+              { className: 'participants-legend' },
+              h('span', null, 'Se reparte en partes iguales'),
+              h(
+                'button',
+                {
+                  className: 'select-all-btn',
+                  type: 'button',
+                  onclick: () => selectAllUnchecked('gasto-participant-checkbox-'),
+                },
+                'Seleccionar todos'
+              )
+            )
           ),
           h(
             'div',
@@ -1560,6 +1807,25 @@
           closeContribDeleteConfirm();
         };
 
+        // Función para convertir contribución a gasto
+        const convertContributionToGasto = () => {
+          const contribution = editingContribution();
+          if (!contribution) return;
+
+          closeContribModal(); // Cerrar modal actual
+          convertItem(
+            contribution,
+            'contribution',
+            'gasto',
+            setContributions,
+            contributions,
+            setGastos,
+            gastos,
+            setActiveTab,
+            openGastoModal
+          );
+        };
+
         // ====== FUNCIONES DE GASTOS ======
         const openGastoModal = (gasto = null) => {
           if (gasto) {
@@ -1614,6 +1880,15 @@
             closeGastoModal();
           }
           closeGastoDeleteConfirm();
+        };
+
+        // Función para convertir gasto a contribución
+        const convertGastoToContribution = () => {
+          const gasto = editingGasto();
+          if (!gasto) return;
+
+          closeGastoModal(); // Cerrar modal actual
+          convertItem(gasto, 'gasto', 'contribution', setGastos, gastos, setContributions, contributions, setActiveTab, openContribModal);
         };
 
         // ====== FUNCIONES DE REINICIO ======
@@ -1781,6 +2056,9 @@
                 isContribConfirmOpen,
                 closeContribDeleteConfirm,
                 confirmContribDelete,
+                convertContributionToGasto,
+                gastos,
+                gastoExists,
               })
             ),
 
@@ -1805,6 +2083,9 @@
                 isGastoConfirmOpen,
                 closeGastoDeleteConfirm,
                 confirmGastoDelete,
+                convertGastoToContribution,
+                contributions,
+                contributionExists,
               })
             )
           ),
