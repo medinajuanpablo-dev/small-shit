@@ -361,7 +361,7 @@
 
       .modal-title {
         color: #4a148c;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.5rem;
         font-size: 1.4rem;
         font-weight: bold;
       }
@@ -648,6 +648,121 @@
         margin: 0.5rem 0;
       }
 
+      .participants-legend {
+        color: #999;
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 1rem;
+        font-style: italic;
+      }
+
+      .participant-detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .participant-detail-table th {
+        background: linear-gradient(145deg, #6a1b9a, #4a148c);
+        color: white;
+        padding: 0.8rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .participant-detail-table td {
+        padding: 0.7rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem;
+      }
+
+      .participant-detail-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .detail-row-contribution {
+        background: rgba(0, 200, 83, 0.1);
+        color: #1b5e20;
+      }
+
+      .detail-row-contribution:hover {
+        background: rgba(0, 200, 83, 0.15);
+      }
+
+      .detail-row-gasto {
+        background: rgba(255, 152, 0, 0.1);
+        color: #e65100;
+      }
+
+      .detail-row-gasto:hover {
+        background: rgba(255, 152, 0, 0.15);
+      }
+
+      .detail-type-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .detail-type-contribution {
+        background: #00c853;
+        color: white;
+      }
+
+      .detail-type-gasto {
+        background: #ff9800;
+        color: white;
+      }
+
+      .no-participant-data {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        margin: 1rem 0;
+      }
+
+      .participant-balance-summary {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: rgba(106, 27, 154, 0.1);
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid rgba(106, 27, 154, 0.2);
+      }
+
+      .participant-balance-summary h4 {
+        margin: 0 0 0.5rem 0;
+        color: #4a148c;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .participant-balance-amount {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .balance-debe {
+        color: #e74c3c;
+      }
+
+      .balance-le-deben {
+        color: #27ae60;
+      }
+
+      .balance-al-dia {
+        color: #666;
+      }
+
       .modal-btn-delete {
         background: linear-gradient(145deg, #e74c3c, #c0392b);
         color: white;
@@ -722,6 +837,8 @@
         isParticipantConfirmOpen,
         closeParticipantDeleteConfirm,
         confirmParticipantDelete,
+        contributions,
+        gastos,
       }) {
         const showDeleteConfirm = participant => {
           setParticipantToDelete(participant);
@@ -738,6 +855,43 @@
             setParticipants(participants().filter(p => p.id !== participantToDelete().id));
           }
           closeDeleteConfirm();
+        };
+
+        const getParticipantData = participant => {
+          if (!participant) return [];
+
+          const participantContributions = contributions()
+            .filter(c => c.participants && c.participants.includes(participant.id))
+            .map(c => ({
+              id: c.id,
+              name: c.name,
+              amount: Math.round(c.amount / c.participants.length),
+              type: 'contribution',
+            }));
+
+          const participantGastos = gastos()
+            .filter(g => g.participants && g.participants.includes(participant.id))
+            .map(g => ({
+              id: g.id,
+              name: g.name,
+              amount: Math.round(g.amount / g.participants.length),
+              type: 'gasto',
+            }));
+
+          return [...participantContributions, ...participantGastos].sort((a, b) => a.name.localeCompare(b.name));
+        };
+
+        const calculateParticipantBalance = participant => {
+          if (!participant) return 0;
+
+          const participantData = getParticipantData(participant);
+          const totalContributions = participantData
+            .filter(item => item.type === 'contribution')
+            .reduce((sum, item) => sum + item.amount, 0);
+
+          const totalGastos = participantData.filter(item => item.type === 'gasto').reduce((sum, item) => sum + item.amount, 0);
+
+          return totalGastos - totalContributions; // Gastos menos contribuciones = lo que debe poner
         };
 
         const modalContent = h(
@@ -780,8 +934,9 @@
                 h(
                   'tbody',
                   null,
-                  ...participants().map(participant =>
-                    h(
+                  ...participants().map(participant => {
+                    const balance = calculateParticipantBalance(participant);
+                    return h(
                       'tr',
                       {
                         key: participant.id,
@@ -794,15 +949,13 @@
                         'td',
                         {
                           className: `participant-amount-cell ${
-                            (participant.amount || 0) > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
+                            balance > 0 ? 'participant-amount-positive' : 'participant-amount-zero-negative'
                           }`,
                         },
-                        `${participant.amount > 0 ? 'Debe' : participant.amount < 0 ? 'Le deben' : ''} $ ${
-                          Math.abs(participant.amount) || '0'
-                        }`
+                        balance > 0 ? `Debe $ ${Math.abs(balance)}` : balance < 0 ? `Le deben $ ${Math.abs(balance)}` : 'Está al día'
                       )
-                    )
-                  )
+                    );
+                  })
                 )
               )
             ),
@@ -823,8 +976,63 @@
                 'div',
                 { className: 'modal-form' },
                 h('h3', { className: 'modal-title' }, `📊 Detalles de ${selectedParticipant()?.name}`),
-                h('p', null, 'Contribuciones y gastos de este participante:'),
-                h('p', { className: 'confirm-warning-text' }, '[Tabla placeholder - próximamente]'),
+                () => {
+                  const participantData = getParticipantData(selectedParticipant());
+                  const balance = calculateParticipantBalance(selectedParticipant());
+                  return h(
+                    'div',
+                    null,
+                    h(
+                      'div',
+                      {
+                        className: 'participant-balance-summary',
+                      },
+                      h('h4', null, 'Balance:'),
+                      h(
+                        'p',
+                        {
+                          className: `participant-balance-amount ${
+                            balance > 0 ? 'balance-debe' : balance < 0 ? 'balance-le-deben' : 'balance-al-dia'
+                          }`,
+                        },
+                        balance > 0 ? `Debe $ ${Math.abs(balance)}` : balance < 0 ? `Le deben $ ${Math.abs(balance)}` : 'Está al día'
+                      )
+                    ),
+                    participantData.length > 0
+                      ? h(
+                          'table',
+                          { className: 'participant-detail-table' },
+                          h('thead', null, h('tr', null, h('th', null, 'Nombre'), h('th', null, 'Monto'), h('th', null, 'Tipo'))),
+                          h(
+                            'tbody',
+                            null,
+                            ...participantData.map(item =>
+                              h(
+                                'tr',
+                                {
+                                  key: `${item.type}-${item.id}`,
+                                  className: `detail-row-${item.type}`,
+                                },
+                                h('td', null, item.name),
+                                h('td', null, `$ ${item.amount}`),
+                                h(
+                                  'td',
+                                  null,
+                                  h(
+                                    'span',
+                                    {
+                                      className: `detail-type-badge detail-type-${item.type}`,
+                                    },
+                                    item.type === 'contribution' ? 'Contribución' : 'Gasto'
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      : h('p', { className: 'no-participant-data' }, 'Este participante no tiene contribuciones ni gastos registrados')
+                  );
+                },
                 h(
                   'div',
                   { className: 'modal-buttons' },
@@ -932,7 +1140,8 @@
                     )
                   )
                 )
-              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles')
+              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles'),
+            h('p', { className: 'participants-legend' }, 'Se reparte en partes iguales')
           ),
           h(
             'div',
@@ -1084,7 +1293,8 @@
                     )
                   )
                 )
-              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles')
+              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles'),
+            h('p', { className: 'participants-legend' }, 'Se reparte en partes iguales')
           ),
           h(
             'div',
@@ -1471,6 +1681,8 @@
                 isParticipantConfirmOpen,
                 closeParticipantDeleteConfirm,
                 confirmParticipantDelete,
+                contributions,
+                gastos,
               })
             ),
 
