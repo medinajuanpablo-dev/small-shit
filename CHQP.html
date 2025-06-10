@@ -299,6 +299,13 @@
         backdrop-filter: blur(3px);
       }
 
+      /* Modal overlay para modales apilados (encima de otros modales) */
+      .modal-overlay.stacked {
+        z-index: 1100;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+      }
+
       .modal-content {
         background: white;
         padding: 1.5rem;
@@ -654,6 +661,19 @@
         color: #666;
         font-style: italic;
         margin: 1rem 0;
+      }
+
+      /* Filas clickeables en tabla de detalles */
+      .detail-row-contribution,
+      .detail-row-gasto {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .detail-row-contribution:hover,
+      .detail-row-gasto:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
       /* ================================================
@@ -1065,7 +1085,7 @@
       // ================================================
       // COMPONENTES DE MODAL
       // ================================================
-      function Modal({ isOpen, onClose, children }) {
+      function Modal({ isOpen, onClose, children, stacked = false }) {
         if (!isOpen) return null;
 
         const handleOverlayClick = e => {
@@ -1076,7 +1096,7 @@
 
         return h(
           'div',
-          { className: 'modal-overlay', onclick: handleOverlayClick },
+          { className: `modal-overlay ${stacked ? 'stacked' : ''}`, onclick: handleOverlayClick },
           h('div', { className: 'modal-content' }, h('button', { className: 'modal-close', onclick: onClose }, '×'), children)
         );
       }
@@ -1234,6 +1254,152 @@
         return Modal({ isOpen, onClose, children: instructionsContent });
       }
 
+      function StackedModal({
+        isOpen,
+        onClose,
+        modalType,
+        editingItem,
+        // Contribution props
+        contributionName,
+        setContributionName,
+        contributionAmount,
+        setContributionAmount,
+        contributionParticipants,
+        setContributionParticipants,
+        // Gasto props
+        gastoName,
+        setGastoName,
+        gastoAmount,
+        setGastoAmount,
+        gastoParticipants,
+        setGastoParticipants,
+        // Common props
+        participants,
+        handleSubmit,
+        handleDelete,
+        gastos,
+        contributions,
+        gastoExists,
+        contributionExists,
+      }) {
+        if (!isOpen || !modalType) return null;
+
+        const isContribution = modalType === 'contribution';
+        const isGasto = modalType === 'gasto';
+
+        const isFormValid = () => {
+          if (isContribution) {
+            const name = contributionName().trim();
+            const amount = parseFloat(contributionAmount()) || 0;
+            const selectedParticipants = contributionParticipants();
+            return name.length > 0 && amount >= 1 && selectedParticipants.length > 0;
+          } else if (isGasto) {
+            const name = gastoName().trim();
+            const amount = parseFloat(gastoAmount()) || 0;
+            const selectedParticipants = gastoParticipants();
+            return name.length > 0 && amount >= 1 && selectedParticipants.length > 0;
+          }
+          return false;
+        };
+
+        const modalContent = h(
+          'form',
+          { className: 'modal-form', onsubmit: handleSubmit },
+          h('h3', { className: 'modal-title' }, isContribution ? 'Editar Contribución' : 'Editar Gasto'),
+
+          h('input', {
+            id: isContribution ? 'contribution-name' : 'gasto-name',
+            className: 'modal-input',
+            type: 'text',
+            placeholder: isContribution ? 'Nombre de la contribución' : 'Nombre del gasto',
+            oninput: e => (isContribution ? setContributionName(e.target.value) : setGastoName(e.target.value)),
+            required: true,
+            maxlength: 20,
+          }),
+
+          h('input', {
+            id: isContribution ? 'contribution-amount' : 'gasto-amount',
+            className: 'modal-input',
+            type: 'number',
+            placeholder: isContribution ? 'Monto de la contribución' : 'Monto del gasto',
+            oninput: e => (isContribution ? setContributionAmount(e.target.value) : setGastoAmount(e.target.value)),
+            required: true,
+          }),
+
+          h(
+            'div',
+            { className: 'participants-selector' },
+            h('label', { className: 'participants-label' }, isContribution ? 'Contribuyentes:' : 'Consumidores:'),
+            participants().length > 0
+              ? h(
+                  'div',
+                  { className: 'participants-checkboxes' },
+                  ...participants().map(participant =>
+                    h(
+                      'label',
+                      { className: 'participant-checkbox-label' },
+                      h('input', {
+                        id: isContribution ? `participant-checkbox-${participant.id}` : `gasto-participant-checkbox-${participant.id}`,
+                        type: 'checkbox',
+                        onchange: e => {
+                          const isChecked = e.target.checked;
+                          if (isContribution) {
+                            const currentSelected = contributionParticipants();
+                            if (isChecked) {
+                              setContributionParticipants([...currentSelected, participant.id]);
+                            } else {
+                              setContributionParticipants(currentSelected.filter(id => id !== participant.id));
+                            }
+                          } else {
+                            const currentSelected = gastoParticipants();
+                            if (isChecked) {
+                              setGastoParticipants([...currentSelected, participant.id]);
+                            } else {
+                              setGastoParticipants(currentSelected.filter(id => id !== participant.id));
+                            }
+                          }
+                        },
+                      }),
+                      h('span', null, participant.name)
+                    )
+                  )
+                )
+              : h('p', { className: 'no-participants' }, 'No hay participantes disponibles'),
+            h(
+              'div',
+              { className: 'participants-legend' },
+              h('span', null, 'Se reparte en partes iguales'),
+              h(
+                'button',
+                {
+                  className: 'select-all-btn',
+                  type: 'button',
+                  onclick: () => selectAllUnchecked(isContribution ? 'participant-checkbox-' : 'gasto-participant-checkbox-'),
+                },
+                'Seleccionar todos'
+              )
+            )
+          ),
+
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: handleDelete }, 'Eliminar'),
+            h(
+              'button',
+              {
+                type: 'submit',
+                className: () => `modal-btn modal-btn-primary ${!isFormValid() ? 'disabled' : ''}`,
+              },
+              'Guardar'
+            )
+          )
+        );
+
+        return Modal({ isOpen, onClose, children: modalContent, stacked: true });
+      }
+
       // ================================================
       // GESTIÓN DE DATOS Y LOCALSTORAGE
       // ================================================
@@ -1387,6 +1553,8 @@
         confirmParticipantDelete,
         contributions,
         gastos,
+        findOriginalItem,
+        openStackedModal,
       }) {
         const showDeleteConfirm = participant => {
           setParticipantToDelete(participant);
@@ -1523,6 +1691,15 @@
                                 {
                                   key: `${item.type}-${item.id}`,
                                   className: `detail-row-${item.type}`,
+                                  onclick: () => {
+                                    // Encontrar el item original completo
+                                    const originalItem = findOriginalItem(item.id, item.type);
+                                    if (originalItem) {
+                                      openStackedModal(originalItem, item.type);
+                                    }
+                                  },
+                                  title: 'Clic para editar',
+                                  style: 'cursor: pointer;',
                                 },
                                 h('td', null, item.name),
                                 h('td', null, `$ ${item.amount}`),
@@ -1961,6 +2138,11 @@
         const [collapsible3Expanded, setCollapsible3Expanded] = setSignal(false);
         const [collapsible4Expanded, setCollapsible4Expanded] = setSignal(false);
 
+        // ====== SIGNALS DE MODALES APILADOS ======
+        const [isStackedModalOpen, setIsStackedModalOpen] = setSignal(false);
+        const [stackedModalType, setStackedModalType] = setSignal(null); // 'contribution' o 'gasto'
+        const [stackedEditingItem, setStackedEditingItem] = setSignal(null);
+
         // ====== PERSISTENCIA EN LOCALSTORAGE ======
         setEffect(() => {
           const saveData = {
@@ -2228,6 +2410,77 @@
         const toggleCollapsible3 = () => setCollapsible3Expanded(!collapsible3Expanded());
         const toggleCollapsible4 = () => setCollapsible4Expanded(!collapsible4Expanded());
 
+        // ====== FUNCIONES DE MODALES APILADOS ======
+        const openStackedModal = (item, type) => {
+          if (type === 'contribution') {
+            setContributionName(item.name);
+            setContributionAmount(item.amount.toString());
+            setContributionParticipants(item.participants || []);
+            setEditingContribution(item);
+          } else if (type === 'gasto') {
+            setGastoName(item.name);
+            setGastoAmount(item.amount.toString());
+            setGastoParticipants(item.participants || []);
+            setEditingGasto(item);
+          }
+
+          setStackedModalType(type);
+          setStackedEditingItem(item);
+          setIsStackedModalOpen(true);
+        };
+
+        const closeStackedModal = () => {
+          setIsStackedModalOpen(false);
+          setStackedModalType(null);
+          setStackedEditingItem(null);
+
+          // Limpiar formularios
+          setContributionName('');
+          setContributionAmount('');
+          setContributionParticipants([]);
+          setEditingContribution(null);
+          setGastoName('');
+          setGastoAmount('');
+          setGastoParticipants([]);
+          setEditingGasto(null);
+        };
+
+        const handleStackedSubmit = e => {
+          e.preventDefault();
+          const type = stackedModalType();
+
+          if (type === 'contribution') {
+            handleContribSubmit(e);
+          } else if (type === 'gasto') {
+            handleGastoSubmit(e);
+          }
+
+          closeStackedModal();
+        };
+
+        const handleStackedDelete = () => {
+          const type = stackedModalType();
+          const item = stackedEditingItem();
+
+          if (type === 'contribution' && item) {
+            setContributions(contributions().filter(c => c.id !== item.id));
+          } else if (type === 'gasto' && item) {
+            setGastos(gastos().filter(g => g.id !== item.id));
+          }
+
+          closeStackedModal();
+        };
+
+        // Función para encontrar el item original por ID y tipo
+        const findOriginalItem = (itemId, type) => {
+          if (type === 'contribution') {
+            return contributions().find(c => c.id === itemId);
+          } else if (type === 'gasto') {
+            return gastos().find(g => g.id === itemId);
+          }
+          return null;
+        };
+
         // ====== EFFECTS PARA SINCRONIZACIÓN DE MODALES ======
 
         // Effect para sincronizar modal de participantes
@@ -2239,6 +2492,48 @@
                 participantNameInput.value = '';
               }
             }, 100);
+          }
+        });
+
+        // Effect para sincronizar modal apilado
+        setEffect(() => {
+          if (isStackedModalOpen()) {
+            setTimeout(() => {
+              const type = stackedModalType();
+              if (type === 'contribution') {
+                const contributionNameInput = document.querySelector('#contribution-name');
+                const contributionAmountInput = document.querySelector('#contribution-amount');
+                const checkboxes = document.querySelectorAll('[id^="participant-checkbox-"]');
+
+                if (contributionNameInput && contributionAmountInput) {
+                  const editing = editingContribution();
+                  if (editing) {
+                    contributionNameInput.value = editing.name;
+                    contributionAmountInput.value = editing.amount;
+                    checkboxes.forEach(checkbox => {
+                      const participantId = parseInt(checkbox.id.replace('participant-checkbox-', ''));
+                      checkbox.checked = editing.participants.includes(participantId);
+                    });
+                  }
+                }
+              } else if (type === 'gasto') {
+                const gastoNameInput = document.querySelector('#gasto-name');
+                const gastoAmountInput = document.querySelector('#gasto-amount');
+                const checkboxes = document.querySelectorAll('[id^="gasto-participant-checkbox-"]');
+
+                if (gastoNameInput && gastoAmountInput) {
+                  const editing = editingGasto();
+                  if (editing) {
+                    gastoNameInput.value = editing.name;
+                    gastoAmountInput.value = editing.amount;
+                    checkboxes.forEach(checkbox => {
+                      const participantId = parseInt(checkbox.id.replace('gasto-participant-checkbox-', ''));
+                      checkbox.checked = editing.participants.includes(participantId);
+                    });
+                  }
+                }
+              }
+            }, 10);
           }
         });
 
@@ -2345,6 +2640,8 @@
                 confirmParticipantDelete,
                 contributions,
                 gastos,
+                findOriginalItem,
+                openStackedModal,
               })
             ),
 
@@ -2430,6 +2727,35 @@
               toggleCollapsible2,
               toggleCollapsible3,
               toggleCollapsible4,
+            }),
+          () =>
+            StackedModal({
+              isOpen: isStackedModalOpen(),
+              onClose: closeStackedModal,
+              modalType: stackedModalType(),
+              editingItem: stackedEditingItem(),
+              // Contribution props
+              contributionName,
+              setContributionName,
+              contributionAmount,
+              setContributionAmount,
+              contributionParticipants,
+              setContributionParticipants,
+              // Gasto props
+              gastoName,
+              setGastoName,
+              gastoAmount,
+              setGastoAmount,
+              gastoParticipants,
+              setGastoParticipants,
+              // Common props
+              participants,
+              handleSubmit: handleStackedSubmit,
+              handleDelete: handleStackedDelete,
+              gastos,
+              contributions,
+              gastoExists,
+              contributionExists,
             })
         );
       }
