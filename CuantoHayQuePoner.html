@@ -1173,7 +1173,18 @@
         const instructionsContent = h(
           'div',
           { className: 'instructions-modal' },
-          h('h3', { className: 'instructions-title' }, '📋 ¿Cómo usar la aplicación?'),
+
+          h('h3', { className: 'instructions-title' }, '¿Qué es esto?'),
+
+          h('p', null, 'Una App para calcular los gastos de un grupo de personas en una reunión o salida.'),
+
+          h(
+            'p',
+            null,
+            'Puedes incluir muchos gastos distintos o las distintas contribuciones que se hacen en el camino y hay que tener en cuenta.'
+          ),
+
+          h('h3', { className: 'instructions-title' }, '¿Cómo usar?'),
 
           Collapsible({
             title: '👥 Agrega a los Participantes',
@@ -1197,7 +1208,7 @@
               h(
                 'p',
                 null,
-                'Agrega las consumiciones o gastos que tengan los participantes del grupo. Por ejemplo, si algunos toman bebidas, agrega cuánto costó y quiénes toman/tomaron.'
+                'Agrega las consumiciones o gastos que hagan los participantes del grupo. Por ejemplo, si algunos toman bebidas, agrega cuánto costó y quiénes toman/tomaron.'
               ),
               h('p', null, 'Puedes ir agregando o editando gastos en cualquier momento, no hace falta que los agregues todos de una vez.')
             ),
