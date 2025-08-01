@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: #ecf0f1;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+        padding: 10px;
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+      .container {
+        background: rgba(52, 73, 94, 0.9);
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        border-radius: 25px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        max-width: 500px;
+        width: 95%;
+        backdrop-filter: blur(15px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+      }
+      h1 {
+        color: #e3f6fc;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        font-size: clamp(2rem, 6vw, 2.8rem);
+        font-weight: bold;
+      }
+      .timer-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+      .main-button {
+        width: clamp(80px, 20vw, 100px);
+        height: clamp(80px, 20vw, 100px);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: clamp(1rem, 3vw, 1.3rem);
+        font-weight: bold;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+      }
+      .main-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+      }
+      .main-button:active {
+        transform: translateY(-1px) scale(1.02);
+      }
+      .btn-work {
+        background: linear-gradient(145deg, #9b59b6, #8e44ad);
+      }
+      .btn-work:hover {
+        background: linear-gradient(145deg, #8e44ad, #7d3c98);
+      }
+      .btn-break {
+        background: linear-gradient(145deg, #27ae60, #2ecc71);
+      }
+      .btn-break:hover {
+        background: linear-gradient(145deg, #229954, #27ae60);
+      }
+      .timer-display {
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 2rem 0;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+      .timer-display.trabajo {
+        background: rgba(155, 89, 182, 0.8);
+        border: 2px solid rgba(155, 89, 182, 0.3);
+      }
+      .timer-display.descanso {
+        background: rgba(39, 174, 96, 0.8);
+        border: 2px solid rgba(39, 174, 96, 0.3);
+      }
+      .time {
+        font-size: clamp(3rem, 12vw, 4.5rem);
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        margin-bottom: 1rem;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.1em;
+      }
+      .session-type {
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        color: #bdc3c7;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      .control-button {
+        padding: clamp(1rem, 3vw, 1.2rem) clamp(2rem, 6vw, 2.5rem);
+        font-size: clamp(1.1rem, 3vw, 1.3rem);
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        color: white;
+        margin: 0.5rem;
+      }
+      .control-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      }
+      .control-button:active {
+        transform: translateY(0);
+      }
+      .btn-stop {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+      }
+      .btn-stop:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+      }
+      .btn-continue {
+        background: linear-gradient(145deg, #27ae60, #2ecc71);
+      }
+      .btn-continue:hover {
+        background: linear-gradient(145deg, #229954, #27ae60);
+      }
+      .button-label {
+        font-size: 0.8em;
+        opacity: 0.9;
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding: 1.5rem;
+          width: 100%;
+          border-radius: 15px;
+        }
+        .timer-buttons {
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+        }
+        .timer-display {
+          padding: 1.5rem;
+          margin: 1.5rem 0;
+        }
+        h1 {
+          margin-bottom: 1.5rem;
+        }
+      }
+      @media (max-width: 400px) {
+        .timer-buttons {
+          gap: 1rem;
+        }
+        .main-button {
+          gap: 0.2rem;
+        }
+        .control-button {
+          padding: 0.8rem 1.5rem;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      //prettier-ignore
+      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+
+      function PomodoroTimer() {
+        const [timeLeft, setTimeLeft] = setSignal(25 * 60);
+        const [isRunning, setIsRunning] = setSignal(false);
+        const [sessionType, setSessionType] = setSignal('trabajo');
+        const [intervalId, setIntervalId] = setSignal(null);
+        const [audioIntervalId, setAudioIntervalId] = setSignal(null);
+
+        const formatTime = seconds => {
+          const mins = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        const playBeep = () => {
+          try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.5);
+          } catch (error) {
+            console.log('Audio no disponible');
+          }
+        };
+
+        const startRepeatingBeep = () => {
+          playBeep();
+          const audioId = setInterval(() => {
+            playBeep();
+          }, 1000);
+          setAudioIntervalId(audioId);
+        };
+
+        const stopRepeatingBeep = () => {
+          if (audioIntervalId()) {
+            clearInterval(audioIntervalId());
+            setAudioIntervalId(null);
+          }
+        };
+
+        const startTimer = (minutes, type) => {
+          if (intervalId()) {
+            clearInterval(intervalId());
+            setIntervalId(null);
+          }
+          stopRepeatingBeep();
+          setTimeLeft(minutes * 60);
+          setSessionType(type);
+          setIsRunning(true);
+
+          const id = setInterval(() => {
+            setTimeLeft(prev => {
+              if (prev <= 1) {
+                clearInterval(id);
+                setIntervalId(null);
+                setIsRunning(false);
+                startRepeatingBeep();
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+
+          setIntervalId(id);
+        };
+
+        const stopTimer = () => {
+          if (intervalId()) {
+            clearInterval(intervalId());
+            setIntervalId(null);
+          }
+          stopRepeatingBeep();
+          setIsRunning(false);
+        };
+
+        const continueTimer = () => {
+          if (timeLeft() > 0 && !isRunning()) {
+            stopRepeatingBeep();
+            setIsRunning(true);
+
+            const id = setInterval(() => {
+              setTimeLeft(prev => {
+                if (prev <= 1) {
+                  clearInterval(id);
+                  setIntervalId(null);
+                  setIsRunning(false);
+                  startRepeatingBeep();
+                  return 0;
+                }
+                return prev - 1;
+              });
+            }, 1000);
+
+            setIntervalId(id);
+          }
+        };
+
+        return h(
+          'div',
+          { className: 'container' },
+          h('h1', null, 'Pomodoro Timer'),
+          h(
+            'div',
+            { className: 'timer-buttons' },
+            h(
+              'button',
+              {
+                className: 'main-button btn-work',
+                onclick: () => startTimer(25, 'trabajo'),
+              },
+              h('div', null, '25'),
+              h('div', { className: 'button-label' }, 'min')
+            ),
+            h(
+              'button',
+              {
+                className: 'main-button btn-break',
+                onclick: () => startTimer(5, 'descanso'),
+              },
+              h('div', null, '5'),
+              h('div', { className: 'button-label' }, 'min')
+            )
+          ),
+          h(
+            'div',
+            { className: () => `timer-display ${sessionType()}` },
+            h('div', { className: 'time' }, () => formatTime(timeLeft())),
+            h('div', { className: 'session-type' }, () => sessionType())
+          ),
+          h(
+            'button',
+            {
+              className: () => (isRunning() || audioIntervalId() ? 'control-button btn-stop' : 'control-button btn-continue'),
+              onclick: () => (isRunning() || audioIntervalId() ? stopTimer() : continueTimer()),
+            },
+            () => (isRunning() || audioIntervalId() ? 'Parar' : 'Seguir')
+          )
+        );
+      }
+
+      const root = document.body;
+      root.appendChild(PomodoroTimer());
+    </script>
+  </body>
+</html>
