@@ -190,6 +190,8 @@
         const [sessionType, setSessionType] = setSignal('trabajo');
         const [intervalId, setIntervalId] = setSignal(null);
         const [audioIntervalId, setAudioIntervalId] = setSignal(null);
+        const [startTime, setStartTime] = setSignal(null);
+        const [originalDuration, setOriginalDuration] = setSignal(0);
 
         const formatTime = seconds => {
           const mins = Math.floor(seconds / 60);
@@ -232,29 +234,40 @@
           }
         };
 
+        const updateTimer = () => {
+          if (!isRunning() || !startTime()) return;
+
+          const now = Date.now();
+          const elapsed = Math.floor((now - startTime()) / 1000);
+          const remaining = Math.max(0, originalDuration() - elapsed);
+
+          setTimeLeft(remaining);
+
+          if (remaining <= 0) {
+            clearInterval(intervalId());
+            setIntervalId(null);
+            setIsRunning(false);
+            setStartTime(null);
+            startRepeatingBeep();
+          }
+        };
+
         const startTimer = (minutes, type) => {
           if (intervalId()) {
             clearInterval(intervalId());
             setIntervalId(null);
           }
           stopRepeatingBeep();
-          setTimeLeft(minutes * 60);
+
+          const duration = minutes * 60;
+          setTimeLeft(duration);
+          setOriginalDuration(duration);
           setSessionType(type);
           setIsRunning(true);
+          setStartTime(Date.now());
 
-          const id = setInterval(() => {
-            setTimeLeft(prev => {
-              if (prev <= 1) {
-                clearInterval(id);
-                setIntervalId(null);
-                setIsRunning(false);
-                startRepeatingBeep();
-                return 0;
-              }
-              return prev - 1;
-            });
-          }, 1000);
-
+          updateTimer();
+          const id = setInterval(updateTimer, 1000);
           setIntervalId(id);
         };
 
@@ -265,6 +278,7 @@
           }
           stopRepeatingBeep();
           setIsRunning(false);
+          setStartTime(null);
         };
 
         const continueTimer = () => {
@@ -272,22 +286,24 @@
             stopRepeatingBeep();
             setIsRunning(true);
 
-            const id = setInterval(() => {
-              setTimeLeft(prev => {
-                if (prev <= 1) {
-                  clearInterval(id);
-                  setIntervalId(null);
-                  setIsRunning(false);
-                  startRepeatingBeep();
-                  return 0;
-                }
-                return prev - 1;
-              });
-            }, 1000);
+            const remainingSeconds = timeLeft();
+            setOriginalDuration(remainingSeconds);
+            setStartTime(Date.now());
 
+            updateTimer();
+            const id = setInterval(updateTimer, 1000);
             setIntervalId(id);
           }
         };
+
+        const handleVisibilityChange = () => {
+          if (!document.hidden && isRunning()) {
+            updateTimer();
+          }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleVisibilityChange);
 
         return h(
           'div',
