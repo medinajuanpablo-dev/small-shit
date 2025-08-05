@@ -221,8 +221,14 @@
 
         const startRepeatingBeep = () => {
           playBeep();
+          let beepCount = 0;
           const audioId = setInterval(() => {
             playBeep();
+            beepCount++;
+            if (beepCount >= 5) {
+              clearInterval(audioId);
+              setAudioIntervalId(null);
+            }
           }, 1000);
           setAudioIntervalId(audioId);
         };
