@@ -156,12 +156,12 @@
       }
 
       .modo-dia-habil {
-        background: linear-gradient(145deg, #4caf50, #388e3c);
+        background: linear-gradient(145deg, #ff9800, #e65100);
         color: white;
       }
 
       .modo-fin-semana {
-        background: linear-gradient(145deg, #ff9800, #e65100);
+        background: linear-gradient(145deg, #8bc34a, #689f38);
         color: white;
       }
 
@@ -170,8 +170,16 @@
         font-weight: bold;
         margin: 1rem 0;
         font-family: 'Courier New', monospace;
-        color: #ffffff;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+      }
+
+      .saldo-dia-habil {
+        color: #ff9800;
+        text-shadow: 0 0 10px rgba(255, 152, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5), 0 0 30px rgba(255, 152, 0, 0.3);
+      }
+
+      .saldo-fin-semana {
+        color: #8bc34a;
+        text-shadow: 0 0 10px rgba(139, 195, 74, 0.8), 0 0 20px rgba(139, 195, 74, 0.5), 0 0 30px rgba(139, 195, 74, 0.3);
       }
 
       .botones-tiempo {
@@ -182,6 +190,17 @@
         max-width: 600px;
         margin-left: auto;
         margin-right: auto;
+      }
+
+      /* Contenedores de filas para mobile - neutrales en desktop */
+      .fila-agregar,
+      .fila-quitar {
+        display: contents; /* Los hijos se comportan como si estuvieran directamente en el grid */
+      }
+
+      .fila-historial,
+      .fila-acciones {
+        display: contents; /* Neutrales en desktop */
       }
 
       .btn-tiempo {
@@ -209,22 +228,16 @@
 
       /* Botones agregar tiempo (verdes) */
       .btn-agregar-10,
+      .btn-agregar-30,
       .btn-agregar-hour {
         background: linear-gradient(145deg, #4caf50, #388e3c);
       }
 
-      .btn-agregar-30 {
-        background: linear-gradient(145deg, #2e7d32, #1b5e20);
-      }
-
       /* Botones quitar tiempo (rojos) */
       .btn-quitar-10,
+      .btn-quitar-30,
       .btn-quitar-hour {
         background: linear-gradient(145deg, #f44336, #d32f2f);
-      }
-
-      .btn-quitar-30 {
-        background: linear-gradient(145deg, #c62828, #b71c1c);
       }
 
       .btn-historial {
@@ -238,7 +251,6 @@
         color: white;
         background: linear-gradient(145deg, #607d8b, #455a64);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        margin-top: 1rem;
       }
 
       .btn-historial:hover {
@@ -268,12 +280,124 @@
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
       }
 
+      .btn-reset {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        background: linear-gradient(145deg, #9e9e9e, #757575);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        margin-top: 1rem;
+        margin-left: 1rem;
+      }
+
+      .btn-reset:hover {
+        background: linear-gradient(145deg, #757575, #616161);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
       .botones-historial-container {
         display: flex;
         justify-content: center;
         gap: 1rem;
         align-items: center;
         margin-top: 1rem;
+      }
+
+      /* ================================================
+         DROPDOWN DE OPCIONES
+         ================================================ */
+      .dropdown-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-toggle {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        background: linear-gradient(145deg, #795548, #5d4037);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .dropdown-toggle:hover {
+        background: linear-gradient(145deg, #5d4037, #4e342e);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+        padding: 0.5rem 0;
+        min-width: 200px;
+        z-index: 1000;
+        margin-bottom: 0.5rem;
+        border: 2px solid rgba(121, 85, 72, 0.1);
+        backdrop-filter: blur(10px);
+        animation: dropdownSlideUp 0.2s ease;
+      }
+
+      .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .dropdown-item:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-item:hover {
+        background: rgba(121, 85, 72, 0.1);
+        color: #5d4037;
+      }
+
+      .dropdown-arrow {
+        transition: transform 0.2s ease;
+        font-size: 0.8rem;
+      }
+
+      .dropdown-arrow.open {
+        transform: rotate(180deg);
+      }
+
+      @keyframes dropdownSlideUp {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
       }
 
       .transacciones-container {
@@ -300,6 +424,40 @@
         padding: 0.8rem;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         font-size: 0.9rem;
+        gap: 0.8rem;
+      }
+
+      .transaccion-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex: 1;
+      }
+
+      .transaccion-delete-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        color: #999;
+        transition: all 0.2s ease;
+        padding: 0.25rem;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+      }
+
+      .transaccion-delete-btn:hover {
+        color: #f44336;
+        background: rgba(244, 67, 54, 0.1);
+        transform: scale(1.1);
+      }
+
+      .transaccion-delete-btn:active {
+        transform: scale(0.95);
       }
 
       .transaccion-item:last-child {
@@ -371,6 +529,120 @@
       }
 
       /* ================================================
+         ESTILOS ESPECÍFICOS DE PUEDO
+         ================================================ */
+      .puedo-container {
+        text-align: center;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 2rem 0;
+      }
+
+      .pregunta-display {
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        font-weight: 600;
+        margin-bottom: 2rem;
+        line-height: 1.4;
+        color: #6a1b9a;
+      }
+
+      .respuesta-buttons {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      .btn-respuesta {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        min-width: 100px;
+      }
+
+      .btn-respuesta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-respuesta:active {
+        transform: translateY(0);
+      }
+
+      .btn-si {
+        background: linear-gradient(145deg, #00e676, #00c853);
+      }
+
+      .btn-si:hover {
+        background: linear-gradient(145deg, #00c853, #00a84c);
+      }
+
+      .btn-no {
+        background: linear-gradient(145deg, #ff5722, #e64a19);
+      }
+
+      .btn-no:hover {
+        background: linear-gradient(145deg, #e64a19, #d84315);
+      }
+
+      .btn-reiniciar {
+        background: linear-gradient(145deg, #ba68c8, #9c27b0);
+      }
+
+      .btn-reiniciar:hover {
+        background: linear-gradient(145deg, #9c27b0, #7b1fa2);
+      }
+
+      .btn-empezar-nuevo {
+        background: linear-gradient(145deg, #9e9e9e, #757575);
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        margin-top: 1rem;
+        width: auto;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .btn-empezar-nuevo:hover {
+        background: linear-gradient(145deg, #757575, #616161);
+      }
+
+      .empezar-nuevo-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 0.8rem;
+      }
+
+      @media (max-width: 480px) {
+        .respuesta-buttons {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: center;
+        }
+
+        .btn-respuesta {
+          width: 200px;
+          padding: 0.8rem 1.5rem;
+        }
+
+        /* Mantener el botón "Empezar de nuevo" pequeño en mobile */
+        .btn-empezar-nuevo {
+          width: auto !important;
+          padding: 0.4rem 0.8rem !important;
+          font-size: 0.75rem !important;
+        }
+      }
+
+      /* ================================================
          CONTENIDO PRINCIPAL
          ================================================ */
       .content-box {
@@ -408,6 +680,7 @@
 
       .tab-section {
         display: block;
+        width: 100%;
       }
 
       .tab-section.hidden {
@@ -524,6 +797,16 @@
         transform: translateY(-1px);
       }
 
+      .modal-btn-danger {
+        background: linear-gradient(145deg, #f44336, #d32f2f);
+        color: white;
+      }
+
+      .modal-btn-danger:hover {
+        background: linear-gradient(145deg, #d32f2f, #b71c1c);
+        transform: translateY(-1px);
+      }
+
       .modal-btn-secondary {
         background: #f5f5f5;
         color: #666;
@@ -625,13 +908,123 @@
         }
 
         .botones-tiempo {
-          grid-template-columns: 1fr;
+          display: flex;
+          flex-direction: column;
           gap: 0.8rem;
+          align-items: center;
+        }
+
+        /* Fila de botones que suman tiempo */
+        .btn-agregar-10,
+        .btn-agregar-30,
+        .btn-agregar-hour {
+          order: 1;
+        }
+
+        /* Fila de botones que restan tiempo */
+        .btn-quitar-10,
+        .btn-quitar-30,
+        .btn-quitar-hour {
+          order: 2;
+        }
+
+        /* Contenedor de filas de botones */
+        .fila-agregar,
+        .fila-quitar {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          width: 100%;
         }
 
         .btn-tiempo {
-          padding: 0.8rem;
-          font-size: 1rem;
+          padding: 0.6rem 0.8rem;
+          font-size: 0.85rem;
+          flex: 1;
+          max-width: 100px;
+        }
+
+        /* Contenedor de botones de historial separado */
+        .botones-historial-container {
+          flex-direction: row;
+          align-items: center;
+          gap: 0.8rem;
+        }
+
+        /* Fila solo para historial */
+        .fila-historial {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
+
+        /* Fila para switch mode y reset */
+        .fila-acciones {
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          width: 100%;
+        }
+
+        .btn-historial,
+        .btn-switch-mode,
+        .btn-reset {
+          padding: 0.6rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .btn-switch-mode,
+        .btn-reset {
+          flex: 1;
+          max-width: 140px;
+          margin: 0;
+        }
+
+        /* Dropdown en mobile */
+        .dropdown-toggle {
+          padding: 0.6rem 1rem;
+          font-size: 0.9rem;
+          flex: 1;
+          max-width: 140px;
+        }
+
+        .dropdown-menu {
+          min-width: 180px;
+          left: 0;
+          transform: none;
+          bottom: 100%;
+          margin-bottom: 0.5rem;
+          animation: dropdownSlideUpMobile 0.2s ease;
+        }
+
+        @keyframes dropdownSlideUpMobile {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .dropdown-item {
+          padding: 0.7rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        /* Botón eliminar transacción en mobile */
+        .transaccion-delete-btn {
+          font-size: 0.9rem;
+          min-width: 20px;
+          height: 20px;
+          padding: 0.2rem;
+        }
+
+        .transaccion-item {
+          padding: 0.6rem;
+          font-size: 0.85rem;
+          gap: 0.5rem;
         }
 
         .saldo-display {
@@ -668,44 +1061,88 @@
       }
 
       // ================================================
-      // COMPONENTES DE SECCIONES
+      // COMPONENTE DROPDOWN
       // ================================================
-      function ContadorSection() {
-        // ====== DETECCIÓN DE MODO ======
-        const getDayMode = () => {
-          const dayOfWeek = new Date().getDay();
-          return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'dia-habil' : 'fin-semana';
+      function Dropdown({ isOpen, toggleOpen, children, label, icon = '⚙️' }) {
+        const handleClickOutside = e => {
+          if (!e.target.closest('.dropdown-container')) {
+            if (isOpen()) {
+              toggleOpen();
+            }
+          }
         };
 
-        // ====== SIGNALS ======
-        const [modoActual, setModoActual] = setSignal(getDayMode());
-        const [contadorData, setContadorData] = setSignal({
-          'dia-habil': { saldo: 0, transacciones: [] },
-          'fin-semana': { saldo: 0, transacciones: [] },
-        });
+        // Agregar listener para cerrar dropdown al hacer click fuera
+        if (isOpen()) {
+          setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+          }, 0);
+        } else {
+          document.removeEventListener('click', handleClickOutside);
+        }
+
+        return h(
+          'div',
+          { className: 'dropdown-container' },
+          h(
+            'button',
+            {
+              className: 'dropdown-toggle',
+              onclick: e => {
+                e.stopPropagation();
+                toggleOpen();
+              },
+            },
+            icon,
+            ' ',
+            label,
+            h('span', { className: () => `dropdown-arrow ${isOpen() ? 'open' : ''}` }, '▼')
+          ),
+          () => (isOpen() ? h('div', { className: 'dropdown-menu' }, children) : null)
+        );
+      }
+
+      // ================================================
+      // COMPONENTES DE SECCIONES
+      // ================================================
+      function ContadorSection({ modoActual, setModoActual, contadorData, setContadorData, formatTime }) {
+        // ====== SIGNALS LOCALES ======
         const [isHistorialOpen, setIsHistorialOpen] = setSignal(false);
+        const [isResetModalOpen, setIsResetModalOpen] = setSignal(false);
+        const [isDropdownOpen, setIsDropdownOpen] = setSignal(false);
+        const [isImportModalOpen, setIsImportModalOpen] = setSignal(false);
 
         // ====== FUNCIONES UTILITARIAS ======
         const currentModeData = () => contadorData()[modoActual()];
 
-        const formatTime = minutes => {
-          const absMinutes = Math.abs(minutes);
-          if (absMinutes === 0) return '0min';
-          const hours = Math.floor(absMinutes / 60);
-          const mins = absMinutes % 60;
-
-          if (hours === 0) return `${mins}min`;
-          if (mins === 0) return `${hours}h`;
-          return `${hours}h ${mins}min`;
-        };
-
         const formatTimestamp = timestamp => {
           const date = new Date(timestamp);
-          return date.toLocaleTimeString('es-ES', {
+          const now = new Date();
+
+          // Crear fechas normalizadas (solo día/mes/año, sin horas)
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          const transactionDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+          const timeString = date.toLocaleTimeString('es-ES', {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false,
           });
+
+          let dateString;
+          if (transactionDate.getTime() === today.getTime()) {
+            dateString = 'Hoy';
+          } else if (transactionDate.getTime() === yesterday.getTime()) {
+            dateString = 'Ayer';
+          } else {
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            dateString = `${date.getDate()} ${months[date.getMonth()]}`;
+          }
+
+          return `${dateString} ${timeString}`;
         };
 
         // ====== LÓGICA PRINCIPAL ======
@@ -718,20 +1155,25 @@
           // TRUCO: Calcular monto real de transacción (solo lo que se puede restar)
           const montoReal = minutes > 0 ? minutes : Math.max(minutes, -saldoActual);
 
-          const transaccion = {
-            id: Date.now(),
-            amount: montoReal,
-            timestamp: Date.now(),
-            description: montoReal > 0 ? `+${montoReal} minutos` : `${montoReal} minutos`,
-          };
-
-          const newData = {
+          let newData = {
             ...currentData,
             [modo]: {
               saldo: nuevoSaldo,
-              transacciones: [transaccion, ...currentData[modo].transacciones],
+              transacciones: currentData[modo].transacciones,
             },
           };
+
+          // Solo agregar transacción si el monto real no es cero
+          if (montoReal !== 0) {
+            const transaccion = {
+              id: Date.now(),
+              amount: montoReal,
+              timestamp: Date.now(),
+              description: montoReal > 0 ? `+${montoReal} minutos` : `${montoReal} minutos`,
+            };
+
+            newData[modo].transacciones = [transaccion, ...currentData[modo].transacciones];
+          }
 
           setContadorData(newData);
         };
@@ -741,25 +1183,204 @@
           setModoActual(newMode);
         };
 
+        const resetModo = () => {
+          const modo = modoActual();
+          const newData = {
+            ...contadorData(),
+            [modo]: { saldo: 0, transacciones: [] },
+          };
+          setContadorData(newData);
+          setIsResetModalOpen(false);
+        };
+
+        const eliminarTransaccion = transaccionId => {
+          const modo = modoActual();
+          const currentData = contadorData();
+          const modeData = currentData[modo];
+
+          // Encontrar la transacción a eliminar
+          const transaccionAEliminar = modeData.transacciones.find(t => t.id === transaccionId);
+
+          if (!transaccionAEliminar) {
+            console.error('Transacción no encontrada:', transaccionId);
+            return;
+          }
+
+          // Revertir el efecto en el saldo (restar lo que se había sumado, sumar lo que se había restado)
+          const nuevoSaldo = Math.max(0, modeData.saldo - transaccionAEliminar.amount);
+
+          // Filtrar la transacción eliminada de la lista
+          const nuevasTransacciones = modeData.transacciones.filter(t => t.id !== transaccionId);
+
+          // Actualizar el estado
+          const newData = {
+            ...currentData,
+            [modo]: {
+              saldo: nuevoSaldo,
+              transacciones: nuevasTransacciones,
+            },
+          };
+
+          setContadorData(newData);
+
+          console.log('Transacción eliminada:', {
+            id: transaccionId,
+            amount: transaccionAEliminar.amount,
+            nuevoSaldo: nuevoSaldo,
+          });
+        };
+
+        // ====== FUNCIONES DE DROPDOWN Y ACCIONES ======
+        const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen());
+
+        const handleExport = () => {
+          try {
+            // Obtener estado actual completo
+            const currentState = {
+              activeTab: 'contador', // Siempre exportamos desde contador
+              modoActual: modoActual(),
+              contadorData: contadorData(),
+              preguntaActual: 'inicio', // Estado inicial para puedo
+              exportDate: new Date().toISOString(),
+              version: 'v1',
+            };
+
+            // Crear archivo JSON
+            const dataStr = JSON.stringify(currentState, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+            // Generar nombre con fecha
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+            const filename = `${dateStr}-${timeStr}-trackeat.json`;
+
+            // Crear enlace de descarga
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(dataBlob);
+            downloadLink.download = filename;
+            downloadLink.style.display = 'none';
+
+            // Ejecutar descarga
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+            // Limpiar URL
+            URL.revokeObjectURL(downloadLink.href);
+
+            console.log('Estado exportado exitosamente:', filename);
+          } catch (error) {
+            console.error('Error al exportar:', error);
+            alert('Error al exportar los datos. Inténtalo de nuevo.');
+          }
+
+          setIsDropdownOpen(false);
+        };
+
+        const handleImport = () => {
+          setIsImportModalOpen(true);
+          setIsDropdownOpen(false);
+        };
+
+        const executeImport = () => {
+          setIsImportModalOpen(false);
+
+          try {
+            // Crear input file oculto
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.json';
+            fileInput.style.display = 'none';
+
+            // Manejar selección de archivo
+            fileInput.onchange = event => {
+              const file = event.target.files[0];
+              if (!file) return;
+
+              const reader = new FileReader();
+              reader.onload = e => {
+                try {
+                  const importedData = JSON.parse(e.target.result);
+
+                  // Validar estructura básica
+                  if (!importedData.contadorData || !importedData.modoActual) {
+                    throw new Error('Archivo JSON no válido: falta estructura de datos requerida');
+                  }
+
+                  // Validar estructura de contadorData
+                  const requiredModes = ['dia-habil', 'fin-semana'];
+                  for (const mode of requiredModes) {
+                    if (
+                      !importedData.contadorData[mode] ||
+                      typeof importedData.contadorData[mode].saldo !== 'number' ||
+                      !Array.isArray(importedData.contadorData[mode].transacciones)
+                    ) {
+                      throw new Error(`Estructura de datos inválida para modo: ${mode}`);
+                    }
+                  }
+
+                  // Actualizar state con datos importados
+                  setModoActual(importedData.modoActual);
+                  setContadorData(importedData.contadorData);
+
+                  console.log('Estado importado exitosamente:', {
+                    modo: importedData.modoActual,
+                    exportDate: importedData.exportDate || 'Sin fecha',
+                    version: importedData.version || 'Sin versión',
+                  });
+
+                  alert('¡Datos importados exitosamente!');
+                } catch (parseError) {
+                  console.error('Error al procesar archivo:', parseError);
+                  alert('Error: El archivo no es un JSON válido de TrackEAT.\n\n' + parseError.message);
+                }
+              };
+
+              reader.onerror = () => {
+                console.error('Error al leer archivo');
+                alert('Error al leer el archivo. Inténtalo de nuevo.');
+              };
+
+              reader.readAsText(file);
+            };
+
+            // Ejecutar selector de archivo
+            document.body.appendChild(fileInput);
+            fileInput.click();
+            document.body.removeChild(fileInput);
+          } catch (error) {
+            console.error('Error al importar:', error);
+            alert('Error al importar datos. Inténtalo de nuevo.');
+          }
+        };
+
+        const handleSwitchMode = () => {
+          switchMode();
+          setIsDropdownOpen(false);
+        };
+
+        const handleReset = () => {
+          openResetModal();
+          setIsDropdownOpen(false);
+        };
+
         // ====== FUNCIONES DE MODAL ======
         const openHistorial = () => setIsHistorialOpen(true);
         const closeHistorial = () => setIsHistorialOpen(false);
-
-        // ====== ACTUALIZACIÓN AUTOMÁTICA DEL MODO ======
-        setEffect(() => {
-          setInterval(() => {
-            const newMode = getDayMode();
-            if (newMode !== modoActual()) {
-              setModoActual(newMode);
-            }
-          }, 60000); // Verificar cada minuto
-        });
+        const openResetModal = () => setIsResetModalOpen(true);
+        const closeResetModal = () => setIsResetModalOpen(false);
+        const closeImportModal = () => setIsImportModalOpen(false);
 
         // ====== CONTENIDO DEL MODAL ======
         const historialModalContent = h(
           'div',
           { className: 'modal-form' },
-          h('h3', { className: 'modal-title' }, () => `Historial - ${modoActual() === 'dia-habil' ? 'Día Hábil' : 'Fin de Semana'}`),
+          h(
+            'h3',
+            { className: 'modal-title' },
+            () => `Transacciones - ${modoActual() === 'dia-habil' ? '💻 Día Hábil' : '🏖️ Fin de Semana'}`
+          ),
           h('div', { className: 'transacciones-container', style: 'margin-top: 0; max-height: 400px;' }, () =>
             currentModeData().transacciones.length > 0
               ? h(
@@ -770,13 +1391,26 @@
                       'div',
                       { className: 'transaccion-item', key: transaccion.id },
                       h(
-                        'span',
-                        {
-                          className: `transaccion-amount ${transaccion.amount > 0 ? 'transaccion-positiva' : 'transaccion-negativa'}`,
-                        },
-                        transaccion.amount > 0 ? `+${transaccion.amount}min` : `${transaccion.amount}min`
+                        'div',
+                        { className: 'transaccion-content' },
+                        h(
+                          'span',
+                          {
+                            className: `transaccion-amount ${transaccion.amount > 0 ? 'transaccion-positiva' : 'transaccion-negativa'}`,
+                          },
+                          transaccion.amount > 0 ? `+${transaccion.amount}min` : `${transaccion.amount}min`
+                        ),
+                        h('span', { className: 'transaccion-tiempo' }, formatTimestamp(transaccion.timestamp))
                       ),
-                      h('span', { className: 'transaccion-tiempo' }, formatTimestamp(transaccion.timestamp))
+                      h(
+                        'button',
+                        {
+                          className: 'transaccion-delete-btn',
+                          onclick: () => eliminarTransaccion(transaccion.id),
+                          title: 'Eliminar transacción',
+                        },
+                        '🗑️'
+                      )
                     )
                   )
                 )
@@ -789,6 +1423,66 @@
           )
         );
 
+        const resetModalContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '⚠️ Confirmar Reset'),
+          h(
+            'p',
+            { style: 'margin: 1.5rem 0; text-align: center; color: #666; font-size: 1.1rem;' },
+            () =>
+              `¿Estás seguro de que quieres resetear completamente el modo ${
+                modoActual() === 'dia-habil' ? '💻 Día Hábil' : '🏖️ Fin de Semana'
+              }?`
+          ),
+          h(
+            'p',
+            { style: 'margin: 1rem 0; text-align: center; color: #999; font-size: 0.9rem;' },
+            'Esta acción eliminará el saldo y todas las transacciones. No se puede deshacer.'
+          ),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeResetModal }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-danger', onclick: resetModo }, 'Confirmar Reset')
+          )
+        );
+
+        const importModalContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '⚠️ Advertencia de Import'),
+          h(
+            'p',
+            { style: 'margin: 1.5rem 0; text-align: center; color: #666; font-size: 1.1rem;' },
+            'Esta acción reemplazará TODOS los datos actuales de TrackEAT.'
+          ),
+          h(
+            'p',
+            { style: 'margin: 1rem 0; text-align: center; color: #e65100; font-size: 1rem; font-weight: bold;' },
+            '• Se perderán todos los saldos actuales\n• Se eliminarán todas las transacciones\n• Se reemplazará el modo actual'
+          ),
+          h(
+            'p',
+            { style: 'margin: 1rem 0; text-align: center; color: #999; font-size: 0.9rem;' },
+            'Recomendamos hacer un Export antes de continuar. ¿Estás seguro de que quieres proceder?'
+          ),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeImportModal }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-danger', onclick: executeImport }, 'Sí, Importar')
+          )
+        );
+
+        // ====== CONTENIDO DEL DROPDOWN ======
+        const dropdownContent = [
+          h('button', { className: 'dropdown-item', onclick: handleSwitchMode }, '🔄 Switch Mode'),
+          h('button', { className: 'dropdown-item', onclick: handleReset }, '🗑️ Reset'),
+          h('button', { className: 'dropdown-item', onclick: handleImport }, '📥 Import'),
+          h('button', { className: 'dropdown-item', onclick: handleExport }, '📤 Export'),
+        ];
+
         return h(
           'div',
           { className: 'tab-content' },
@@ -798,68 +1492,78 @@
             'div',
             { className: 'contador-display' },
             h('div', { className: () => `modo-indicator modo-${modoActual()}` }, () =>
-              modoActual() === 'dia-habil' ? 'DÍA HÁBIL' : 'FIN DE SEMANA'
+              modoActual() === 'dia-habil' ? '💻 DÍA HÁBIL' : '🏖️ FIN DE SEMANA'
             ),
 
             // Saldo actual
-            h('div', { className: 'saldo-display' }, () => formatTime(currentModeData().saldo))
+            h('div', { className: () => `saldo-display saldo-${modoActual()}` }, () => formatTime(currentModeData().saldo))
           ),
 
           // Botones de tiempo
           h(
             'div',
             { className: 'botones-tiempo' },
+            // Fila de botones que agregan tiempo
             h(
-              'button',
-              {
-                className: 'btn-tiempo btn-agregar-10',
-                onclick: () => agregarTiempo(10),
-              },
-              '+10 min'
+              'div',
+              { className: 'fila-agregar' },
+              h(
+                'button',
+                {
+                  className: 'btn-tiempo btn-agregar-10',
+                  onclick: () => agregarTiempo(10),
+                },
+                '+10 min'
+              ),
+              h(
+                'button',
+                {
+                  className: 'btn-tiempo btn-agregar-30',
+                  onclick: () => agregarTiempo(30),
+                },
+                '+30 min'
+              ),
+              h(
+                'button',
+                {
+                  className: 'btn-tiempo btn-agregar-hour',
+                  onclick: () => agregarTiempo(60),
+                },
+                '+1 H'
+              )
             ),
+            // Fila de botones que quitan tiempo
             h(
-              'button',
-              {
-                className: 'btn-tiempo btn-agregar-30',
-                onclick: () => agregarTiempo(30),
-              },
-              '+30 min'
-            ),
-            h(
-              'button',
-              {
-                className: 'btn-tiempo btn-agregar-hour',
-                onclick: () => agregarTiempo(60),
-              },
-              '+1 HOUR'
-            ),
-            h(
-              'button',
-              {
-                className: 'btn-tiempo btn-quitar-10',
-                onclick: () => agregarTiempo(-10),
-              },
-              '-10 min'
-            ),
-            h(
-              'button',
-              {
-                className: 'btn-tiempo btn-quitar-30',
-                onclick: () => agregarTiempo(-30),
-              },
-              '-30 min'
-            ),
-            h(
-              'button',
-              {
-                className: 'btn-tiempo btn-quitar-hour',
-                onclick: () => agregarTiempo(-60),
-              },
-              '-1 HOUR'
+              'div',
+              { className: 'fila-quitar' },
+              h(
+                'button',
+                {
+                  className: 'btn-tiempo btn-quitar-10',
+                  onclick: () => agregarTiempo(-10),
+                },
+                '-10 min'
+              ),
+              h(
+                'button',
+                {
+                  className: 'btn-tiempo btn-quitar-30',
+                  onclick: () => agregarTiempo(-30),
+                },
+                '-30 min'
+              ),
+              h(
+                'button',
+                {
+                  className: 'btn-tiempo btn-quitar-hour',
+                  onclick: () => agregarTiempo(-60),
+                },
+                '-1 H'
+              )
             )
           ),
 
-          // Botones de historial y switch mode
+          // Botones principales: Ver Transacciones y Opciones
           h(
             'div',
             { className: 'botones-historial-container' },
@@ -869,16 +1573,16 @@
                 className: 'btn-historial',
                 onclick: openHistorial,
               },
-              'Ver Historial de Transacciones'
+              'Transacciones'
             ),
-            h(
-              'button',
-              {
-                className: 'btn-switch-mode',
-                onclick: switchMode,
-              },
-              'Switch Mode'
-            )
+            () =>
+              Dropdown({
+                isOpen: isDropdownOpen,
+                toggleOpen: toggleDropdown,
+                label: 'Opciones',
+                icon: '⚙️',
+                children: dropdownContent,
+              })
           ),
 
           // Modal de historial
@@ -888,16 +1592,205 @@
               onClose: closeHistorial,
               theme: `tema-${modoActual()}`,
               children: historialModalContent,
+            }),
+
+          // Modal de reset
+          () =>
+            Modal({
+              isOpen: isResetModalOpen(),
+              onClose: closeResetModal,
+              theme: `tema-${modoActual()}`,
+              children: resetModalContent,
+            }),
+
+          // Modal de import
+          () =>
+            Modal({
+              isOpen: isImportModalOpen(),
+              onClose: closeImportModal,
+              theme: `tema-${modoActual()}`,
+              children: importModalContent,
             })
         );
       }
 
-      function PuedoSection() {
+      function PuedoSection({ modoActual, contadorData, formatTime, preguntaInicial, updatePreguntaActual }) {
+        // ====== DATOS DE PREGUNTAS EAT ======
+        const preguntas = {
+          inicio: {
+            texto: () => {
+              const saldo = contadorData()[modoActual()].saldo;
+              if (saldo === 0) {
+                return 'No queda tiempo para EATs, ¡nos vemos mañana!';
+              }
+              return `Te queda ${formatTime(saldo)} para EATs. ¿Crees que es buen momento para gastarlo o mejor después?`;
+            },
+            si: 'pregunta_peli',
+            no: 'resultado_mejor_despues',
+            esSinTiempo: () => contadorData()[modoActual()].saldo === 0,
+          },
+          pregunta_peli: {
+            texto: '¿Es buen momento para peli?',
+            si: 'resultado_pelicula',
+            no: 'pregunta2',
+          },
+          pregunta2: {
+            texto: 'Tengo un juego en transcurso, ¿quiero jugarlo y es horario?',
+            si: 'resultado_juego_pc',
+            no: 'pregunta3',
+          },
+          pregunta3: {
+            texto: '¿Falta poco para dormir o solo quiero acompañar a Hoo en lo que sea?',
+            si: 'resultado_juego_celu',
+            no: 'pregunta4',
+          },
+          pregunta4: {
+            texto: '¿Es momento para SEAT?',
+            si: 'resultado_seat',
+            no: 'pregunta5',
+          },
+          pregunta5: {
+            texto: '¿Estoy en un momento en que puedo permitirme adicción a un juego y es horario?',
+            si: 'resultado_empezar_juego',
+            no: 'resultado_no_eat',
+          },
+          resultado_pelicula: {
+            texto: '🎬 Película o YouTube',
+            esSolucion: true,
+          },
+          resultado_juego_pc: {
+            texto: '🎮 Juego PC',
+            esSolucion: true,
+          },
+          resultado_juego_celu: {
+            texto: '📱 Juego Celu/Tablet',
+            esSolucion: true,
+          },
+          resultado_seat: {
+            texto: '💺 SEAT, con convencio',
+            esSolucion: true,
+          },
+          resultado_empezar_juego: {
+            texto: '🚀 Empezar Juego PC',
+            esSolucion: true,
+          },
+          resultado_no_eat: {
+            texto: '❌ Entonces no es momento de EAT alguna.',
+            esSolucion: true,
+          },
+          resultado_mejor_despues: {
+            texto: '👍 Ok! Mejor después :)',
+            esSolucion: true,
+          },
+        };
+
+        // ====== SIGNALS ======
+        const [preguntaActual, setPreguntaActual] = setSignal(preguntaInicial);
+
+        // ====== FUNCIONES ======
+        const responder = respuesta => {
+          const pregunta = preguntas[preguntaActual()];
+          if (pregunta && !pregunta.esSolucion) {
+            const siguiente = respuesta === 'si' ? pregunta.si : pregunta.no;
+            setPreguntaActual(siguiente);
+            updatePreguntaActual(siguiente);
+          }
+        };
+
+        const reiniciar = () => {
+          setPreguntaActual('inicio');
+          updatePreguntaActual('inicio');
+        };
+
+        const getPreguntaData = () => preguntas[preguntaActual()];
+
         return h(
           'div',
           { className: 'tab-content' },
-          h('h2', null, '🤔 ¿Puedo?'),
-          h('p', null, 'Responde una serie de preguntas y obtén un resultado personalizado.')
+          h(
+            'div',
+            { className: 'puedo-container' },
+
+            // Pregunta o resultado
+            h('div', { className: 'pregunta-display' }, () => {
+              const data = getPreguntaData();
+              return typeof data.texto === 'function' ? data.texto() : data.texto;
+            }),
+
+            // Botones de respuesta o reinicio
+            () => {
+              const data = getPreguntaData();
+
+              // Si no hay tiempo, no mostrar botones
+              if (data.esSinTiempo && data.esSinTiempo()) {
+                return null;
+              }
+
+              if (data.esSolucion) {
+                return h(
+                  'div',
+                  { className: 'respuesta-buttons' },
+                  h(
+                    'button',
+                    {
+                      className: 'btn-respuesta btn-reiniciar',
+                      onclick: reiniciar,
+                    },
+                    'Reiniciar'
+                  )
+                );
+              }
+
+              // Textos diferentes para pregunta inicial
+              const esInicio = preguntaActual() === 'inicio';
+              const textoSi = esInicio ? 'Es buen momento' : 'Sí';
+              const textoNo = esInicio ? 'Mejor después' : 'No';
+
+              const elementos = [
+                // Botones principales Sí/No
+                h(
+                  'div',
+                  { className: 'respuesta-buttons' },
+                  h(
+                    'button',
+                    {
+                      className: 'btn-respuesta btn-si',
+                      onclick: () => responder('si'),
+                    },
+                    textoSi
+                  ),
+                  h(
+                    'button',
+                    {
+                      className: 'btn-respuesta btn-no',
+                      onclick: () => responder('no'),
+                    },
+                    textoNo
+                  )
+                ),
+              ];
+
+              // Agregar botón "Empezar de nuevo" en fila separada si no es la pregunta inicial
+              if (!esInicio) {
+                elementos.push(
+                  h(
+                    'div',
+                    { className: 'empezar-nuevo-container' },
+                    h(
+                      'button',
+                      {
+                        className: 'btn-respuesta btn-empezar-nuevo',
+                        onclick: reiniciar,
+                      },
+                      'Empezar de nuevo'
+                    )
+                  )
+                );
+              }
+
+              return h('div', null, ...elementos);
+            }
+          )
         );
       }
 
@@ -905,8 +1798,101 @@
       // COMPONENTE PRINCIPAL DE LA APLICACIÓN
       // ================================================
       function TrackEATApp() {
+        // ====== DETECCIÓN DE MODO ======
+        const getDayMode = () => {
+          const dayOfWeek = new Date().getDay();
+          return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'dia-habil' : 'fin-semana';
+        };
+
+        // ====== LOCALSTORAGE ======
+        const STORAGE_KEY = 'trackeat_comprehensive_app_state_v1_data_store';
+
+        const loadAppState = () => {
+          try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              return {
+                activeTab: parsed.activeTab || 'contador',
+                modoActual: parsed.modoActual || getDayMode(),
+                contadorData: parsed.contadorData || {
+                  'dia-habil': { saldo: 0, transacciones: [] },
+                  'fin-semana': { saldo: 0, transacciones: [] },
+                },
+                preguntaActual: parsed.preguntaActual || 'inicio',
+              };
+            }
+          } catch (error) {
+            console.error('Error cargando estado:', error);
+          }
+          return {
+            activeTab: 'contador',
+            modoActual: getDayMode(),
+            contadorData: {
+              'dia-habil': { saldo: 0, transacciones: [] },
+              'fin-semana': { saldo: 0, transacciones: [] },
+            },
+            preguntaActual: 'inicio',
+          };
+        };
+
+        const saveAppState = state => {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          } catch (error) {
+            console.error('Error guardando estado:', error);
+          }
+        };
+
         // ====== SIGNALS PRINCIPALES ======
-        const [activeTab, setActiveTab] = setSignal('contador');
+        const initialState = loadAppState();
+        const [activeTab, setActiveTab] = setSignal(initialState.activeTab);
+        const [modoActual, setModoActual] = setSignal(initialState.modoActual);
+        const [contadorData, setContadorData] = setSignal(initialState.contadorData);
+
+        // ====== FUNCIONES UTILITARIAS ======
+        const formatTime = minutes => {
+          const absMinutes = Math.abs(minutes);
+          if (absMinutes === 0) return '0min';
+          const hours = Math.floor(absMinutes / 60);
+          const mins = absMinutes % 60;
+
+          if (hours === 0) return `${mins}min`;
+          if (mins === 0) return `${hours}h`;
+          return `${hours}h ${mins}min`;
+        };
+
+        // ====== EFECTOS DE GUARDADO AUTOMÁTICO ======
+        setEffect(() => {
+          const currentState = {
+            activeTab: activeTab(),
+            modoActual: modoActual(),
+            contadorData: contadorData(),
+            preguntaActual: 'inicio', // Se actualizará desde PuedoSection
+          };
+          saveAppState(currentState);
+        });
+
+        // Función para actualizar pregunta actual desde PuedoSection
+        const updatePreguntaActual = pregunta => {
+          const currentState = {
+            activeTab: activeTab(),
+            modoActual: modoActual(),
+            contadorData: contadorData(),
+            preguntaActual: pregunta,
+          };
+          saveAppState(currentState);
+        };
+
+        // ====== ACTUALIZACIÓN AUTOMÁTICA DEL MODO ======
+        setEffect(() => {
+          setInterval(() => {
+            const newMode = getDayMode();
+            if (newMode !== modoActual()) {
+              setModoActual(newMode);
+            }
+          }, 60000); // Verificar cada minuto
+        });
 
         // ====== CONFIGURACIÓN DE PESTAÑAS ======
         const tabs = [
@@ -936,8 +1922,16 @@
           h(
             'div',
             { className: 'content-box' },
-            h('div', { className: () => `tab-section ${activeTab() === 'contador' ? '' : 'hidden'}` }, ContadorSection()),
-            h('div', { className: () => `tab-section ${activeTab() === 'puedo' ? '' : 'hidden'}` }, PuedoSection())
+            h(
+              'div',
+              { className: () => `tab-section ${activeTab() === 'contador' ? '' : 'hidden'}` },
+              ContadorSection({ modoActual, setModoActual, contadorData, setContadorData, formatTime })
+            ),
+            h(
+              'div',
+              { className: () => `tab-section ${activeTab() === 'puedo' ? '' : 'hidden'}` },
+              PuedoSection({ modoActual, contadorData, formatTime, preguntaInicial: initialState.preguntaActual, updatePreguntaActual })
+            )
           )
         );
       }
