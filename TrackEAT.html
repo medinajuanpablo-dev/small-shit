@@ -160,7 +160,7 @@
         color: white;
       }
 
-      .modo-fin-semana {
+      .modo-dia-descanso {
         background: linear-gradient(145deg, #8bc34a, #689f38);
         color: white;
       }
@@ -177,7 +177,7 @@
         text-shadow: 0 0 10px rgba(255, 152, 0, 0.8), 0 0 20px rgba(255, 152, 0, 0.5), 0 0 30px rgba(255, 152, 0, 0.3);
       }
 
-      .saldo-fin-semana {
+      .saldo-dia-descanso {
         color: #8bc34a;
         text-shadow: 0 0 10px rgba(139, 195, 74, 0.8), 0 0 20px rgba(139, 195, 74, 0.5), 0 0 30px rgba(139, 195, 74, 0.3);
       }
@@ -1179,7 +1179,7 @@
         };
 
         const switchMode = () => {
-          const newMode = modoActual() === 'dia-habil' ? 'fin-semana' : 'dia-habil';
+          const newMode = modoActual() === 'dia-habil' ? 'dia-descanso' : 'dia-habil';
           setModoActual(newMode);
         };
 
@@ -1308,8 +1308,21 @@
                     throw new Error('Archivo JSON no válido: falta estructura de datos requerida');
                   }
 
+                  // Migrar 'fin-semana' a 'dia-descanso' en datos importados si es necesario
+                  if (importedData.contadorData['fin-semana'] && !importedData.contadorData['dia-descanso']) {
+                    importedData.contadorData['dia-descanso'] = importedData.contadorData['fin-semana'];
+                    delete importedData.contadorData['fin-semana'];
+                    console.log('Import: migrado fin-semana → dia-descanso');
+                  }
+
+                  // Migrar modoActual si es necesario
+                  if (importedData.modoActual === 'fin-semana') {
+                    importedData.modoActual = 'dia-descanso';
+                    console.log('Import: modo migrado fin-semana → dia-descanso');
+                  }
+
                   // Validar estructura de contadorData
-                  const requiredModes = ['dia-habil', 'fin-semana'];
+                  const requiredModes = ['dia-habil', 'dia-descanso'];
                   for (const mode of requiredModes) {
                     if (
                       !importedData.contadorData[mode] ||
@@ -1379,7 +1392,7 @@
           h(
             'h3',
             { className: 'modal-title' },
-            () => `Transacciones - ${modoActual() === 'dia-habil' ? '💻 Día Hábil' : '🏖️ Fin de Semana'}`
+            () => `Transacciones - ${modoActual() === 'dia-habil' ? '💻 Día Hábil' : '🛋️ Día de Descanso'}`
           ),
           h('div', { className: 'transacciones-container', style: 'margin-top: 0; max-height: 400px;' }, () =>
             currentModeData().transacciones.length > 0
@@ -1432,7 +1445,7 @@
             { style: 'margin: 1.5rem 0; text-align: center; color: #666; font-size: 1.1rem;' },
             () =>
               `¿Estás seguro de que quieres resetear completamente el modo ${
-                modoActual() === 'dia-habil' ? '💻 Día Hábil' : '🏖️ Fin de Semana'
+                modoActual() === 'dia-habil' ? '💻 Día Hábil' : '🛋️ Día de Descanso'
               }?`
           ),
           h(
@@ -1492,7 +1505,7 @@
             'div',
             { className: 'contador-display' },
             h('div', { className: () => `modo-indicator modo-${modoActual()}` }, () =>
-              modoActual() === 'dia-habil' ? '💻 DÍA HÁBIL' : '🏖️ FIN DE SEMANA'
+              modoActual() === 'dia-habil' ? '💻 DÍA HÁBIL' : '🛋️ DÍA DE DESCANSO'
             ),
 
             // Saldo actual
@@ -1635,7 +1648,7 @@
             no: 'pregunta2',
           },
           pregunta2: {
-            texto: 'Tengo un juego en transcurso, ¿quiero jugarlo y es horario?',
+            texto: '¿Tengo un juego en transcurso, quiero jugarlo y es horario?',
             si: 'resultado_juego_pc',
             no: 'pregunta3',
           },
@@ -1801,7 +1814,7 @@
         // ====== DETECCIÓN DE MODO ======
         const getDayMode = () => {
           const dayOfWeek = new Date().getDay();
-          return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'dia-habil' : 'fin-semana';
+          return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'dia-habil' : 'dia-descanso';
         };
 
         // ====== LOCALSTORAGE ======
@@ -1812,13 +1825,31 @@
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
               const parsed = JSON.parse(saved);
+
+              // Migración: convertir 'fin-semana' a 'dia-descanso' si existe
+              let contadorData = parsed.contadorData || {
+                'dia-habil': { saldo: 0, transacciones: [] },
+                'dia-descanso': { saldo: 0, transacciones: [] },
+              };
+
+              // Si existe 'fin-semana', migrarlo a 'dia-descanso'
+              if (contadorData['fin-semana'] && !contadorData['dia-descanso']) {
+                contadorData['dia-descanso'] = contadorData['fin-semana'];
+                delete contadorData['fin-semana'];
+                console.log('Migración completada: fin-semana → dia-descanso');
+              }
+
+              // Migrar modoActual si es necesario
+              let modoActual = parsed.modoActual || getDayMode();
+              if (modoActual === 'fin-semana') {
+                modoActual = 'dia-descanso';
+                console.log('Modo migrado: fin-semana → dia-descanso');
+              }
+
               return {
                 activeTab: parsed.activeTab || 'contador',
-                modoActual: parsed.modoActual || getDayMode(),
-                contadorData: parsed.contadorData || {
-                  'dia-habil': { saldo: 0, transacciones: [] },
-                  'fin-semana': { saldo: 0, transacciones: [] },
-                },
+                modoActual,
+                contadorData,
                 preguntaActual: parsed.preguntaActual || 'inicio',
               };
             }
@@ -1830,7 +1861,7 @@
             modoActual: getDayMode(),
             contadorData: {
               'dia-habil': { saldo: 0, transacciones: [] },
-              'fin-semana': { saldo: 0, transacciones: [] },
+              'dia-descanso': { saldo: 0, transacciones: [] },
             },
             preguntaActual: 'inicio',
           };
