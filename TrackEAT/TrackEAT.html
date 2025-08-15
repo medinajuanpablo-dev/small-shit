@@ -1811,11 +1811,8 @@
       // COMPONENTE PRINCIPAL DE LA APLICACIÓN
       // ================================================
       function TrackEATApp() {
-        // ====== DETECCIÓN DE MODO ======
-        const getDayMode = () => {
-          const dayOfWeek = new Date().getDay();
-          return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'dia-habil' : 'dia-descanso';
-        };
+        // ====== MODO POR DEFECTO ======
+        // Modo manual solamente - por defecto "día hábil"
 
         // ====== LOCALSTORAGE ======
         const STORAGE_KEY = 'trackeat_comprehensive_app_state_v1_data_store';
@@ -1840,7 +1837,7 @@
               }
 
               // Migrar modoActual si es necesario
-              let modoActual = parsed.modoActual || getDayMode();
+              let modoActual = parsed.modoActual || 'dia-habil';
               if (modoActual === 'fin-semana') {
                 modoActual = 'dia-descanso';
                 console.log('Modo migrado: fin-semana → dia-descanso');
@@ -1858,7 +1855,7 @@
           }
           return {
             activeTab: 'contador',
-            modoActual: getDayMode(),
+            modoActual: 'dia-habil',
             contadorData: {
               'dia-habil': { saldo: 0, transacciones: [] },
               'dia-descanso': { saldo: 0, transacciones: [] },
@@ -1915,15 +1912,8 @@
           saveAppState(currentState);
         };
 
-        // ====== ACTUALIZACIÓN AUTOMÁTICA DEL MODO ======
-        setEffect(() => {
-          setInterval(() => {
-            const newMode = getDayMode();
-            if (newMode !== modoActual()) {
-              setModoActual(newMode);
-            }
-          }, 60000); // Verificar cada minuto
-        });
+        // ====== MODO MANUAL ÚNICAMENTE ======
+        // Sin actualización automática - solo cambio manual
 
         // ====== CONFIGURACIÓN DE PESTAÑAS ======
         const tabs = [
