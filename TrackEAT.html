@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrackEAT</title>
+    <style>
+      /* ================================================
+         LAYOUT GENERAL Y ESTRUCTURA BASE
+         ================================================ */
+      body {
+        background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+        color: #2e7d32;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 10px;
+        min-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: clamp(1rem, 3vw, 1.5rem);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 95%;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(46, 125, 50, 0.2);
+      }
+
+      h1 {
+        color: #2e7d32;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: clamp(1.4rem, 4vw, 2rem);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+      }
+
+      /* ================================================
+         SISTEMA DE PESTAÑAS (TABS)
+         ================================================ */
+      .tabs-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid rgba(46, 125, 50, 0.2);
+        gap: clamp(0.5rem, 2vw, 1rem);
+      }
+
+      .tab {
+        padding: clamp(0.6rem, 1.5vw, 0.8rem) clamp(0.8rem, 2.5vw, 1.5rem);
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        color: #666;
+        font-size: clamp(0.85rem, 2vw, 1rem);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+        flex: 1;
+        min-width: fit-content;
+        white-space: nowrap;
+      }
+
+      .tab:hover {
+        color: #2e7d32;
+        background: rgba(46, 125, 50, 0.1);
+      }
+
+      .tab.active {
+        color: #2e7d32;
+        border-bottom-color: #4caf50;
+        background: rgba(46, 125, 50, 0.1);
+        font-weight: bold;
+      }
+
+      /* Colores específicos por pestaña */
+      .tab.active.contador,
+      .tab:hover.contador {
+        color: #e65100;
+        border-bottom-color: #ff9800;
+        background: rgba(255, 152, 0, 0.1);
+      }
+
+      .tab.active.puedo,
+      .tab:hover.puedo {
+        color: #6a1b9a;
+        border-bottom-color: #9c27b0;
+        background: rgba(156, 39, 176, 0.1);
+      }
+
+      /* ================================================
+         TEMAS DINÁMICOS POR PESTAÑA
+         ================================================ */
+
+      /* Tema Naranja - Contador */
+      .tema-contador .content-box {
+        background: rgba(255, 152, 0, 0.05);
+        border-color: rgba(255, 152, 0, 0.2);
+      }
+
+      .tema-contador .tab-content {
+        color: #e65100;
+      }
+
+      .tema-contador .tab-content h2 {
+        color: #e65100;
+      }
+
+      .tema-contador .modal-content {
+        border: 2px solid rgba(255, 152, 0, 0.3);
+      }
+
+      .tema-contador .modal-title {
+        color: #e65100;
+      }
+
+      .tema-contador .modal-input {
+        border-color: rgba(255, 152, 0, 0.3);
+      }
+
+      .tema-contador .modal-input:focus {
+        border-color: #ff9800;
+        box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+      }
+
+      .tema-contador .modal-btn-primary {
+        background: linear-gradient(145deg, #ff9800, #e65100);
+      }
+
+      .tema-contador .modal-btn-primary:hover {
+        background: linear-gradient(145deg, #e65100, #d84315);
+      }
+
+      /* ================================================
+         ESTILOS ESPECÍFICOS DEL CONTADOR
+         ================================================ */
+      .contador-display {
+        text-align: center;
+        margin: 2rem 0;
+      }
+
+      .modo-indicator {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+      }
+
+      .modo-dia-habil {
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+        color: white;
+      }
+
+      .modo-fin-semana {
+        background: linear-gradient(145deg, #ff9800, #e65100);
+        color: white;
+      }
+
+      .saldo-display {
+        font-size: clamp(2.5rem, 8vw, 3.5rem);
+        font-weight: bold;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+      }
+
+      .botones-tiempo {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin: 2rem 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .btn-tiempo {
+        padding: 1rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-tiempo:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-tiempo:active {
+        transform: translateY(0);
+      }
+
+      /* Botones agregar tiempo (verdes) */
+      .btn-agregar-10,
+      .btn-agregar-hour {
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+      }
+
+      .btn-agregar-30 {
+        background: linear-gradient(145deg, #2e7d32, #1b5e20);
+      }
+
+      /* Botones quitar tiempo (rojos) */
+      .btn-quitar-10,
+      .btn-quitar-hour {
+        background: linear-gradient(145deg, #f44336, #d32f2f);
+      }
+
+      .btn-quitar-30 {
+        background: linear-gradient(145deg, #c62828, #b71c1c);
+      }
+
+      .btn-historial {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        background: linear-gradient(145deg, #607d8b, #455a64);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        margin-top: 1rem;
+      }
+
+      .btn-historial:hover {
+        background: linear-gradient(145deg, #455a64, #37474f);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-switch-mode {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        background: linear-gradient(145deg, #795548, #5d4037);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        margin-top: 1rem;
+        margin-left: 1rem;
+      }
+
+      .btn-switch-mode:hover {
+        background: linear-gradient(145deg, #5d4037, #4e342e);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .botones-historial-container {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        align-items: center;
+        margin-top: 1rem;
+      }
+
+      .transacciones-container {
+        margin-top: 2rem;
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .transacciones-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .transaccion-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem;
+      }
+
+      .transaccion-item:last-child {
+        border-bottom: none;
+      }
+
+      .transaccion-amount {
+        font-weight: bold;
+        font-family: 'Courier New', monospace;
+      }
+
+      .transaccion-positiva {
+        color: #4caf50;
+      }
+
+      .transaccion-negativa {
+        color: #f44336;
+      }
+
+      .transaccion-tiempo {
+        color: #666;
+        font-size: 0.8rem;
+      }
+
+      .no-transacciones {
+        text-align: center;
+        color: #999;
+        font-style: italic;
+        padding: 2rem;
+      }
+
+      /* Tema Púrpura - Puedo */
+      .tema-puedo .content-box {
+        background: rgba(156, 39, 176, 0.05);
+        border-color: rgba(156, 39, 176, 0.2);
+      }
+
+      .tema-puedo .tab-content {
+        color: #6a1b9a;
+      }
+
+      .tema-puedo .tab-content h2 {
+        color: #6a1b9a;
+      }
+
+      .tema-puedo .modal-content {
+        border: 2px solid rgba(156, 39, 176, 0.3);
+      }
+
+      .tema-puedo .modal-title {
+        color: #6a1b9a;
+      }
+
+      .tema-puedo .modal-input {
+        border-color: rgba(156, 39, 176, 0.3);
+      }
+
+      .tema-puedo .modal-input:focus {
+        border-color: #9c27b0;
+        box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+      }
+
+      .tema-puedo .modal-btn-primary {
+        background: linear-gradient(145deg, #9c27b0, #6a1b9a);
+      }
+
+      .tema-puedo .modal-btn-primary:hover {
+        background: linear-gradient(145deg, #6a1b9a, #4a148c);
+      }
+
+      /* ================================================
+         CONTENIDO PRINCIPAL
+         ================================================ */
+      .content-box {
+        background: rgba(46, 125, 50, 0.05);
+        padding: clamp(0.5rem, 3vw, 1.5rem);
+        border-radius: 15px;
+        border: 2px solid rgba(46, 125, 50, 0.1);
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .tab-content {
+        text-align: center;
+        color: #2e7d32;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .tab-content h2 {
+        margin-bottom: 0.8rem;
+        color: #1b5e20;
+        font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+      }
+
+      .tab-content p {
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        line-height: 1.5;
+        max-width: 600px;
+        margin: 0 auto;
+        color: #757575;
+      }
+
+      .tab-section {
+        display: block;
+      }
+
+      .tab-section.hidden {
+        display: none;
+      }
+
+      /* ================================================
+         MODALES Y OVERLAYS
+         ================================================ */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(3px);
+      }
+
+      .modal-content {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        animation: modalSlideIn 0.3s ease;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+
+      .modal-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+
+      .modal-title {
+        color: #2e7d32;
+        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      .modal-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .modal-input {
+        padding: 0.6rem;
+        border: 2px solid rgba(46, 125, 50, 0.2);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .modal-input:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+      }
+
+      /* ================================================
+         BOTONES DE MODAL
+         ================================================ */
+      .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+
+      .modal-btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .modal-btn-primary {
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+        color: white;
+      }
+
+      .modal-btn-primary:hover {
+        background: linear-gradient(145deg, #388e3c, #2e7d32);
+        transform: translateY(-1px);
+      }
+
+      .modal-btn-secondary {
+        background: #f5f5f5;
+        color: #666;
+      }
+
+      .modal-btn-secondary:hover {
+        background: #eeeeee;
+        color: #333;
+      }
+
+      /* ================================================
+         ANIMACIONES
+         ================================================ */
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* ================================================
+         RESPONSIVE DESIGN
+         ================================================ */
+      @media (max-width: 768px) {
+        .tabs-container {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .tab {
+          border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+          border-right: none;
+          max-width: none;
+          text-align: center;
+          padding: 1rem;
+        }
+
+        .tab.active {
+          border-bottom-color: #4caf50;
+        }
+
+        .tab:last-child {
+          border-bottom: none;
+        }
+
+        .botones-tiempo {
+          grid-template-columns: 1fr 1fr;
+          max-width: 400px;
+        }
+
+        .botones-historial-container {
+          flex-direction: column;
+          gap: 0.8rem;
+        }
+
+        .btn-switch-mode {
+          margin-left: 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 0.5rem;
+          width: 100%;
+        }
+
+        .tab {
+          font-size: 0.9rem;
+          padding: 0.8rem;
+        }
+
+        .modal-content {
+          padding: 1rem;
+          width: 95%;
+          max-height: 90vh;
+        }
+
+        .modal-form {
+          gap: 0.6rem;
+        }
+
+        .modal-input {
+          padding: 0.5rem;
+          font-size: 0.85rem;
+        }
+
+        .modal-btn {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.85rem;
+        }
+
+        .modal-title {
+          font-size: 1.2rem;
+          margin-bottom: 0.3rem;
+        }
+
+        .botones-tiempo {
+          grid-template-columns: 1fr;
+          gap: 0.8rem;
+        }
+
+        .btn-tiempo {
+          padding: 0.8rem;
+          font-size: 1rem;
+        }
+
+        .saldo-display {
+          font-size: 2.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // ================================================
+      // MINI FRAMEWORK (SIGNALS Y REACTIVOS)
+      // ================================================
+      //prettier-ignore
+      const { setSignal, setEffect, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+
+      // ================================================
+      // COMPONENTE DE MODAL GENÉRICO
+      // ================================================
+      function Modal({ isOpen, onClose, children, theme = '' }) {
+        if (!isOpen) return null;
+
+        const handleOverlayClick = e => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        };
+
+        return h(
+          'div',
+          { className: `modal-overlay ${theme}`, onclick: handleOverlayClick },
+          h('div', { className: 'modal-content' }, h('button', { className: 'modal-close', onclick: onClose }, '×'), children)
+        );
+      }
+
+      // ================================================
+      // COMPONENTES DE SECCIONES
+      // ================================================
+      function ContadorSection() {
+        // ====== DETECCIÓN DE MODO ======
+        const getDayMode = () => {
+          const dayOfWeek = new Date().getDay();
+          return dayOfWeek >= 1 && dayOfWeek <= 5 ? 'dia-habil' : 'fin-semana';
+        };
+
+        // ====== SIGNALS ======
+        const [modoActual, setModoActual] = setSignal(getDayMode());
+        const [contadorData, setContadorData] = setSignal({
+          'dia-habil': { saldo: 0, transacciones: [] },
+          'fin-semana': { saldo: 0, transacciones: [] },
+        });
+        const [isHistorialOpen, setIsHistorialOpen] = setSignal(false);
+
+        // ====== FUNCIONES UTILITARIAS ======
+        const currentModeData = () => contadorData()[modoActual()];
+
+        const formatTime = minutes => {
+          const absMinutes = Math.abs(minutes);
+          if (absMinutes === 0) return '0min';
+          const hours = Math.floor(absMinutes / 60);
+          const mins = absMinutes % 60;
+
+          if (hours === 0) return `${mins}min`;
+          if (mins === 0) return `${hours}h`;
+          return `${hours}h ${mins}min`;
+        };
+
+        const formatTimestamp = timestamp => {
+          const date = new Date(timestamp);
+          return date.toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          });
+        };
+
+        // ====== LÓGICA PRINCIPAL ======
+        const agregarTiempo = minutes => {
+          const modo = modoActual();
+          const currentData = contadorData();
+          const saldoActual = currentData[modo].saldo;
+          const nuevoSaldo = Math.max(0, saldoActual + minutes);
+
+          // TRUCO: Calcular monto real de transacción (solo lo que se puede restar)
+          const montoReal = minutes > 0 ? minutes : Math.max(minutes, -saldoActual);
+
+          const transaccion = {
+            id: Date.now(),
+            amount: montoReal,
+            timestamp: Date.now(),
+            description: montoReal > 0 ? `+${montoReal} minutos` : `${montoReal} minutos`,
+          };
+
+          const newData = {
+            ...currentData,
+            [modo]: {
+              saldo: nuevoSaldo,
+              transacciones: [transaccion, ...currentData[modo].transacciones],
+            },
+          };
+
+          setContadorData(newData);
+        };
+
+        const switchMode = () => {
+          const newMode = modoActual() === 'dia-habil' ? 'fin-semana' : 'dia-habil';
+          setModoActual(newMode);
+        };
+
+        // ====== FUNCIONES DE MODAL ======
+        const openHistorial = () => setIsHistorialOpen(true);
+        const closeHistorial = () => setIsHistorialOpen(false);
+
+        // ====== ACTUALIZACIÓN AUTOMÁTICA DEL MODO ======
+        setEffect(() => {
+          setInterval(() => {
+            const newMode = getDayMode();
+            if (newMode !== modoActual()) {
+              setModoActual(newMode);
+            }
+          }, 60000); // Verificar cada minuto
+        });
+
+        // ====== CONTENIDO DEL MODAL ======
+        const historialModalContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, () => `Historial - ${modoActual() === 'dia-habil' ? 'Día Hábil' : 'Fin de Semana'}`),
+          h('div', { className: 'transacciones-container', style: 'margin-top: 0; max-height: 400px;' }, () =>
+            currentModeData().transacciones.length > 0
+              ? h(
+                  'div',
+                  null,
+                  ...currentModeData().transacciones.map(transaccion =>
+                    h(
+                      'div',
+                      { className: 'transaccion-item', key: transaccion.id },
+                      h(
+                        'span',
+                        {
+                          className: `transaccion-amount ${transaccion.amount > 0 ? 'transaccion-positiva' : 'transaccion-negativa'}`,
+                        },
+                        transaccion.amount > 0 ? `+${transaccion.amount}min` : `${transaccion.amount}min`
+                      ),
+                      h('span', { className: 'transaccion-tiempo' }, formatTimestamp(transaccion.timestamp))
+                    )
+                  )
+                )
+              : h('div', { className: 'no-transacciones' }, 'No hay transacciones registradas')
+          ),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-primary', onclick: closeHistorial }, 'Cerrar')
+          )
+        );
+
+        return h(
+          'div',
+          { className: 'tab-content' },
+
+          // Indicador de modo
+          h(
+            'div',
+            { className: 'contador-display' },
+            h('div', { className: () => `modo-indicator modo-${modoActual()}` }, () =>
+              modoActual() === 'dia-habil' ? 'DÍA HÁBIL' : 'FIN DE SEMANA'
+            ),
+
+            // Saldo actual
+            h('div', { className: 'saldo-display' }, () => formatTime(currentModeData().saldo))
+          ),
+
+          // Botones de tiempo
+          h(
+            'div',
+            { className: 'botones-tiempo' },
+            h(
+              'button',
+              {
+                className: 'btn-tiempo btn-agregar-10',
+                onclick: () => agregarTiempo(10),
+              },
+              '+10 min'
+            ),
+            h(
+              'button',
+              {
+                className: 'btn-tiempo btn-agregar-30',
+                onclick: () => agregarTiempo(30),
+              },
+              '+30 min'
+            ),
+            h(
+              'button',
+              {
+                className: 'btn-tiempo btn-agregar-hour',
+                onclick: () => agregarTiempo(60),
+              },
+              '+1 HOUR'
+            ),
+            h(
+              'button',
+              {
+                className: 'btn-tiempo btn-quitar-10',
+                onclick: () => agregarTiempo(-10),
+              },
+              '-10 min'
+            ),
+            h(
+              'button',
+              {
+                className: 'btn-tiempo btn-quitar-30',
+                onclick: () => agregarTiempo(-30),
+              },
+              '-30 min'
+            ),
+            h(
+              'button',
+              {
+                className: 'btn-tiempo btn-quitar-hour',
+                onclick: () => agregarTiempo(-60),
+              },
+              '-1 HOUR'
+            )
+          ),
+
+          // Botones de historial y switch mode
+          h(
+            'div',
+            { className: 'botones-historial-container' },
+            h(
+              'button',
+              {
+                className: 'btn-historial',
+                onclick: openHistorial,
+              },
+              'Ver Historial de Transacciones'
+            ),
+            h(
+              'button',
+              {
+                className: 'btn-switch-mode',
+                onclick: switchMode,
+              },
+              'Switch Mode'
+            )
+          ),
+
+          // Modal de historial
+          () =>
+            Modal({
+              isOpen: isHistorialOpen(),
+              onClose: closeHistorial,
+              theme: `tema-${modoActual()}`,
+              children: historialModalContent,
+            })
+        );
+      }
+
+      function PuedoSection() {
+        return h(
+          'div',
+          { className: 'tab-content' },
+          h('h2', null, '🤔 ¿Puedo?'),
+          h('p', null, 'Responde una serie de preguntas y obtén un resultado personalizado.')
+        );
+      }
+
+      // ================================================
+      // COMPONENTE PRINCIPAL DE LA APLICACIÓN
+      // ================================================
+      function TrackEATApp() {
+        // ====== SIGNALS PRINCIPALES ======
+        const [activeTab, setActiveTab] = setSignal('contador');
+
+        // ====== CONFIGURACIÓN DE PESTAÑAS ======
+        const tabs = [
+          { id: 'contador', label: '⏱️ Contador' },
+          { id: 'puedo', label: '🤔 Puedo?' },
+        ];
+
+        // ====== RENDER PRINCIPAL ======
+        return h(
+          'div',
+          { className: () => `container tema-${activeTab()}` },
+
+          h('h1', null, 'TrackEAT'),
+
+          h(
+            'div',
+            { className: 'tabs-container' },
+            ...tabs.map(tab =>
+              h(
+                'button',
+                { className: () => `tab ${tab.id} ${activeTab() === tab.id ? 'active' : ''}`, onclick: () => setActiveTab(tab.id) },
+                tab.label
+              )
+            )
+          ),
+
+          h(
+            'div',
+            { className: 'content-box' },
+            h('div', { className: () => `tab-section ${activeTab() === 'contador' ? '' : 'hidden'}` }, ContadorSection()),
+            h('div', { className: () => `tab-section ${activeTab() === 'puedo' ? '' : 'hidden'}` }, PuedoSection())
+          )
+        );
+      }
+
+      // ================================================
+      // INICIALIZACIÓN DE LA APLICACIÓN
+      // ================================================
+      const root = document.body;
+      root.appendChild(TrackEATApp());
+    </script>
+  </body>
+</html>
