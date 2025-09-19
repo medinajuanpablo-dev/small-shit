@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cropper</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #2d3748;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+        padding: 10px;
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: clamp(1rem, 3vw, 2rem);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        width: 95%;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(102, 126, 234, 0.2);
+      }
+
+      h1 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        font-weight: bold;
+      }
+
+      .upload-area {
+        border: 3px dashed #667eea;
+        border-radius: 15px;
+        padding: clamp(2rem, 6vw, 3rem);
+        margin: 2rem 0;
+        background: rgba(102, 126, 234, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .upload-area:hover {
+        border-color: #764ba2;
+        background: rgba(118, 75, 162, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .upload-area.dragover {
+        border-color: #4299e1;
+        background: rgba(66, 153, 225, 0.15);
+        transform: scale(1.02);
+      }
+
+      .upload-text {
+        font-size: clamp(1.1rem, 3vw, 1.3rem);
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .upload-subtext {
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        color: #718096;
+        margin-bottom: 1rem;
+      }
+
+      .processing-status {
+        background: rgba(102, 126, 234, 0.1);
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+        text-align: center;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(102, 126, 234, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transition: width 0.3s ease;
+        border-radius: 4px;
+      }
+
+      .files-list {
+        max-height: 200px;
+        overflow-y: auto;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin: 1rem 0;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+      }
+
+      .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.3rem 0.5rem;
+        margin: 0.2rem 0;
+        background: white;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+
+      .file-name {
+        color: #2d3748;
+        font-weight: 500;
+        flex: 1;
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 0.5rem;
+      }
+
+      .file-status {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+
+      .status-pending {
+        background: #fef5e7;
+        color: #d69e2e;
+      }
+
+      .status-processing {
+        background: #e6fffa;
+        color: #319795;
+      }
+
+      .status-completed {
+        background: #f0fff4;
+        color: #38a169;
+      }
+
+      .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .upload-btn {
+        padding: clamp(0.8rem, 2.5vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        background: linear-gradient(145deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(145deg, #764ba2, #667eea);
+      }
+
+      .image-preview {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        margin: 2rem 0;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+      }
+
+      .crop-button {
+        padding: clamp(1rem, 3vw, 1.2rem) clamp(2rem, 5vw, 2.5rem);
+        font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+        background: linear-gradient(145deg, #48bb78, #38a169);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 6px 18px rgba(72, 187, 120, 0.3);
+        margin: 1.5rem auto;
+        display: block;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .crop-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(72, 187, 120, 0.4);
+        background: linear-gradient(145deg, #38a169, #2f855a);
+      }
+
+      .crop-button:disabled {
+        background: linear-gradient(145deg, #a0aec0, #718096);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .results-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+
+      .result-item {
+        background: rgba(102, 126, 234, 0.05);
+        padding: 1rem;
+        border-radius: 15px;
+        border: 2px solid rgba(102, 126, 234, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .result-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: rgba(102, 126, 234, 0.3);
+      }
+
+      .result-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .download-btn {
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 0.9rem;
+        background: linear-gradient(145deg, #ed8936, #dd6b20);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+      }
+
+      .download-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(237, 137, 54, 0.4);
+        background: linear-gradient(145deg, #dd6b20, #c05621);
+      }
+
+      .download-all-btn {
+        width: 100%;
+        max-width: 400px;
+        padding: clamp(1rem, 3vw, 1.2rem);
+        font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+        background: linear-gradient(145deg, #9f7aea, #805ad5);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 6px 18px rgba(159, 122, 234, 0.3);
+        margin: 1.5rem auto;
+        display: block;
+      }
+
+      .download-all-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(159, 122, 234, 0.4);
+        background: linear-gradient(145deg, #805ad5, #6b46c1);
+      }
+
+      .info-text {
+        color: #718096;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        margin: 1rem 0;
+        line-height: 1.5;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .reset-btn {
+        padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1.2rem, 3vw, 1.5rem);
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        background: linear-gradient(145deg, #e53e3e, #c53030);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        margin-top: 2rem;
+      }
+
+      .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(229, 62, 62, 0.4);
+        background: linear-gradient(145deg, #c53030, #9c2a2a);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+          width: 100%;
+          border-radius: 15px;
+        }
+
+        .upload-area {
+          padding: 1.5rem;
+          margin: 1rem 0;
+        }
+
+        .results-container {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+
+        .image-preview {
+          max-height: 250px;
+          margin: 1rem 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .results-container {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .upload-area {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      //prettier-ignore
+      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+
+      function CropperApp() {
+        const [selectedFiles, setSelectedFiles] = setSignal([]);
+        const [imageUrl, setImageUrl] = setSignal('');
+        const [croppedImages, setCroppedImages] = setSignal([]);
+        const [isDragOver, setIsDragOver] = setSignal(false);
+        const [isProcessing, setIsProcessing] = setSignal(false);
+        const [processingProgress, setProcessingProgress] = setSignal(0);
+        const [fileStatuses, setFileStatuses] = setSignal([]);
+
+        const handleFilesSelect = files => {
+          const validFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+          if (validFiles.length === 0) {
+            alert('Por favor selecciona archivos de imagen válidos');
+            return;
+          }
+
+          if (validFiles.length !== files.length) {
+            alert(`Se seleccionaron ${validFiles.length} imágenes válidas de ${files.length} archivos`);
+          }
+
+          setSelectedFiles(validFiles);
+          setCroppedImages([]);
+          setFileStatuses(validFiles.map((file, index) => ({ id: index, name: file.name, status: 'pending' })));
+
+          // Solo mostrar preview si es una sola imagen
+          if (validFiles.length === 1) {
+            const reader = new FileReader();
+            reader.onload = e => setImageUrl(e.target.result);
+            reader.readAsDataURL(validFiles[0]);
+          } else {
+            setImageUrl('');
+          }
+        };
+
+        const handleFileInput = e => {
+          const files = e.target.files;
+          if (files && files.length > 0) {
+            handleFilesSelect(files);
+          }
+        };
+
+        const handleDrop = e => {
+          e.preventDefault();
+          setIsDragOver(false);
+          const files = e.dataTransfer.files;
+          if (files && files.length > 0) {
+            handleFilesSelect(files);
+          }
+        };
+
+        const handleDragOver = e => {
+          e.preventDefault();
+          setIsDragOver(true);
+        };
+
+        const handleDragLeave = e => {
+          e.preventDefault();
+          setIsDragOver(false);
+        };
+
+        const cropSingleImage = (file, fileName) => {
+          return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = e => {
+              const img = new Image();
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                const width = img.width;
+                const height = img.height;
+                const halfWidth = width / 2;
+                const halfHeight = height / 2;
+
+                const crops = [
+                  { name: 'Superior Izquierda', x: 0, y: 0, width: halfWidth, height: halfHeight },
+                  { name: 'Superior Derecha', x: halfWidth, y: 0, width: halfWidth, height: halfHeight },
+                  { name: 'Inferior Izquierda', x: 0, y: halfHeight, width: halfWidth, height: halfHeight },
+                  { name: 'Inferior Derecha', x: halfWidth, y: halfHeight, width: halfWidth, height: halfHeight },
+                ];
+
+                const results = crops.map(crop => {
+                  canvas.width = crop.width;
+                  canvas.height = crop.height;
+
+                  ctx.drawImage(img, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+
+                  return {
+                    name: `${fileName} - ${crop.name}`,
+                    originalFile: fileName,
+                    cropName: crop.name,
+                    dataUrl: canvas.toDataURL('image/png'),
+                  };
+                });
+
+                resolve(results);
+              };
+              img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          });
+        };
+
+        const cropAllImages = async () => {
+          if (selectedFiles().length === 0) return;
+
+          setIsProcessing(true);
+          setProcessingProgress(0);
+          setCroppedImages([]);
+
+          const allResults = [];
+          const totalFiles = selectedFiles().length;
+
+          for (let i = 0; i < totalFiles; i++) {
+            const file = selectedFiles()[i];
+            const fileName = file.name.replace(/\.[^/.]+$/, ''); // Remove extension
+
+            // Update file status to processing
+            setFileStatuses(prev => prev.map(status => (status.id === i ? { ...status, status: 'processing' } : status)));
+
+            try {
+              const results = await cropSingleImage(file, fileName);
+              allResults.push(...results);
+
+              // Update file status to completed
+              setFileStatuses(prev => prev.map(status => (status.id === i ? { ...status, status: 'completed' } : status)));
+
+              // Update progress
+              setProcessingProgress(Math.round(((i + 1) / totalFiles) * 100));
+
+              // Small delay to prevent UI blocking
+              await new Promise(resolve => setTimeout(resolve, 100));
+            } catch (error) {
+              console.error('Error processing file:', file.name, error);
+            }
+          }
+
+          setCroppedImages(allResults);
+          setIsProcessing(false);
+        };
+
+        const downloadImage = (dataUrl, filename) => {
+          const link = document.createElement('a');
+          link.download = filename;
+          link.href = dataUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
+        const downloadAllImages = async () => {
+          if (croppedImages().length === 0) return;
+
+          // Crear un ZIP usando JSZip (incluimos la librería inline para simplicidad)
+          const JSZip = await loadJSZip();
+          const zip = new JSZip();
+
+          // Agregar cada imagen al ZIP
+          croppedImages().forEach((crop, index) => {
+            const base64Data = crop.dataUrl.split(',')[1];
+            const filename = `cropped-${crop.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+            zip.file(filename, base64Data, { base64: true });
+          });
+
+          // Generar el ZIP y descargarlo
+          const content = await zip.generateAsync({ type: 'blob' });
+          const link = document.createElement('a');
+          link.download = 'cropped-images.zip';
+          link.href = URL.createObjectURL(content);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+        };
+
+        // Función para cargar JSZip dinámicamente
+        const loadJSZip = () => {
+          return new Promise((resolve, reject) => {
+            if (window.JSZip) {
+              resolve(window.JSZip);
+              return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            script.onload = () => resolve(window.JSZip);
+            script.onerror = () => {
+              // Fallback: implementación simple sin JSZip
+              console.warn('No se pudo cargar JSZip, usando descarga individual');
+              resolve(createSimpleZip());
+            };
+            document.head.appendChild(script);
+          });
+        };
+
+        // Fallback simple si JSZip no se puede cargar
+        const createSimpleZip = () => {
+          return {
+            file: () => {},
+            generateAsync: () => {
+              // Descargar todas las imágenes individualmente como fallback
+              croppedImages().forEach((crop, index) => {
+                setTimeout(() => {
+                  downloadImage(crop.dataUrl, `cropped-${crop.name.toLowerCase().replace(/\s+/g, '-')}.png`);
+                }, index * 500);
+              });
+              return Promise.resolve(new Blob());
+            },
+          };
+        };
+
+        const resetApp = () => {
+          setSelectedFiles([]);
+          setImageUrl('');
+          setCroppedImages([]);
+          setIsDragOver(false);
+          setIsProcessing(false);
+          setProcessingProgress(0);
+          setFileStatuses([]);
+        };
+
+        return h(
+          'div',
+          { className: 'container' },
+          h('h1', null, '✂️ Cropper'),
+
+          // Área de carga
+          h(
+            'div',
+            {
+              className: () => `upload-area ${isDragOver() ? 'dragover' : ''}`,
+              ondrop: handleDrop,
+              ondragover: handleDragOver,
+              ondragleave: handleDragLeave,
+            },
+            h('input', {
+              type: 'file',
+              className: 'file-input',
+              accept: 'image/*',
+              multiple: true,
+              onchange: handleFileInput,
+            }),
+            h('div', { className: 'upload-text' }, '📁 Selecciona o arrastra imágenes'),
+            h('div', { className: 'upload-subtext' }, 'Formatos soportados: JPG, PNG, GIF, WebP • Múltiples archivos permitidos'),
+            h('button', { className: 'upload-btn', onclick: () => document.querySelector('.file-input').click() }, 'Seleccionar Imágenes')
+          ),
+
+          // Lista de archivos seleccionados
+          () =>
+            selectedFiles().length > 0
+              ? h(
+                  'div',
+                  { className: 'files-list' },
+                  h(
+                    'h3',
+                    { style: 'margin: 0 0 0.5rem 0; color: #667eea; font-size: 1rem;' },
+                    `📋 Archivos seleccionados (${selectedFiles().length})`
+                  ),
+                  ...fileStatuses().map(status =>
+                    h(
+                      'div',
+                      { className: 'file-item', key: status.id },
+                      h('div', { className: 'file-name' }, status.name),
+                      h(
+                        'div',
+                        { className: () => `file-status status-${status.status}` },
+                        status.status === 'pending' ? 'Pendiente' : status.status === 'processing' ? 'Procesando...' : 'Completado'
+                      )
+                    )
+                  )
+                )
+              : null,
+
+          // Vista previa de imagen única
+          () =>
+            imageUrl() && selectedFiles().length === 1
+              ? h('img', { src: imageUrl(), className: 'image-preview', alt: 'Vista previa' })
+              : null,
+
+          // Estado de procesamiento
+          () =>
+            isProcessing()
+              ? h(
+                  'div',
+                  { className: 'processing-status' },
+                  h('div', { style: 'color: #667eea; font-weight: 600; margin-bottom: 0.5rem;' }, '⚡ Procesando imágenes...'),
+                  h(
+                    'div',
+                    { className: 'progress-bar' },
+                    h('div', { className: 'progress-fill', style: () => `width: ${processingProgress()}%` })
+                  ),
+                  h('div', { style: 'color: #718096; font-size: 0.9rem; margin-top: 0.5rem;' }, () => `${processingProgress()}% completado`)
+                )
+              : null,
+
+          // Botón de procesamiento
+          () =>
+            selectedFiles().length > 0 && !isProcessing()
+              ? h(
+                  'button',
+                  {
+                    className: 'crop-button',
+                    onclick: cropAllImages,
+                  },
+                  () => `✂️ Procesar ${selectedFiles().length} imagen${selectedFiles().length > 1 ? 'es' : ''}`
+                )
+              : null,
+
+          // Información
+          () =>
+            selectedFiles().length === 0 && !croppedImages().length
+              ? h('div', { className: 'info-text' }, 'Sube una o múltiples imágenes para cortarlas en 4 partes iguales (corte en cruz)')
+              : null,
+
+          // Resultados
+          () =>
+            croppedImages().length > 0
+              ? h(
+                  'div',
+                  null,
+                  h('h2', { style: 'color: #667eea; margin: 2rem 0 1rem 0;' }, () => `🎯 Resultados (${croppedImages().length} imágenes)`),
+                  h(
+                    'button',
+                    {
+                      className: 'download-all-btn',
+                      onclick: downloadAllImages,
+                    },
+                    () => `📦 Descargar Todas (${croppedImages().length} imágenes ZIP)`
+                  ),
+                  h(
+                    'div',
+                    { className: 'results-container' },
+                    ...croppedImages().map((crop, index) =>
+                      h(
+                        'div',
+                        { className: 'result-item', key: index },
+                        h('img', { src: crop.dataUrl, className: 'result-image', alt: crop.name }),
+                        h(
+                          'button',
+                          {
+                            className: 'download-btn',
+                            onclick: () => downloadImage(crop.dataUrl, `${crop.name.toLowerCase().replace(/\s+/g, '-')}.png`),
+                          },
+                          () => {
+                            const shortName = crop.name.length > 20 ? crop.name.substring(0, 20) + '...' : crop.name;
+                            return `📥 ${shortName}`;
+                          }
+                        )
+                      )
+                    )
+                  )
+                )
+              : null,
+
+          // Botón de reset
+          () =>
+            selectedFiles().length > 0 || croppedImages().length > 0
+              ? h('button', { className: 'reset-btn', onclick: resetApp }, '🔄 Reiniciar')
+              : null
+        );
+      }
+
+      const root = document.body;
+      root.appendChild(CropperApp());
+    </script>
+  </body>
+</html>
