@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Joiner</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: #2d3748;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+        padding: 10px;
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: clamp(1rem, 3vw, 2rem);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        max-width: 900px;
+        width: 95%;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(79, 172, 254, 0.2);
+      }
+
+      h1 {
+        color: #4facfe;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        font-weight: bold;
+      }
+
+      .upload-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .upload-area {
+        border: 3px dashed #4facfe;
+        border-radius: 15px;
+        padding: clamp(1.5rem, 4vw, 2rem);
+        background: rgba(79, 172, 254, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .upload-area:hover {
+        border-color: #00f2fe;
+        background: rgba(0, 242, 254, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .upload-area.dragover {
+        border-color: #4299e1;
+        background: rgba(66, 153, 225, 0.15);
+        transform: scale(1.02);
+      }
+
+      .upload-area.filled {
+        border-color: #48bb78;
+        background: rgba(72, 187, 120, 0.1);
+      }
+
+      .upload-text {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        color: #4facfe;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .upload-label {
+        font-size: clamp(1.2rem, 3vw, 1.5rem);
+        color: #2d3748;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .front-label {
+        color: #e53e3e;
+      }
+
+      .back-label {
+        color: #3182ce;
+      }
+
+      .upload-subtext {
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        color: #718096;
+        margin-bottom: 1rem;
+      }
+
+      .file-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .upload-btn {
+        padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1.2rem, 3vw, 1.5rem);
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        background: linear-gradient(145deg, #4facfe, #00f2fe);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+      }
+
+      .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
+        background: linear-gradient(145deg, #00f2fe, #4facfe);
+      }
+
+      .image-preview {
+        width: 100%;
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        margin-bottom: 0.5rem;
+      }
+
+      .preview-label {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .join-button {
+        padding: clamp(1rem, 3vw, 1.2rem) clamp(2rem, 5vw, 2.5rem);
+        font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+        background: linear-gradient(145deg, #48bb78, #38a169);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 6px 18px rgba(72, 187, 120, 0.3);
+        margin: 2rem auto;
+        display: block;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .join-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(72, 187, 120, 0.4);
+        background: linear-gradient(145deg, #38a169, #2f855a);
+      }
+
+      .join-button:disabled {
+        background: linear-gradient(145deg, #a0aec0, #718096);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .result-container {
+        margin: 2rem 0;
+        text-align: center;
+      }
+
+      .result-image {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        margin: 1rem 0;
+        border: 2px solid rgba(79, 172, 254, 0.2);
+      }
+
+      .download-btn {
+        padding: clamp(0.8rem, 2.5vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        background: linear-gradient(145deg, #ed8936, #dd6b20);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(237, 137, 54, 0.3);
+        margin: 1rem;
+      }
+
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 18px rgba(237, 137, 54, 0.4);
+        background: linear-gradient(145deg, #dd6b20, #c05621);
+      }
+
+      .reset-btn {
+        padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1.2rem, 3vw, 1.5rem);
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        background: linear-gradient(145deg, #e53e3e, #c53030);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        margin-top: 2rem;
+      }
+
+      .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(229, 62, 62, 0.4);
+        background: linear-gradient(145deg, #c53030, #9c2a2a);
+      }
+
+      .info-text {
+        color: #718096;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        margin: 1rem 0;
+        line-height: 1.5;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+          width: 100%;
+          border-radius: 15px;
+        }
+
+        .upload-section {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+
+        .upload-area {
+          min-height: 150px;
+          padding: 1rem;
+        }
+
+        .result-image {
+          max-height: 250px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .upload-area {
+          padding: 0.8rem;
+          min-height: 120px;
+        }
+
+        .upload-section {
+          gap: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      //prettier-ignore
+      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+
+      function JoinerApp() {
+        const [frontImage, setFrontImage] = setSignal(null);
+        const [backImage, setBackImage] = setSignal(null);
+        const [frontImageUrl, setFrontImageUrl] = setSignal('');
+        const [backImageUrl, setBackImageUrl] = setSignal('');
+        const [joinedImageUrl, setJoinedImageUrl] = setSignal('');
+        const [isDragOverFront, setIsDragOverFront] = setSignal(false);
+        const [isDragOverBack, setIsDragOverBack] = setSignal(false);
+
+        const handleFileSelect = (file, type) => {
+          if (!file || !file.type.startsWith('image/')) {
+            alert('Por favor selecciona un archivo de imagen válido');
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = e => {
+            if (type === 'front') {
+              setFrontImage(file);
+              setFrontImageUrl(e.target.result);
+            } else {
+              setBackImage(file);
+              setBackImageUrl(e.target.result);
+            }
+            setJoinedImageUrl('');
+          };
+          reader.readAsDataURL(file);
+        };
+
+        const handleFileInput = (e, type) => {
+          const file = e.target.files[0];
+          if (file) {
+            handleFileSelect(file, type);
+          }
+        };
+
+        const handleDrop = (e, type) => {
+          e.preventDefault();
+          if (type === 'front') {
+            setIsDragOverFront(false);
+          } else {
+            setIsDragOverBack(false);
+          }
+          const file = e.dataTransfer.files[0];
+          if (file) {
+            handleFileSelect(file, type);
+          }
+        };
+
+        const handleDragOver = (e, type) => {
+          e.preventDefault();
+          if (type === 'front') {
+            setIsDragOverFront(true);
+          } else {
+            setIsDragOverBack(true);
+          }
+        };
+
+        const handleDragLeave = (e, type) => {
+          e.preventDefault();
+          if (type === 'front') {
+            setIsDragOverFront(false);
+          } else {
+            setIsDragOverBack(false);
+          }
+        };
+
+        const joinImages = () => {
+          if (!frontImageUrl() || !backImageUrl()) return;
+
+          const frontImg = new Image();
+          const backImg = new Image();
+          let imagesLoaded = 0;
+
+          const processImages = () => {
+            imagesLoaded++;
+            if (imagesLoaded !== 2) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Calcular dimensiones para que ambas imágenes tengan la misma altura
+            const maxHeight = Math.max(frontImg.height, backImg.height);
+            const frontAspect = frontImg.width / frontImg.height;
+            const backAspect = backImg.width / backImg.height;
+
+            const frontWidth = Math.round(maxHeight * frontAspect);
+            const backWidth = Math.round(maxHeight * backAspect);
+
+            canvas.width = frontWidth + backWidth;
+            canvas.height = maxHeight;
+
+            // Dibujar imagen frontal (izquierda)
+            ctx.drawImage(frontImg, 0, 0, frontWidth, maxHeight);
+
+            // Dibujar imagen trasera (derecha)
+            ctx.drawImage(backImg, frontWidth, 0, backWidth, maxHeight);
+
+            // Agregar etiquetas de texto
+            const fontSize = Math.max(24, Math.min(maxHeight / 15, 60));
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+            ctx.lineWidth = Math.max(4, fontSize / 8);
+
+            // Etiqueta "FRONT" en la imagen izquierda
+            const frontText = 'FRONT';
+            const frontTextWidth = ctx.measureText(frontText).width;
+            const frontX = (frontWidth - frontTextWidth) / 2;
+            const frontY = fontSize + 20;
+
+            // Sombra adicional para mejor contraste
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillText(frontText, frontX + 2, frontY + 2);
+
+            // Borde negro fuerte
+            ctx.strokeText(frontText, frontX, frontY);
+
+            // Texto blanco principal
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fillText(frontText, frontX, frontY);
+
+            // Etiqueta "BACK" en la imagen derecha
+            const backText = 'BACK';
+            const backTextWidth = ctx.measureText(backText).width;
+            const backX = frontWidth + (backWidth - backTextWidth) / 2;
+            const backY = fontSize + 20;
+
+            // Sombra adicional para mejor contraste
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillText(backText, backX + 2, backY + 2);
+
+            // Borde negro fuerte
+            ctx.strokeText(backText, backX, backY);
+
+            // Texto blanco principal
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.fillText(backText, backX, backY);
+
+            setJoinedImageUrl(canvas.toDataURL('image/png'));
+          };
+
+          frontImg.onload = processImages;
+          backImg.onload = processImages;
+          frontImg.src = frontImageUrl();
+          backImg.src = backImageUrl();
+        };
+
+        const downloadImage = () => {
+          if (!joinedImageUrl()) return;
+
+          const link = document.createElement('a');
+          link.download = 'joined-front-back.png';
+          link.href = joinedImageUrl();
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
+        const resetApp = () => {
+          setFrontImage(null);
+          setBackImage(null);
+          setFrontImageUrl('');
+          setBackImageUrl('');
+          setJoinedImageUrl('');
+          setIsDragOverFront(false);
+          setIsDragOverBack(false);
+        };
+
+        return h(
+          'div',
+          { className: 'container' },
+          h('h1', null, '🔗 Joiner'),
+
+          // Sección de carga de imágenes
+          h(
+            'div',
+            { className: 'upload-section' },
+
+            // Upload área para imagen frontal
+            h(
+              'div',
+              {
+                className: () => `upload-area ${isDragOverFront() ? 'dragover' : ''} ${frontImageUrl() ? 'filled' : ''}`,
+                ondrop: e => handleDrop(e, 'front'),
+                ondragover: e => handleDragOver(e, 'front'),
+                ondragleave: e => handleDragLeave(e, 'front'),
+              },
+              h('input', {
+                type: 'file',
+                className: 'file-input',
+                accept: 'image/*',
+                onchange: e => handleFileInput(e, 'front'),
+              }),
+              h('div', { className: 'upload-label front-label' }, '👈 FRONT'),
+              () =>
+                frontImageUrl()
+                  ? h(
+                      'div',
+                      null,
+                      h('img', { src: frontImageUrl(), className: 'image-preview', alt: 'Front preview' }),
+                      h('div', { className: 'preview-label' }, frontImage()?.name || 'Imagen frontal')
+                    )
+                  : h(
+                      'div',
+                      null,
+                      h('div', { className: 'upload-text' }, '📁 Imagen Frontal'),
+                      h('div', { className: 'upload-subtext' }, 'Aparecerá a la IZQUIERDA'),
+                      h(
+                        'button',
+                        { className: 'upload-btn', onclick: () => document.querySelectorAll('.file-input')[0].click() },
+                        'Seleccionar'
+                      )
+                    )
+            ),
+
+            // Upload área para imagen trasera
+            h(
+              'div',
+              {
+                className: () => `upload-area ${isDragOverBack() ? 'dragover' : ''} ${backImageUrl() ? 'filled' : ''}`,
+                ondrop: e => handleDrop(e, 'back'),
+                ondragover: e => handleDragOver(e, 'back'),
+                ondragleave: e => handleDragLeave(e, 'back'),
+              },
+              h('input', {
+                type: 'file',
+                className: 'file-input',
+                accept: 'image/*',
+                onchange: e => handleFileInput(e, 'back'),
+              }),
+              h('div', { className: 'upload-label back-label' }, 'BACK 👉'),
+              () =>
+                backImageUrl()
+                  ? h(
+                      'div',
+                      null,
+                      h('img', { src: backImageUrl(), className: 'image-preview', alt: 'Back preview' }),
+                      h('div', { className: 'preview-label' }, backImage()?.name || 'Imagen trasera')
+                    )
+                  : h(
+                      'div',
+                      null,
+                      h('div', { className: 'upload-text' }, '📁 Imagen Trasera'),
+                      h('div', { className: 'upload-subtext' }, 'Aparecerá a la DERECHA'),
+                      h(
+                        'button',
+                        { className: 'upload-btn', onclick: () => document.querySelectorAll('.file-input')[1].click() },
+                        'Seleccionar'
+                      )
+                    )
+            )
+          ),
+
+          // Información
+          () =>
+            !frontImageUrl() || !backImageUrl()
+              ? h(
+                  'div',
+                  { className: 'info-text' },
+                  'Sube ambas imágenes para juntarlas horizontalmente. La imagen frontal aparecerá a la izquierda con la etiqueta "FRONT" y la trasera a la derecha con "BACK".'
+                )
+              : null,
+
+          // Botón de unir
+          () =>
+            frontImageUrl() && backImageUrl()
+              ? h(
+                  'button',
+                  {
+                    className: 'join-button',
+                    onclick: joinImages,
+                  },
+                  '🔗 Unir Imágenes'
+                )
+              : null,
+
+          // Resultado
+          () =>
+            joinedImageUrl()
+              ? h(
+                  'div',
+                  { className: 'result-container' },
+                  h('h2', { style: 'color: #4facfe; margin-bottom: 1rem;' }, '🎯 Resultado'),
+                  h('img', { src: joinedImageUrl(), className: 'result-image', alt: 'Joined image' }),
+                  h('button', { className: 'download-btn', onclick: downloadImage }, '📥 Descargar Imagen')
+                )
+              : null,
+
+          // Botón de reset
+          () =>
+            frontImageUrl() || backImageUrl() || joinedImageUrl()
+              ? h('button', { className: 'reset-btn', onclick: resetApp }, '🔄 Reiniciar')
+              : null
+        );
+      }
+
+      const root = document.body;
+      root.appendChild(JoinerApp());
+    </script>
+  </body>
+</html>
