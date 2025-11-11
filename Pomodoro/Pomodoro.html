@@ -23,7 +23,7 @@
         padding: clamp(1.5rem, 4vw, 2.5rem);
         border-radius: 25px;
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-        max-width: 500px;
+        max-width: 600px;
         width: 95%;
         backdrop-filter: blur(15px);
         border: 2px solid rgba(255, 255, 255, 0.1);
@@ -34,6 +34,255 @@
         text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
         font-size: clamp(2rem, 6vw, 2.8rem);
         font-weight: bold;
+      }
+      .project-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        gap: 1rem;
+      }
+      .project-header-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+      }
+      .project-header-pomodoros {
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        color: #bdc3c7;
+        font-weight: 500;
+      }
+      .add-manual-button {
+        padding: 0.6rem 1.2rem;
+        background: linear-gradient(145deg, #1de9b6, #009688);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .add-manual-button:hover {
+        background: linear-gradient(145deg, #009688, #00796b);
+        transform: translateY(-2px);
+      }
+      .back-button {
+        padding: 0.6rem 1.2rem;
+        background: linear-gradient(145deg, #7f8c8d, #95a5a6);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .back-button:hover {
+        background: linear-gradient(145deg, #95a5a6, #7f8c8d);
+        transform: translateY(-2px);
+      }
+      .projects-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .project-item {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .project-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+      .confirm-warning-text {
+        color: #ecf0f1;
+        margin: 1rem 0;
+        font-size: 1rem;
+        text-align: center;
+      }
+      .modal-btn-delete {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+      }
+      .modal-btn-delete:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+        transform: translateY(-1px);
+      }
+      .project-name-cell {
+        text-align: left;
+        font-weight: 600;
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        color: #ecf0f1;
+      }
+      .project-name-cell.text-color-red {
+        color: #e74c3c !important;
+        background: transparent !important;
+      }
+      .project-name-cell.text-color-green {
+        color: #27ae60 !important;
+        background: transparent !important;
+      }
+      .project-name-cell.text-color-blue {
+        color: #3498db !important;
+        background: transparent !important;
+      }
+      .project-name-cell.text-color-purple {
+        color: #9b59b6 !important;
+        background: transparent !important;
+      }
+      .project-name-cell.text-color-orange {
+        color: #e67e22 !important;
+        background: transparent !important;
+      }
+      .project-name {
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        font-weight: bold;
+        color: #e3f6fc;
+      }
+      .project-name.text-color-red {
+        color: #e74c3c !important;
+        background: transparent !important;
+      }
+      .project-name.text-color-green {
+        color: #27ae60 !important;
+        background: transparent !important;
+      }
+      .project-name.text-color-blue {
+        color: #3498db !important;
+        background: transparent !important;
+      }
+      .project-name.text-color-purple {
+        color: #9b59b6 !important;
+        background: transparent !important;
+      }
+      .project-name.text-color-orange {
+        color: #e67e22 !important;
+        background: transparent !important;
+      }
+      .project-count {
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        color: #bdc3c7;
+        font-weight: 500;
+      }
+      .project-button {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+      .project-button:hover {
+        transform: translateY(-2px);
+      }
+      .project-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .btn-start {
+        background: linear-gradient(145deg, #27ae60, #2ecc71);
+        color: white;
+      }
+      .btn-start:hover:not(:disabled) {
+        background: linear-gradient(145deg, #229954, #27ae60);
+      }
+      .btn-delete {
+        background: white;
+        color: #e74c3c;
+        border: 2px solid #e74c3c;
+        padding: 0.6rem;
+        min-width: 44px;
+      }
+      .btn-delete:hover:not(:disabled) {
+        background: #e74c3c;
+        color: white;
+      }
+      .add-project-button {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(145deg, #9b59b6, #8e44ad);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+      }
+      .add-project-button:hover {
+        background: linear-gradient(145deg, #8e44ad, #7d3c98);
+        transform: translateY(-2px);
+      }
+      .new-day-button {
+        width: 30%;
+        padding: 1rem;
+        background: linear-gradient(145deg, #e67e22, #d35400);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+      }
+      .new-day-button:hover {
+        background: linear-gradient(145deg, #d35400, #c0392b);
+        transform: translateY(-2px);
+      }
+      .color-option {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .color-option:hover {
+        transform: scale(1.1);
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+      .color-option.selected {
+        border-color: white;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+      }
+      .color-options {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 1rem 0;
+      }
+      .color-red {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+      }
+      .color-green {
+        background: linear-gradient(145deg, #27ae60, #2ecc71);
+      }
+      .color-blue {
+        background: linear-gradient(145deg, #3498db, #2980b9);
+      }
+      .color-purple {
+        background: linear-gradient(145deg, #9b59b6, #8e44ad);
+      }
+      .color-orange {
+        background: linear-gradient(145deg, #e67e22, #d35400);
       }
       .timer-buttons {
         display: flex;
@@ -147,11 +396,142 @@
         font-size: 0.8em;
         opacity: 0.9;
       }
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(3px);
+      }
+      .modal-content {
+        background: rgba(52, 73, 94, 0.95);
+        padding: 1.5rem;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        animation: modalSlideIn 0.3s ease;
+      }
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #ecf0f1;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+      .modal-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+      }
+      .modal-title {
+        color: #e3f6fc;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+      .modal-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .modal-input {
+        padding: 0.8rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ecf0f1;
+        transition: border-color 0.3s ease;
+      }
+      .modal-input:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+      }
+      .modal-input::placeholder {
+        color: rgba(236, 240, 241, 0.5);
+      }
+      .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+      .modal-btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+      .modal-btn-primary {
+        background: linear-gradient(145deg, #3498db, #2980b9);
+        color: white;
+      }
+      .modal-btn-primary:hover {
+        background: linear-gradient(145deg, #2980b9, #1f618d);
+        transform: translateY(-1px);
+      }
+      .modal-btn-primary.disabled {
+        background: #7f8c8d;
+        color: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .modal-btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ecf0f1;
+      }
+      .modal-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
       @media (max-width: 600px) {
         .container {
           padding: 1.5rem;
           width: 100%;
           border-radius: 15px;
+        }
+        .project-item {
+          grid-template-columns: 1fr;
+          gap: 0.8rem;
+        }
+        .project-name-cell,
+        .project-count {
+          text-align: center;
+        }
+        .project-button {
+          width: 100%;
         }
         .timer-buttons {
           gap: 1.5rem;
@@ -182,9 +562,241 @@
   <body>
     <script type="module">
       //prettier-ignore
-      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+      const { setSignal, setEffect, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
 
-      function PomodoroTimer() {
+      function Modal({ isOpen, onClose, onConfirm, children }) {
+        if (!isOpen) return null;
+        const handleOverlayClick = e => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        };
+        const handleKeyDown = e => {
+          if (e.key === 'Escape') {
+            onClose();
+          } else if (e.key === 'Enter' && onConfirm) {
+            e.preventDefault();
+            onConfirm();
+          }
+        };
+        setEffect(() => {
+          if (isOpen) {
+            document.addEventListener('keydown', handleKeyDown);
+            return () => {
+              document.removeEventListener('keydown', handleKeyDown);
+            };
+          }
+        });
+        return h(
+          'div',
+          { className: 'modal-overlay', onclick: handleOverlayClick },
+          h('div', { className: 'modal-content' }, h('button', { className: 'modal-close', onclick: onClose }, '×'), children)
+        );
+      }
+
+      function ConfirmDelete({ isOpen, onClose, onConfirm, projectName }) {
+        const confirmContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '⚠️ Confirmar Eliminación'),
+          h('p', { className: 'confirm-warning-text' }, `¿Estás seguro que deseas eliminar el proyecto "${projectName}"?`),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: onConfirm }, 'Eliminar')
+          )
+        );
+        return Modal({ isOpen, onClose, onConfirm, children: confirmContent });
+      }
+
+      function ConfirmNewDay({ isOpen, onClose, onConfirm }) {
+        const confirmContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '🔄 Confirmar New Day'),
+          h('p', { className: 'confirm-warning-text' }, '¿Estás seguro que deseas reiniciar todos los contadores de pomodoros a 0?'),
+          h(
+            'p',
+            { className: 'confirm-warning-text', style: 'font-size: 0.9rem; color: #e74c3c; margin-top: 1rem;' },
+            'Esta acción reiniciará todos los proyectos. No se puede deshacer.'
+          ),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: onConfirm }, 'Sí, Reiniciar Todo')
+          )
+        );
+        return Modal({ isOpen, onClose, onConfirm, children: confirmContent });
+      }
+
+      function ProjectsList({ projects, setProjects, onStartProject, onDeleteProject, onAddProject, onNewDay, formatPomodoros }) {
+        const [isAddModalOpen, setIsAddModalOpen] = setSignal(false);
+        const [newProjectName, setNewProjectName] = setSignal('');
+        const [selectedColor, setSelectedColor] = setSignal('red');
+        const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = setSignal(false);
+        const [projectToDelete, setProjectToDelete] = setSignal(null);
+        const [isNewDayConfirmOpen, setIsNewDayConfirmOpen] = setSignal(false);
+
+        const handleAddProject = () => {
+          const name = newProjectName().trim();
+          if (name.length === 0) return;
+          const newProject = { id: Date.now(), name, color: selectedColor(), pomodoros: 0 };
+          setProjects([...projects(), newProject]);
+          setNewProjectName('');
+          setSelectedColor('red');
+          setIsAddModalOpen(false);
+        };
+
+        setEffect(() => {
+          if (isAddModalOpen()) {
+            setTimeout(() => {
+              const projectNameInput = document.querySelector('#project-name-input');
+              if (projectNameInput) {
+                projectNameInput.value = '';
+              }
+            }, 10);
+          }
+        });
+
+        const colorOptions = [
+          { value: 'red', className: 'color-red' },
+          { value: 'green', className: 'color-green' },
+          { value: 'blue', className: 'color-blue' },
+          { value: 'purple', className: 'color-purple' },
+          { value: 'orange', className: 'color-orange' },
+        ];
+
+        return h(
+          'div',
+          null,
+          h('h1', null, 'Elegir proyecto'),
+          () =>
+            h(
+              'div',
+              { className: 'projects-list' },
+              ...projects().map(project =>
+                h(
+                  'div',
+                  {
+                    key: project.id,
+                    className: 'project-item',
+                    onclick: () => onStartProject(project),
+                  },
+                  h('div', { className: `project-name-cell text-color-${project.color}` }, project.name),
+                  h('div', { className: 'project-count' }, () => formatPomodoros(project.pomodoros)),
+                  h(
+                    'button',
+                    {
+                      className: 'project-button btn-start',
+                      onclick: e => {
+                        e.stopPropagation();
+                        onStartProject(project);
+                      },
+                    },
+                    'Iniciar'
+                  ),
+                  h(
+                    'button',
+                    {
+                      className: 'project-button btn-delete',
+                      onclick: e => {
+                        e.stopPropagation();
+                        setProjectToDelete(project);
+                        setIsDeleteConfirmOpen(true);
+                      },
+                    },
+                    '🗑️'
+                  )
+                )
+              )
+            ),
+          () => h('button', { className: 'add-project-button', onclick: () => setIsAddModalOpen(true) }, '+ Agregar Proyecto'),
+          () => h('button', { className: 'new-day-button', onclick: () => setIsNewDayConfirmOpen(true) }, '🔄 New Day'),
+          () =>
+            ConfirmDelete({
+              isOpen: isDeleteConfirmOpen(),
+              onClose: () => {
+                setIsDeleteConfirmOpen(false);
+                setProjectToDelete(null);
+              },
+              onConfirm: () => {
+                if (projectToDelete()) {
+                  onDeleteProject(projectToDelete().id);
+                  setIsDeleteConfirmOpen(false);
+                  setProjectToDelete(null);
+                }
+              },
+              projectName: projectToDelete()?.name || '',
+            }),
+          () =>
+            ConfirmNewDay({
+              isOpen: isNewDayConfirmOpen(),
+              onClose: () => setIsNewDayConfirmOpen(false),
+              onConfirm: () => {
+                onNewDay();
+                setIsNewDayConfirmOpen(false);
+              },
+            }),
+          () =>
+            Modal({
+              isOpen: isAddModalOpen(),
+              onClose: () => {
+                setIsAddModalOpen(false);
+                setNewProjectName('');
+                setSelectedColor('red');
+              },
+              onConfirm: () => {
+                if (newProjectName().trim().length > 0) {
+                  handleAddProject();
+                }
+              },
+              children: h(
+                'div',
+                { className: 'modal-form' },
+                h('h3', { className: 'modal-title' }, 'Agregar Proyecto'),
+                h('input', {
+                  id: 'project-name-input',
+                  className: 'modal-input',
+                  type: 'text',
+                  placeholder: 'Nombre del proyecto',
+                  oninput: e => setNewProjectName(e.target.value),
+                }),
+                h(
+                  'div',
+                  { className: 'color-options' },
+                  ...colorOptions.map(option =>
+                    h('div', {
+                      className: () => `color-option ${option.className} ${selectedColor() === option.value ? 'selected' : ''}`,
+                      onclick: () => setSelectedColor(option.value),
+                    })
+                  )
+                ),
+                h(
+                  'div',
+                  { className: 'modal-buttons' },
+                  h(
+                    'button',
+                    { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: () => setIsAddModalOpen(false) },
+                    'Cancelar'
+                  ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      className: () => `modal-btn modal-btn-primary ${newProjectName().trim().length === 0 ? 'disabled' : ''}`,
+                      onclick: handleAddProject,
+                    },
+                    'Agregar'
+                  )
+                )
+              ),
+            })
+        );
+      }
+
+      function PomodoroTimer({ currentProject, onBack, onUpdatePomodoros, onSetPomodoros, formatPomodoros }) {
         const [timeLeft, setTimeLeft] = setSignal(25 * 60);
         const [isRunning, setIsRunning] = setSignal(false);
         const [sessionType, setSessionType] = setSignal('trabajo');
@@ -192,6 +804,9 @@
         const [audioIntervalId, setAudioIntervalId] = setSignal(null);
         const [startTime, setStartTime] = setSignal(null);
         const [originalDuration, setOriginalDuration] = setSignal(0);
+        const [lastPomodoroUpdate, setLastPomodoroUpdate] = setSignal(null);
+        const [isAddManualModalOpen, setIsAddManualModalOpen] = setSignal(false);
+        const [manualPomodoros, setManualPomodoros] = setSignal('');
 
         const formatTime = seconds => {
           const mins = Math.floor(seconds / 60);
@@ -204,14 +819,11 @@
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
             oscillator.start();
             oscillator.stop(audioContext.currentTime + 0.5);
           } catch (error) {
@@ -240,20 +852,56 @@
           }
         };
 
-        const updateTimer = () => {
-          if (!isRunning() || !startTime()) return;
+        const calculatePomodorosFromTime = (startTime, endTime) => {
+          const secondsWorked = (endTime - startTime) / 1000;
+          const minutesWorked = secondsWorked / 60;
+          return minutesWorked / 25;
+        };
 
+        const updatePomodorosIfNeeded = () => {
+          if (!isRunning() || sessionType() !== 'trabajo' || !currentProject() || !lastPomodoroUpdate()) return;
+          const currentTime = Date.now();
+          const lastUpdate = lastPomodoroUpdate();
+          if (!lastUpdate || !lastUpdate.time) return;
+          const pomodorosWorked = calculatePomodorosFromTime(lastUpdate.time, currentTime);
+          if (pomodorosWorked > 0) {
+            onUpdatePomodoros(pomodorosWorked);
+            const project = currentProject();
+            if (project) {
+              setLastPomodoroUpdate({ time: currentTime, pomodorosAtStart: project.pomodoros });
+            }
+          }
+        };
+
+        const finalizePomodoros = () => {
+          if (!isRunning() || sessionType() !== 'trabajo' || !currentProject() || !lastPomodoroUpdate()) return;
+          const finalTime = Date.now();
+          const lastUpdate = lastPomodoroUpdate();
+          if (!lastUpdate || !lastUpdate.time) return;
+          const pomodorosWorked = calculatePomodorosFromTime(lastUpdate.time, finalTime);
+          if (pomodorosWorked > 0) {
+            onUpdatePomodoros(pomodorosWorked);
+          }
+        };
+
+        const updateTimer = () => {
+          if (!isRunning() || !startTime() || !intervalId()) return;
           const now = Date.now();
           const elapsed = Math.floor((now - startTime()) / 1000);
           const remaining = Math.max(0, originalDuration() - elapsed);
-
           setTimeLeft(remaining);
-
+          if (remaining > 0) {
+            updatePomodorosIfNeeded();
+          }
           if (remaining <= 0) {
-            clearInterval(intervalId());
-            setIntervalId(null);
+            finalizePomodoros();
+            if (intervalId()) {
+              clearInterval(intervalId());
+              setIntervalId(null);
+            }
             setIsRunning(false);
             setStartTime(null);
+            setLastPomodoroUpdate(null);
             startRepeatingBeep();
           }
         };
@@ -264,20 +912,28 @@
             setIntervalId(null);
           }
           stopRepeatingBeep();
-
           const duration = minutes * 60;
           setTimeLeft(duration);
           setOriginalDuration(duration);
           setSessionType(type);
           setIsRunning(true);
-          setStartTime(Date.now());
-
+          const now = Date.now();
+          setStartTime(now);
+          if (type === 'trabajo' && currentProject()) {
+            setLastPomodoroUpdate({ time: now, pomodorosAtStart: currentProject().pomodoros });
+          } else {
+            setLastPomodoroUpdate(null);
+          }
           updateTimer();
           const id = setInterval(updateTimer, 1000);
           setIntervalId(id);
         };
 
         const stopTimer = () => {
+          if (!isRunning()) return;
+          if (sessionType() === 'trabajo' && currentProject() && lastPomodoroUpdate()) {
+            finalizePomodoros();
+          }
           if (intervalId()) {
             clearInterval(intervalId());
             setIntervalId(null);
@@ -285,17 +941,22 @@
           stopRepeatingBeep();
           setIsRunning(false);
           setStartTime(null);
+          setLastPomodoroUpdate(null);
         };
 
         const continueTimer = () => {
           if (timeLeft() > 0 && !isRunning()) {
             stopRepeatingBeep();
             setIsRunning(true);
-
             const remainingSeconds = timeLeft();
             setOriginalDuration(remainingSeconds);
-            setStartTime(Date.now());
-
+            const now = Date.now();
+            setStartTime(now);
+            if (sessionType() === 'trabajo' && currentProject()) {
+              setLastPomodoroUpdate({ time: now, pomodorosAtStart: currentProject().pomodoros });
+            } else {
+              setLastPomodoroUpdate(null);
+            }
             updateTimer();
             const id = setInterval(updateTimer, 1000);
             setIntervalId(id);
@@ -311,10 +972,49 @@
         document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('focus', handleVisibilityChange);
 
+        const handleSetPomodoros = () => {
+          const value = parseFloat(manualPomodoros());
+          if (isNaN(value) || value < 0) return;
+          onSetPomodoros(value);
+          setManualPomodoros('');
+          setIsAddManualModalOpen(false);
+        };
+
+        setEffect(() => {
+          if (isAddManualModalOpen()) {
+            setTimeout(() => {
+              const pomodorosInput = document.querySelector('#manual-pomodoros-input');
+              if (pomodorosInput) {
+                const currentValue = currentProject()?.pomodoros || 0;
+                pomodorosInput.value = currentValue.toString();
+                setManualPomodoros(currentValue.toString());
+              }
+            }, 10);
+          }
+        });
+
         return h(
           'div',
-          { className: 'container' },
-          h('h1', null, 'Pomodoro Timer'),
+          null,
+          h(
+            'div',
+            { className: 'project-header' },
+            h(
+              'div',
+              { className: 'project-header-info' },
+              h(
+                'div',
+                { className: () => `project-name text-color-${currentProject()?.color || ''}` },
+                () => currentProject()?.name || 'Pomodoro Timer'
+              ),
+              h('div', { className: 'project-header-pomodoros' }, () => {
+                const project = currentProject();
+                return project ? formatPomodoros(project.pomodoros) : '';
+              })
+            ),
+            h('button', { className: 'add-manual-button', onclick: () => setIsAddManualModalOpen(true) }, 'Editar'),
+            h('button', { className: 'back-button', onclick: onBack }, '← Volver')
+          ),
           h(
             'div',
             { className: 'timer-buttons' },
@@ -350,12 +1050,155 @@
               onclick: () => (isRunning() || audioIntervalId() ? stopTimer() : continueTimer()),
             },
             () => (isRunning() || audioIntervalId() ? 'Parar' : 'Seguir')
-          )
+          ),
+          () =>
+            Modal({
+              isOpen: isAddManualModalOpen(),
+              onClose: () => {
+                setIsAddManualModalOpen(false);
+                setManualPomodoros('');
+              },
+              onConfirm: () => {
+                const value = parseFloat(manualPomodoros());
+                if (!isNaN(value) && value >= 0) {
+                  handleSetPomodoros();
+                }
+              },
+              children: h(
+                'div',
+                { className: 'modal-form' },
+                h('h3', { className: 'modal-title' }, 'Editar Pomodoros'),
+                h('input', {
+                  id: 'manual-pomodoros-input',
+                  className: 'modal-input',
+                  type: 'number',
+                  step: '0.0001',
+                  min: '0',
+                  placeholder: 'Cantidad total de pomodoros (ej: 0.5, 1, 2.5)',
+                  oninput: e => setManualPomodoros(e.target.value),
+                }),
+                h(
+                  'div',
+                  { className: 'modal-buttons' },
+                  h(
+                    'button',
+                    { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: () => setIsAddManualModalOpen(false) },
+                    'Cancelar'
+                  ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      className: () =>
+                        `modal-btn modal-btn-primary ${
+                          parseFloat(manualPomodoros()) < 0 || isNaN(parseFloat(manualPomodoros())) ? 'disabled' : ''
+                        }`,
+                      onclick: handleSetPomodoros,
+                    },
+                    'Guardar'
+                  )
+                )
+              ),
+            })
+        );
+      }
+
+      function PomodoroApp() {
+        const STORAGE_KEY = 'pomodoro_projects_v1';
+        const defaultProjects = [
+          { id: 1, name: 'Browserbase', color: 'red', pomodoros: 0 },
+          { id: 2, name: 'DrLullaby', color: 'green', pomodoros: 0 },
+          { id: 3, name: 'Work Defense', color: 'blue', pomodoros: 0 },
+        ];
+
+        const loadProjects = () => {
+          try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+              return JSON.parse(saved);
+            }
+          } catch (error) {
+            console.error('Error loading projects:', error);
+          }
+          return defaultProjects;
+        };
+
+        const saveProjects = projects => {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+          } catch (error) {
+            console.error('Error saving projects:', error);
+          }
+        };
+
+        const [projects, setProjects] = setSignal(loadProjects());
+        const [currentProject, setCurrentProject] = setSignal(null);
+        const [view, setView] = setSignal('list');
+
+        setEffect(() => {
+          saveProjects(projects());
+        });
+
+        const onStartProject = project => {
+          setCurrentProject(project);
+          setView('timer');
+        };
+
+        const onBack = () => {
+          setView('list');
+          setCurrentProject(null);
+        };
+
+        const onDeleteProject = projectId => {
+          setProjects(projects().filter(p => p.id !== projectId));
+          if (currentProject()?.id === projectId) {
+            setCurrentProject(null);
+            setView('list');
+          }
+        };
+
+        const onAddProject = () => {};
+
+        const onNewDay = () => {
+          setProjects(projects().map(p => ({ ...p, pomodoros: 0 })));
+        };
+
+        const onUpdatePomodoros = increment => {
+          const project = currentProject();
+          if (project) {
+            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, pomodoros: p.pomodoros + increment } : p));
+            setProjects(updatedProjects);
+            setCurrentProject(updatedProjects.find(p => p.id === project.id));
+          }
+        };
+
+        const onSetPomodoros = value => {
+          const project = currentProject();
+          if (project) {
+            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, pomodoros: value } : p));
+            setProjects(updatedProjects);
+            setCurrentProject(updatedProjects.find(p => p.id === project.id));
+          }
+        };
+
+        const formatPomodoros = pomodoros => {
+          if (pomodoros === 0) return '0 pomodoros';
+          if (pomodoros < 1) return `${pomodoros.toFixed(4)} pomodoro`;
+          const whole = Math.floor(pomodoros);
+          const decimal = pomodoros - whole;
+          if (decimal < 0.01) return `${whole} pomodoro${whole !== 1 ? 's' : ''}`;
+          return `${pomodoros.toFixed(4)} pomodoros`;
+        };
+
+        return h('div', { className: 'container' }, () =>
+          view() === 'list'
+            ? ProjectsList({ projects, setProjects, onStartProject, onDeleteProject, onAddProject, onNewDay, formatPomodoros })
+            : PomodoroTimer({ currentProject, onBack, onUpdatePomodoros, onSetPomodoros, formatPomodoros })
         );
       }
 
       const root = document.body;
-      root.appendChild(PomodoroTimer());
+      root.appendChild(PomodoroApp());
     </script>
   </body>
 </html>
