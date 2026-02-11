@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista del Super</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+        color: #2e7d32;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 10px;
+        min-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: clamp(1rem, 3vw, 1.5rem);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        width: 95%;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(46, 125, 50, 0.2);
+        display: flex;
+        flex-direction: column;
+        min-height: 400px;
+      }
+      h1 {
+        color: #2e7d32;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: clamp(1.4rem, 4vw, 2rem);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+      }
+      .items-list {
+        flex: 1;
+        margin-bottom: 1rem;
+        min-height: 200px;
+      }
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+      .items-table th {
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+        color: white;
+        font-weight: 600;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        padding: 0.8rem;
+        text-align: left;
+      }
+      .items-table th:last-child {
+        text-align: right;
+      }
+      .items-table td {
+        border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        padding: 0.8rem;
+      }
+      .items-table td:last-child {
+        text-align: right;
+        font-weight: bold;
+        color: #2e7d32;
+      }
+      .items-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .items-table tbody tr:hover {
+        background: rgba(76, 175, 80, 0.05);
+      }
+      .empty-state {
+        text-align: center;
+        color: #999;
+        font-style: italic;
+        padding: 3rem 1rem;
+      }
+      .footer-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 1rem;
+        gap: 1rem;
+      }
+      .total-display {
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        font-weight: bold;
+        color: #2e7d32;
+        padding: 0.8rem 1.2rem;
+        background: linear-gradient(145deg, rgba(76, 175, 80, 0.1), rgba(56, 142, 60, 0.1));
+        border-radius: 12px;
+        border: 2px solid rgba(46, 125, 50, 0.2);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+      }
+      .add-button {
+        padding: clamp(1rem, 3vw, 1.2rem);
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        box-shadow: 0 6px 18px rgba(76, 175, 80, 0.3);
+        min-width: 120px;
+      }
+      .add-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(76, 175, 80, 0.4);
+        background: linear-gradient(145deg, #388e3c, #2e7d32);
+      }
+      .add-button:active {
+        transform: translateY(0);
+      }
+      .reset-button {
+        padding: clamp(1rem, 3vw, 1.2rem);
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        background: linear-gradient(145deg, #ffc107, #ff9800);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        box-shadow: 0 6px 18px rgba(255, 193, 7, 0.3);
+        min-width: 60px;
+      }
+      .reset-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(255, 193, 7, 0.4);
+        background: linear-gradient(145deg, #ff9800, #f57c00);
+      }
+      .reset-button:active {
+        transform: translateY(0);
+      }
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(3px);
+      }
+      .modal-content {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        animation: modalSlideIn 0.3s ease;
+      }
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+      .modal-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #333;
+      }
+      .modal-title {
+        color: #2e7d32;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+      .modal-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .modal-input {
+        padding: 0.8rem;
+        border: 2px solid rgba(46, 125, 50, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: #333;
+        transition: border-color 0.3s ease;
+      }
+      .modal-input:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      }
+      .modal-input::placeholder {
+        color: rgba(0, 0, 0, 0.4);
+      }
+      .units-selector {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .unit-button {
+        flex: 1;
+        min-width: 60px;
+        padding: 1rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border: 2px solid rgba(46, 125, 50, 0.3);
+        border-radius: 10px;
+        background: white;
+        color: #2e7d32;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .unit-button:hover {
+        background: rgba(76, 175, 80, 0.1);
+        transform: translateY(-2px);
+      }
+      .unit-button.selected {
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+        color: white;
+        border-color: #2e7d32;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      }
+      .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+      .modal-btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+      .modal-btn-primary {
+        background: linear-gradient(145deg, #4caf50, #388e3c);
+        color: white;
+      }
+      .modal-btn-primary:hover {
+        background: linear-gradient(145deg, #388e3c, #2e7d32);
+        transform: translateY(-1px);
+      }
+      .modal-btn-primary.disabled {
+        background: #cccccc;
+        color: #999999;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      .modal-btn-secondary {
+        background: #f5f5f5;
+        color: #666;
+      }
+      .modal-btn-secondary:hover {
+        background: #eeeeee;
+        color: #333;
+      }
+      .modal-btn-delete {
+        background: linear-gradient(145deg, #e74c3c, #c0392b);
+        color: white;
+      }
+      .modal-btn-delete:hover {
+        background: linear-gradient(145deg, #c0392b, #a93226);
+        transform: translateY(-1px);
+      }
+      .confirm-warning-text {
+        text-align: center;
+        margin: 1rem 0;
+        color: #333;
+        font-size: 1rem;
+      }
+      .field-label {
+        color: #2e7d32;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+      }
+      .field-container {
+        display: flex;
+        flex-direction: column;
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      @media (max-width: 480px) {
+        .container {
+          padding: 0.5rem;
+          width: 100%;
+        }
+        .items-table th,
+        .items-table td {
+          padding: 0.6rem 0.3rem;
+          font-size: 0.85rem;
+        }
+        .modal-content {
+          padding: 1rem;
+          width: 95%;
+        }
+        .unit-button {
+          min-width: 50px;
+          padding: 0.8rem;
+          font-size: 1rem;
+        }
+        .footer-section {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .total-display {
+          text-align: center;
+        }
+        .add-button,
+        .reset-button {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      //prettier-ignore
+      const { setSignal, setEffect, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+
+      function Modal({ isOpen, onClose, children }) {
+        if (!isOpen) return null;
+        const handleOverlayClick = e => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        };
+        const handleKeyDown = e => {
+          if (e.key === 'Escape') {
+            onClose();
+          }
+        };
+        setEffect(() => {
+          if (isOpen) {
+            document.addEventListener('keydown', handleKeyDown);
+            return () => {
+              document.removeEventListener('keydown', handleKeyDown);
+            };
+          }
+        });
+        return h(
+          'div',
+          { className: 'modal-overlay', onclick: handleOverlayClick },
+          h('div', { className: 'modal-content' }, h('button', { className: 'modal-close', onclick: onClose }, '×'), children)
+        );
+      }
+
+      function ConfirmReset({ isOpen, onClose, onConfirm }) {
+        const confirmContent = h(
+          'div',
+          { className: 'modal-form' },
+          h('h3', { className: 'modal-title' }, '⚠️ Confirmar Borrado'),
+          h('p', { className: 'confirm-warning-text' }, '¿Seguro que quieres borrar toda la lista?'),
+          h(
+            'div',
+            { className: 'modal-buttons' },
+            h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: onClose }, 'Cancelar'),
+            h('button', { type: 'button', className: 'modal-btn modal-btn-delete', onclick: onConfirm }, 'Borrar Todo')
+          )
+        );
+        return Modal({ isOpen, onClose, children: confirmContent });
+      }
+
+      function SuperListaApp() {
+        const STORAGE_KEY = 'super_lista_items';
+        const loadItems = () => {
+          try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+              return JSON.parse(saved);
+            }
+          } catch (error) {
+            console.error('Error loading items:', error);
+          }
+          return [];
+        };
+        const saveItems = items => {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+          } catch (error) {
+            console.error('Error saving items:', error);
+          }
+        };
+        const [items, setItems] = setSignal(loadItems());
+        const [isModalOpen, setIsModalOpen] = setSignal(false);
+        const [isResetConfirmOpen, setIsResetConfirmOpen] = setSignal(false);
+        const [itemName, setItemName] = setSignal('');
+        const [itemPrice, setItemPrice] = setSignal(0);
+        const [itemUnits, setItemUnits] = setSignal(1);
+        setEffect(() => {
+          saveItems(items());
+        });
+        const openModal = () => {
+          const nextItemNumber = items().length + 1;
+          setItemName(`Item ${nextItemNumber}`);
+          setItemPrice(0);
+          setItemUnits(1);
+          setIsModalOpen(true);
+        };
+        const closeModal = () => {
+          setIsModalOpen(false);
+          setItemName('');
+          setItemPrice(0);
+          setItemUnits(1);
+        };
+        const capitalizeName = name => {
+          return name
+            .trim()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+        };
+        const handleAddItem = e => {
+          e.preventDefault();
+          const name = itemName().trim();
+          const price = parseInt(itemPrice()) || 0;
+          const units = itemUnits();
+          if (name.length === 0 || price < 0) return;
+          const capitalizedName = capitalizeName(name);
+          const newItem = { id: Date.now(), name: capitalizedName, pricePerUnit: price, units };
+          setItems([...items(), newItem]);
+          closeModal();
+        };
+        const isFormValid = () => {
+          const name = itemName().trim();
+          const price = parseInt(itemPrice()) || 0;
+          return name.length > 0 && price >= 0;
+        };
+        setEffect(() => {
+          if (isModalOpen()) {
+            setTimeout(() => {
+              const nameInput = document.querySelector('#item-name-input');
+              if (nameInput) {
+                nameInput.focus();
+                nameInput.select();
+              }
+            }, 10);
+          }
+        });
+        const formatPrice = price => {
+          return `$ ${price.toLocaleString('es-AR')}`;
+        };
+        const calculateTotal = () => {
+          return items().reduce((sum, item) => sum + item.pricePerUnit * item.units, 0);
+        };
+        const handleReset = () => {
+          setItems([]);
+          setIsResetConfirmOpen(false);
+        };
+        return h(
+          'div',
+          { className: 'container' },
+          h('h1', null, '🛒 Lista del Super'),
+          h(
+            'div',
+            { className: 'items-list' },
+            () =>
+              items().length > 0
+                ? h(
+                    'table',
+                    { className: 'items-table' },
+                    h('thead', null, h('tr', null, h('th', null, 'Item'), h('th', null, 'Precio/u'), h('th', null, 'Unidades'), h('th', null, 'Total'))),
+                    h(
+                      'tbody',
+                      null,
+                      ...items().map(item =>
+                        h(
+                          'tr',
+                          { key: item.id },
+                          h('td', null, item.name),
+                          h('td', null, formatPrice(item.pricePerUnit)),
+                          h('td', null, item.units),
+                          h('td', null, formatPrice(item.pricePerUnit * item.units))
+                        )
+                      )
+                    )
+                  )
+                : h('div', { className: 'empty-state' }, 'No hay items en la lista. Presiona el botón "+" para agregar.')
+          ),
+          h(
+            'div',
+            { className: 'footer-section' },
+            () => (items().length > 0 ? h('div', { className: 'total-display' }, `Total: ${formatPrice(calculateTotal())}`) : null),
+            () =>
+              h(
+                'div',
+                { style: 'display: flex; gap: 1.5rem; align-items: center;' },
+                h('button', { className: 'reset-button', onclick: () => setIsResetConfirmOpen(true) }, '🔄'),
+                h('button', { className: 'add-button', onclick: openModal }, '+')
+              )
+          ),
+          () =>
+            Modal({
+              isOpen: isModalOpen(),
+              onClose: closeModal,
+              children: h(
+                'form',
+                { className: 'modal-form', onsubmit: handleAddItem },
+                h('h3', { className: 'modal-title' }, 'Agregar Item'),
+                h(
+                  'div',
+                  { className: 'field-container' },
+                  h('label', { className: 'field-label' }, 'Nombre:'),
+                  h('input', {
+                    id: 'item-name-input',
+                    className: 'modal-input',
+                    type: 'text',
+                    placeholder: 'Nombre del item',
+                    value: () => itemName(),
+                    oninput: e => setItemName(e.target.value),
+                    onfocus: e => e.target.select(),
+                  })
+                ),
+                h(
+                  'div',
+                  { className: 'field-container' },
+                  h('label', { className: 'field-label' }, 'Precio por unidad:'),
+                  h('input', {
+                    id: 'item-price-input',
+                    className: 'modal-input',
+                    type: 'number',
+                    min: '0',
+                    step: '1',
+                    placeholder: '0',
+                    value: () => itemPrice(),
+                    oninput: e => {
+                      const val = e.target.value;
+                      if (val === '' || /^\d+$/.test(val)) {
+                        setItemPrice(val === '' ? 0 : parseInt(val) || 0);
+                      }
+                    },
+                  })
+                ),
+                h(
+                  'div',
+                  { className: 'field-container' },
+                  h('label', { className: 'field-label' }, 'Unidades:'),
+                  h(
+                    'div',
+                    { className: 'units-selector' },
+                    ...[1, 2, 3, 4, 5, 6].map(unit =>
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          className: () => `unit-button ${itemUnits() === unit ? 'selected' : ''}`,
+                          onclick: () => setItemUnits(unit),
+                        },
+                        unit
+                      )
+                    )
+                  )
+                ),
+                h(
+                  'div',
+                  { className: 'modal-buttons' },
+                  h('button', { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: closeModal }, 'Cancelar'),
+                  h(
+                    'button',
+                    {
+                      type: 'submit',
+                      className: () => `modal-btn modal-btn-primary ${!isFormValid() ? 'disabled' : ''}`,
+                    },
+                    'Agregar'
+                  )
+                )
+              ),
+            }),
+          () =>
+            ConfirmReset({
+              isOpen: isResetConfirmOpen(),
+              onClose: () => setIsResetConfirmOpen(false),
+              onConfirm: handleReset,
+            })
+        );
+      }
+
+      const root = document.body;
+      root.appendChild(SuperListaApp());
+    </script>
+  </body>
+</html>

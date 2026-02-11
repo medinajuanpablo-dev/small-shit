@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pomodoro Timer</title>
+    <title>Cronómetro</title>
     <style>
       body {
         background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
@@ -55,6 +55,17 @@
         font-size: clamp(0.9rem, 2.5vw, 1.1rem);
         color: #bdc3c7;
         font-weight: 500;
+      }
+      .project-target-time {
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        color: #f1c40f;
+        font-weight: 500;
+        margin-left: 0.5rem;
+      }
+      .project-count-with-target {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
       .add-manual-button {
         padding: 0.6rem 1.2rem;
@@ -335,13 +346,9 @@
         border: 2px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
       }
-      .timer-display.trabajo {
-        background: rgba(155, 89, 182, 0.8);
-        border: 2px solid rgba(155, 89, 182, 0.3);
-      }
-      .timer-display.descanso {
-        background: rgba(39, 174, 96, 0.8);
-        border: 2px solid rgba(39, 174, 96, 0.3);
+      .timer-display {
+        background: rgba(52, 152, 219, 0.8);
+        border: 2px solid rgba(52, 152, 219, 0.3);
       }
       .time {
         font-size: clamp(3rem, 12vw, 4.5rem);
@@ -351,13 +358,6 @@
         margin-bottom: 1rem;
         font-family: 'Courier New', monospace;
         letter-spacing: 0.1em;
-      }
-      .session-type {
-        font-size: clamp(1.2rem, 4vw, 1.5rem);
-        color: #bdc3c7;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 2px;
       }
       .control-button {
         padding: clamp(1rem, 3vw, 1.2rem) clamp(2rem, 6vw, 2.5rem);
@@ -615,7 +615,7 @@
           'div',
           { className: 'modal-form' },
           h('h3', { className: 'modal-title' }, '🔄 Confirmar New Day'),
-          h('p', { className: 'confirm-warning-text' }, '¿Estás seguro que deseas reiniciar todos los contadores de pomodoros a 0?'),
+          h('p', { className: 'confirm-warning-text' }, '¿Estás seguro que deseas reiniciar todos los contadores de tiempo a 0?'),
           h(
             'p',
             { className: 'confirm-warning-text', style: 'font-size: 0.9rem; color: #e74c3c; margin-top: 1rem;' },
@@ -631,10 +631,20 @@
         return Modal({ isOpen, onClose, onConfirm, children: confirmContent });
       }
 
-      function ProjectsList({ projects, setProjects, onStartProject, onDeleteProject, onAddProject, onNewDay, formatPomodoros }) {
+      function ProjectsList({
+        projects,
+        setProjects,
+        onStartProject,
+        onDeleteProject,
+        onAddProject,
+        onNewDay,
+        formatTimeAccumulated,
+        parseTimeInput,
+      }) {
         const [isAddModalOpen, setIsAddModalOpen] = setSignal(false);
         const [newProjectName, setNewProjectName] = setSignal('');
         const [selectedColor, setSelectedColor] = setSignal('red');
+        const [targetTimeInput, setTargetTimeInput] = setSignal('');
         const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = setSignal(false);
         const [projectToDelete, setProjectToDelete] = setSignal(null);
         const [isNewDayConfirmOpen, setIsNewDayConfirmOpen] = setSignal(false);
@@ -642,10 +652,12 @@
         const handleAddProject = () => {
           const name = newProjectName().trim();
           if (name.length === 0) return;
-          const newProject = { id: Date.now(), name, color: selectedColor(), pomodoros: 0 };
+          const targetTime = parseTimeInput(targetTimeInput()) || 0;
+          const newProject = { id: Date.now(), name, color: selectedColor(), timeInSeconds: 0, targetTimeInSeconds: targetTime };
           setProjects([...projects(), newProject]);
           setNewProjectName('');
           setSelectedColor('red');
+          setTargetTimeInput('');
           setIsAddModalOpen(false);
         };
 
@@ -653,8 +665,12 @@
           if (isAddModalOpen()) {
             setTimeout(() => {
               const projectNameInput = document.querySelector('#project-name-input');
+              const targetTimeInputEl = document.querySelector('#target-time-input');
               if (projectNameInput) {
                 projectNameInput.value = '';
+              }
+              if (targetTimeInputEl) {
+                targetTimeInputEl.value = '';
               }
             }, 10);
           }
@@ -685,7 +701,17 @@
                     onclick: () => onStartProject(project),
                   },
                   h('div', { className: `project-name-cell text-color-${project.color}` }, project.name),
-                  h('div', { className: 'project-count' }, () => formatPomodoros(project.pomodoros)),
+                  h(
+                    'div',
+                    { className: 'project-count-with-target' },
+                    h('div', { className: 'project-count' }, () => formatTimeAccumulated(project.timeInSeconds)),
+                    () => {
+                      if (project.targetTimeInSeconds && project.targetTimeInSeconds > 0) {
+                        return h('div', { className: 'project-target-time' }, `/ ${formatTimeAccumulated(project.targetTimeInSeconds)}`);
+                      }
+                      return null;
+                    }
+                  ),
                   h(
                     'button',
                     {
@@ -746,6 +772,7 @@
                 setIsAddModalOpen(false);
                 setNewProjectName('');
                 setSelectedColor('red');
+                setTargetTimeInput('');
               },
               onConfirm: () => {
                 if (newProjectName().trim().length > 0) {
@@ -762,6 +789,13 @@
                   type: 'text',
                   placeholder: 'Nombre del proyecto',
                   oninput: e => setNewProjectName(e.target.value),
+                }),
+                h('input', {
+                  id: 'target-time-input',
+                  className: 'modal-input',
+                  type: 'text',
+                  placeholder: 'Tiempo objetivo (opcional, ej: 2 h 30 m)',
+                  oninput: e => setTargetTimeInput(e.target.value),
                 }),
                 h(
                   'div',
@@ -796,198 +830,143 @@
         );
       }
 
-      function PomodoroTimer({ currentProject, onBack, onUpdatePomodoros, onSetPomodoros, formatPomodoros }) {
-        const [timeLeft, setTimeLeft] = setSignal(25 * 60);
+      function PomodoroTimer({
+        currentProject,
+        onBack,
+        onAddTime,
+        onSetTime,
+        onSetTargetTime,
+        formatTimeAccumulated,
+        view,
+        parseTimeInput,
+      }) {
+        const [elapsedSeconds, setElapsedSeconds] = setSignal(0);
         const [isRunning, setIsRunning] = setSignal(false);
-        const [sessionType, setSessionType] = setSignal('trabajo');
         const [intervalId, setIntervalId] = setSignal(null);
-        const [audioIntervalId, setAudioIntervalId] = setSignal(null);
         const [startTime, setStartTime] = setSignal(null);
-        const [originalDuration, setOriginalDuration] = setSignal(0);
-        const [lastPomodoroUpdate, setLastPomodoroUpdate] = setSignal(null);
-        const [isAddManualModalOpen, setIsAddManualModalOpen] = setSignal(false);
-        const [manualPomodoros, setManualPomodoros] = setSignal('');
+        const [isEditModalOpen, setIsEditModalOpen] = setSignal(false);
+        const [manualTimeInput, setManualTimeInput] = setSignal('');
+        const [targetTimeInput, setTargetTimeInput] = setSignal('');
+        const [lastSavedSeconds, setLastSavedSeconds] = setSignal(0);
 
         const formatTime = seconds => {
-          const mins = Math.floor(seconds / 60);
+          const hours = Math.floor(seconds / 3600);
+          const mins = Math.floor((seconds % 3600) / 60);
           const secs = seconds % 60;
+          if (hours > 0) {
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+          }
           return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        };
-
-        const playBeep = () => {
-          try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.5);
-          } catch (error) {
-            console.log('Audio no disponible');
-          }
-        };
-
-        const startRepeatingBeep = () => {
-          playBeep();
-          let beepCount = 0;
-          const audioId = setInterval(() => {
-            playBeep();
-            beepCount++;
-            if (beepCount >= 5) {
-              clearInterval(audioId);
-              setAudioIntervalId(null);
-            }
-          }, 1000);
-          setAudioIntervalId(audioId);
-        };
-
-        const stopRepeatingBeep = () => {
-          if (audioIntervalId()) {
-            clearInterval(audioIntervalId());
-            setAudioIntervalId(null);
-          }
-        };
-
-        const calculatePomodorosFromTime = (startTime, endTime) => {
-          const secondsWorked = (endTime - startTime) / 1000;
-          const minutesWorked = secondsWorked / 60;
-          return minutesWorked / 25;
-        };
-
-        const updatePomodorosIfNeeded = () => {
-          if (!isRunning() || sessionType() !== 'trabajo' || !currentProject() || !lastPomodoroUpdate()) return;
-          const currentTime = Date.now();
-          const lastUpdate = lastPomodoroUpdate();
-          if (!lastUpdate || !lastUpdate.time) return;
-          const pomodorosWorked = calculatePomodorosFromTime(lastUpdate.time, currentTime);
-          if (pomodorosWorked > 0) {
-            onUpdatePomodoros(pomodorosWorked);
-            const project = currentProject();
-            if (project) {
-              setLastPomodoroUpdate({ time: currentTime, pomodorosAtStart: project.pomodoros });
-            }
-          }
-        };
-
-        const finalizePomodoros = () => {
-          if (!isRunning() || sessionType() !== 'trabajo' || !currentProject() || !lastPomodoroUpdate()) return;
-          const finalTime = Date.now();
-          const lastUpdate = lastPomodoroUpdate();
-          if (!lastUpdate || !lastUpdate.time) return;
-          const pomodorosWorked = calculatePomodorosFromTime(lastUpdate.time, finalTime);
-          if (pomodorosWorked > 0) {
-            onUpdatePomodoros(pomodorosWorked);
-          }
         };
 
         const updateTimer = () => {
           if (!isRunning() || !startTime() || !intervalId()) return;
           const now = Date.now();
           const elapsed = Math.floor((now - startTime()) / 1000);
-          const remaining = Math.max(0, originalDuration() - elapsed);
-          setTimeLeft(remaining);
-          if (remaining > 0) {
-            updatePomodorosIfNeeded();
-          }
-          if (remaining <= 0) {
-            finalizePomodoros();
-            if (intervalId()) {
-              clearInterval(intervalId());
-              setIntervalId(null);
-            }
-            setIsRunning(false);
-            setStartTime(null);
-            setLastPomodoroUpdate(null);
-            startRepeatingBeep();
+          setElapsedSeconds(elapsed);
+          if (currentProject() && elapsed > lastSavedSeconds()) {
+            const secondsToAdd = elapsed - lastSavedSeconds();
+            onAddTime(secondsToAdd);
+            setLastSavedSeconds(elapsed);
           }
         };
 
-        const startTimer = (minutes, type) => {
+        const startTimer = () => {
           if (intervalId()) {
             clearInterval(intervalId());
             setIntervalId(null);
           }
-          stopRepeatingBeep();
-          const duration = minutes * 60;
-          setTimeLeft(duration);
-          setOriginalDuration(duration);
-          setSessionType(type);
           setIsRunning(true);
           const now = Date.now();
           setStartTime(now);
-          if (type === 'trabajo' && currentProject()) {
-            setLastPomodoroUpdate({ time: now, pomodorosAtStart: currentProject().pomodoros });
-          } else {
-            setLastPomodoroUpdate(null);
-          }
+          setLastSavedSeconds(0);
+          setElapsedSeconds(0);
           updateTimer();
           const id = setInterval(updateTimer, 1000);
           setIntervalId(id);
         };
 
-        const stopTimer = () => {
+        const pauseTimer = () => {
           if (!isRunning()) return;
-          if (sessionType() === 'trabajo' && currentProject() && lastPomodoroUpdate()) {
-            finalizePomodoros();
-          }
           if (intervalId()) {
             clearInterval(intervalId());
             setIntervalId(null);
           }
-          stopRepeatingBeep();
+          if (elapsedSeconds() > lastSavedSeconds() && currentProject()) {
+            const secondsToAdd = elapsedSeconds() - lastSavedSeconds();
+            onAddTime(secondsToAdd);
+          }
           setIsRunning(false);
           setStartTime(null);
-          setLastPomodoroUpdate(null);
+          setElapsedSeconds(0);
+          setLastSavedSeconds(0);
         };
 
-        const continueTimer = () => {
-          if (timeLeft() > 0 && !isRunning()) {
-            stopRepeatingBeep();
-            setIsRunning(true);
-            const remainingSeconds = timeLeft();
-            setOriginalDuration(remainingSeconds);
-            const now = Date.now();
-            setStartTime(now);
-            if (sessionType() === 'trabajo' && currentProject()) {
-              setLastPomodoroUpdate({ time: now, pomodorosAtStart: currentProject().pomodoros });
-            } else {
-              setLastPomodoroUpdate(null);
-            }
-            updateTimer();
-            const id = setInterval(updateTimer, 1000);
-            setIntervalId(id);
+        const handleSetTime = () => {
+          const seconds = parseTimeInput(manualTimeInput());
+          if (seconds === null || seconds < 0) return;
+          onSetTime(seconds);
+          const targetSeconds = parseTimeInput(targetTimeInput());
+          if (targetSeconds !== null && targetSeconds >= 0) {
+            onSetTargetTime(targetSeconds);
           }
-        };
-
-        const handleVisibilityChange = () => {
-          if (!document.hidden && isRunning()) {
-            updateTimer();
-          }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('focus', handleVisibilityChange);
-
-        const handleSetPomodoros = () => {
-          const value = parseFloat(manualPomodoros());
-          if (isNaN(value) || value < 0) return;
-          onSetPomodoros(value);
-          setManualPomodoros('');
-          setIsAddManualModalOpen(false);
+          setManualTimeInput('');
+          setTargetTimeInput('');
+          setIsEditModalOpen(false);
         };
 
         setEffect(() => {
-          if (isAddManualModalOpen()) {
+          if (view() !== 'timer' || !currentProject()) {
+            if (isRunning()) {
+              if (elapsedSeconds() > lastSavedSeconds() && currentProject()) {
+                const secondsToAdd = elapsedSeconds() - lastSavedSeconds();
+                onAddTime(secondsToAdd);
+              }
+              if (intervalId()) {
+                clearInterval(intervalId());
+                setIntervalId(null);
+              }
+              setIsRunning(false);
+              setStartTime(null);
+              setElapsedSeconds(0);
+              setLastSavedSeconds(0);
+            }
+          }
+        });
+
+        setEffect(() => {
+          if (isEditModalOpen()) {
             setTimeout(() => {
-              const pomodorosInput = document.querySelector('#manual-pomodoros-input');
-              if (pomodorosInput) {
-                const currentValue = currentProject()?.pomodoros || 0;
-                pomodorosInput.value = currentValue.toString();
-                setManualPomodoros(currentValue.toString());
+              const timeInput = document.querySelector('#manual-time-input');
+              const targetTimeInputEl = document.querySelector('#target-time-input-edit');
+              if (timeInput) {
+                const currentValue = currentProject()?.timeInSeconds || 0;
+                const hours = Math.floor(currentValue / 3600);
+                const minutes = Math.floor((currentValue % 3600) / 60);
+                const seconds = currentValue % 60;
+                let displayValue = '';
+                if (hours > 0) displayValue += `${hours} h `;
+                if (minutes > 0) displayValue += `${minutes} m `;
+                if (seconds > 0 || displayValue === '') displayValue += `${seconds} s`;
+                timeInput.value = displayValue.trim();
+                setManualTimeInput(displayValue.trim());
+              }
+              if (targetTimeInputEl) {
+                const targetValue = currentProject()?.targetTimeInSeconds || 0;
+                if (targetValue > 0) {
+                  const hours = Math.floor(targetValue / 3600);
+                  const minutes = Math.floor((targetValue % 3600) / 60);
+                  const seconds = targetValue % 60;
+                  let displayValue = '';
+                  if (hours > 0) displayValue += `${hours} h `;
+                  if (minutes > 0) displayValue += `${minutes} m `;
+                  if (seconds > 0 || displayValue === '') displayValue += `${seconds} s`;
+                  targetTimeInputEl.value = displayValue.trim();
+                  setTargetTimeInput(displayValue.trim());
+                } else {
+                  targetTimeInputEl.value = '';
+                  setTargetTimeInput('');
+                }
               }
             }, 10);
           }
@@ -1005,84 +984,87 @@
               h(
                 'div',
                 { className: () => `project-name text-color-${currentProject()?.color || ''}` },
-                () => currentProject()?.name || 'Pomodoro Timer'
+                () => currentProject()?.name || 'Cronómetro'
               ),
               h('div', { className: 'project-header-pomodoros' }, () => {
                 const project = currentProject();
-                return project ? formatPomodoros(project.pomodoros) : '';
+                if (!project) return '';
+                return h(
+                  'div',
+                  { className: 'project-count-with-target' },
+                  h('div', null, formatTimeAccumulated(project.timeInSeconds)),
+                  project.targetTimeInSeconds && project.targetTimeInSeconds > 0
+                    ? h('div', { className: 'project-target-time' }, `/ ${formatTimeAccumulated(project.targetTimeInSeconds)}`)
+                    : null
+                );
               })
             ),
-            h('button', { className: 'add-manual-button', onclick: () => setIsAddManualModalOpen(true) }, 'Editar'),
-            h('button', { className: 'back-button', onclick: onBack }, '← Volver')
-          ),
-          h(
-            'div',
-            { className: 'timer-buttons' },
+            h('button', { className: 'add-manual-button', onclick: () => setIsEditModalOpen(true) }, 'Editar'),
             h(
               'button',
               {
-                className: 'main-button btn-work',
-                onclick: () => startTimer(25, 'trabajo'),
+                className: 'back-button',
+                onclick: () => {
+                  if (isRunning()) {
+                    pauseTimer();
+                  }
+                  onBack();
+                },
               },
-              h('div', null, '25'),
-              h('div', { className: 'button-label' }, 'min')
-            ),
-            h(
-              'button',
-              {
-                className: 'main-button btn-break',
-                onclick: () => startTimer(5, 'descanso'),
-              },
-              h('div', null, '5'),
-              h('div', { className: 'button-label' }, 'min')
+              '← Volver'
             )
           ),
           h(
             'div',
-            { className: () => `timer-display ${sessionType()}` },
-            h('div', { className: 'time' }, () => formatTime(timeLeft())),
-            h('div', { className: 'session-type' }, () => sessionType())
+            { className: 'timer-display' },
+            h('div', { className: 'time' }, () => formatTime(elapsedSeconds()))
           ),
           h(
             'button',
             {
-              className: () => (isRunning() || audioIntervalId() ? 'control-button btn-stop' : 'control-button btn-continue'),
-              onclick: () => (isRunning() || audioIntervalId() ? stopTimer() : continueTimer()),
+              className: () => (isRunning() ? 'control-button btn-stop' : 'control-button btn-continue'),
+              onclick: () => (isRunning() ? pauseTimer() : startTimer()),
             },
-            () => (isRunning() || audioIntervalId() ? 'Parar' : 'Seguir')
+            () => (isRunning() ? 'Pausar' : 'Iniciar')
           ),
           () =>
             Modal({
-              isOpen: isAddManualModalOpen(),
+              isOpen: isEditModalOpen(),
               onClose: () => {
-                setIsAddManualModalOpen(false);
-                setManualPomodoros('');
+                setIsEditModalOpen(false);
+                setManualTimeInput('');
+                setTargetTimeInput('');
               },
               onConfirm: () => {
-                const value = parseFloat(manualPomodoros());
-                if (!isNaN(value) && value >= 0) {
-                  handleSetPomodoros();
+                const seconds = parseTimeInput(manualTimeInput());
+                if (seconds !== null && seconds >= 0) {
+                  handleSetTime();
                 }
               },
               children: h(
                 'div',
                 { className: 'modal-form' },
-                h('h3', { className: 'modal-title' }, 'Editar Pomodoros'),
+                h('h3', { className: 'modal-title' }, 'Editar Tiempo'),
                 h('input', {
-                  id: 'manual-pomodoros-input',
+                  id: 'manual-time-input',
                   className: 'modal-input',
-                  type: 'number',
-                  step: '0.0001',
-                  min: '0',
-                  placeholder: 'Cantidad total de pomodoros (ej: 0.5, 1, 2.5)',
-                  oninput: e => setManualPomodoros(e.target.value),
+                  type: 'text',
+                  placeholder: 'Tiempo (ej: 1 h 30 m 45 s o 5445)',
+                  oninput: e => setManualTimeInput(e.target.value),
+                }),
+                h('input', {
+                  id: 'target-time-input-edit',
+                  className: 'modal-input',
+                  type: 'text',
+                  placeholder: 'Tiempo objetivo (opcional, ej: 2 h 30 m)',
+                  oninput: e => setTargetTimeInput(e.target.value),
                 }),
                 h(
                   'div',
                   { className: 'modal-buttons' },
                   h(
                     'button',
-                    { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: () => setIsAddManualModalOpen(false) },
+                    { type: 'button', className: 'modal-btn modal-btn-secondary', onclick: () => setIsEditModalOpen(false) },
                     'Cancelar'
                   ),
                   h(
@@ -1091,9 +1073,9 @@
                       type: 'button',
                       className: () =>
                         `modal-btn modal-btn-primary ${
-                          parseFloat(manualPomodoros()) < 0 || isNaN(parseFloat(manualPomodoros())) ? 'disabled' : ''
+                          parseTimeInput(manualTimeInput()) === null || parseTimeInput(manualTimeInput()) < 0 ? 'disabled' : ''
                         }`,
-                      onclick: handleSetPomodoros,
+                      onclick: handleSetTime,
                     },
                     'Guardar'
                   )
@@ -1104,18 +1086,23 @@
       }
 
       function PomodoroApp() {
-        const STORAGE_KEY = 'pomodoro_projects_v1';
+        const STORAGE_KEY = 'pomodoro_projects_v2';
         const defaultProjects = [
-          { id: 1, name: 'Browserbase', color: 'red', pomodoros: 0 },
-          { id: 2, name: 'DrLullaby', color: 'green', pomodoros: 0 },
-          { id: 3, name: 'Work Defense', color: 'blue', pomodoros: 0 },
+          { id: 1, name: 'Browserbase', color: 'red', timeInSeconds: 0, targetTimeInSeconds: 0 },
+          { id: 2, name: 'DrLullaby', color: 'green', timeInSeconds: 0, targetTimeInSeconds: 0 },
+          { id: 3, name: 'Work Defense', color: 'blue', timeInSeconds: 0, targetTimeInSeconds: 0 },
         ];
 
         const loadProjects = () => {
           try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
-              return JSON.parse(saved);
+              const projects = JSON.parse(saved);
+              return projects.map(p => ({
+                ...p,
+                timeInSeconds: p.timeInSeconds !== undefined ? p.timeInSeconds : p.pomodoros ? p.pomodoros * 25 * 60 : 0,
+                targetTimeInSeconds: p.targetTimeInSeconds !== undefined ? p.targetTimeInSeconds : 0,
+              }));
             }
           } catch (error) {
             console.error('Error loading projects:', error);
@@ -1160,40 +1147,110 @@
         const onAddProject = () => {};
 
         const onNewDay = () => {
-          setProjects(projects().map(p => ({ ...p, pomodoros: 0 })));
+          setProjects(projects().map(p => ({ ...p, timeInSeconds: 0 })));
         };
 
-        const onUpdatePomodoros = increment => {
+        const onAddTime = seconds => {
           const project = currentProject();
           if (project) {
-            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, pomodoros: p.pomodoros + increment } : p));
+            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, timeInSeconds: p.timeInSeconds + seconds } : p));
             setProjects(updatedProjects);
             setCurrentProject(updatedProjects.find(p => p.id === project.id));
           }
         };
 
-        const onSetPomodoros = value => {
+        const onSetTime = seconds => {
           const project = currentProject();
           if (project) {
-            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, pomodoros: value } : p));
+            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, timeInSeconds: seconds } : p));
             setProjects(updatedProjects);
             setCurrentProject(updatedProjects.find(p => p.id === project.id));
           }
         };
 
-        const formatPomodoros = pomodoros => {
-          if (pomodoros === 0) return '0 pomodoros';
-          if (pomodoros < 1) return `${pomodoros.toFixed(4)} pomodoro`;
-          const whole = Math.floor(pomodoros);
-          const decimal = pomodoros - whole;
-          if (decimal < 0.01) return `${whole} pomodoro${whole !== 1 ? 's' : ''}`;
-          return `${pomodoros.toFixed(4)} pomodoros`;
+        const onSetTargetTime = seconds => {
+          const project = currentProject();
+          if (project) {
+            const updatedProjects = projects().map(p => (p.id === project.id ? { ...p, targetTimeInSeconds: seconds } : p));
+            setProjects(updatedProjects);
+            setCurrentProject(updatedProjects.find(p => p.id === project.id));
+          }
+        };
+
+        const parseTimeInput = input => {
+          const trimmed = input.trim();
+          if (!trimmed) return null;
+          const numOnly = /^\d+$/.test(trimmed);
+          if (numOnly) {
+            const seconds = parseInt(trimmed, 10);
+            return isNaN(seconds) ? null : seconds;
+          }
+          let hours = 0;
+          let minutes = 0;
+          let seconds = 0;
+          const hourMatch = trimmed.match(/(\d+)\s*h/i);
+          const minuteMatch = trimmed.match(/(\d+)\s*m/i);
+          const secondMatch = trimmed.match(/(\d+)\s*s/i);
+          if (hourMatch) {
+            const h = parseInt(hourMatch[1], 10);
+            if (!isNaN(h)) hours = h;
+          }
+          if (minuteMatch) {
+            const m = parseInt(minuteMatch[1], 10);
+            if (!isNaN(m)) minutes = m;
+          }
+          if (secondMatch) {
+            const s = parseInt(secondMatch[1], 10);
+            if (!isNaN(s)) seconds = s;
+          }
+          if (hourMatch || minuteMatch || secondMatch) {
+            return hours * 3600 + minutes * 60 + seconds;
+          }
+          const parts = trimmed.split(/\s+/).filter(p => p && !/[hms]/i.test(p));
+          if (parts.length === 1) {
+            const secs = parseInt(parts[0], 10);
+            return isNaN(secs) ? null : secs;
+          }
+          if (parts.length === 2) {
+            const mins = parseInt(parts[0], 10);
+            const secs = parseInt(parts[1], 10);
+            if (isNaN(mins) || isNaN(secs)) return null;
+            return mins * 60 + secs;
+          }
+          if (parts.length === 3) {
+            const hrs = parseInt(parts[0], 10);
+            const mins = parseInt(parts[1], 10);
+            const secs = parseInt(parts[2], 10);
+            if (isNaN(hrs) || isNaN(mins) || isNaN(secs)) return null;
+            return hrs * 3600 + mins * 60 + secs;
+          }
+          return null;
+        };
+
+        const formatTimeAccumulated = seconds => {
+          const hours = Math.floor(seconds / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          const secs = seconds % 60;
+          const parts = [];
+          if (hours > 0) parts.push(`${hours} h`);
+          if (minutes > 0) parts.push(`${minutes} m`);
+          if (secs > 0 || parts.length === 0) parts.push(`${secs} s`);
+          return parts.join(' ');
         };
 
         return h('div', { className: 'container' }, () =>
           view() === 'list'
-            ? ProjectsList({ projects, setProjects, onStartProject, onDeleteProject, onAddProject, onNewDay, formatPomodoros })
-            : PomodoroTimer({ currentProject, onBack, onUpdatePomodoros, onSetPomodoros, formatPomodoros })
+            ? ProjectsList({
+                projects,
+                setProjects,
+                onStartProject,
+                onDeleteProject,
+                onAddProject,
+                onNewDay,
+                formatTimeAccumulated,
+                parseTimeInput,
+              })
+            : PomodoroTimer({ currentProject, onBack, onAddTime, onSetTime, onSetTargetTime, formatTimeAccumulated, view, parseTimeInput })
         );
       }
 
