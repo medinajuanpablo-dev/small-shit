@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chronos - Timer & Stopwatch</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        color: #ecf0f1;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        text-align: center;
+        padding: 10px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .container {
+        background: rgba(30, 30, 40, 0.6);
+        padding: clamp(1.5rem, 4vw, 3rem);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        max-width: 500px;
+        width: 100%;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 2.8rem);
+        font-weight: 800;
+        color: #fff;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        letter-spacing: 2px;
+      }
+      .tabs {
+        display: flex;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 6px;
+        gap: 6px;
+      }
+      .tab {
+        flex: 1;
+        padding: 12px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .tab:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      .display-board {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 20px;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: inset 2px rgba(255, 255, 255, 0.05);
+        min-height: 156px;
+      }
+      .time-text {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: clamp(2.8rem, 11vw, 4.2rem);
+        font-weight: bold;
+        letter-spacing: 2px;
+        color: #00e5ff;
+        text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+      }
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 10px;
+      }
+      .btn {
+        padding: 14px 28px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #fff;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn-primary { background: linear-gradient(135deg, #00b4db, #0083b0); }
+      .btn-danger { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+      .btn-secondary { background: linear-gradient(135deg, #616161, #424242); }
+      
+      .timer-inputs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+      }
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .input-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .time-input {
+        width: 70px;
+        height: 70px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #00e5ff;
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: 'Courier New', Courier, monospace;
+        text-align: center;
+        transition: all 0.3s;
+      }
+      .time-input:focus {
+        outline: none;
+        border-color: #00e5ff;
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+      }
+      .colon {
+        font-size: 2rem;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.3);
+        margin-bottom: 25px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      //prettier-ignore
+      const { setSignal, h } = (() => {let currentObserver=null;function setSignal(value){const subscribers=new Set();const read=()=>{if(currentObserver)subscribers.add(currentObserver);return value;};const write=newValue=>{value=typeof newValue==='function'?newValue(value):newValue;subscribers.forEach(fn=>fn());};return[read,write];}function setEffect(fn){const execute=()=>{currentObserver=execute;fn();currentObserver=null;};execute();}function setMemo(fn){const[get,set]=setSignal();setEffect(()=>set(fn()));return get;}const SVG_NS='http://www.w3.org/2000/svg';const isSvg=tag=>/^(svg|path|circle|rect|line|polygon|polyline|ellipse|g|text|defs|use)$/.test(tag);function Fragment(props){const fragment=document.createDocumentFragment();insertChildren(fragment,props.children);return fragment;}function insertChildren(parent,children){if(!children)return;const childArray=Array.isArray(children)?children.flat():[children];for(const child of childArray){if(child==null||typeof child==='boolean')continue;if(typeof child==='function'){const marker=document.createComment('');let lastValue=null;parent.appendChild(marker);setEffect(()=>{const value=child();if(value===lastValue)return;lastValue=value;let node;while((node=marker.nextSibling)&&node.nodeType!==8)node.remove();if(value==null)return;if(typeof value==='object'&&value.nodeType){parent.insertBefore(value,marker.nextSibling);}else if(typeof value!=='object'){parent.insertBefore(document.createTextNode(String(value)),marker.nextSibling);}});}else if(typeof child==='object'&&child.nodeType){parent.appendChild(child);}else{parent.appendChild(document.createTextNode(String(child)));}}}function jsx(type,props={}){if(typeof type==='function')return type(props);if(type===Fragment)return Fragment(props);const el=isSvg(type)?document.createElementNS(SVG_NS,type):document.createElement(type);for(const key in props){if(key==='children'||key==='ref')continue;if(key.startsWith('on')&&typeof props[key]==='function'){el.addEventListener(key.slice(2).toLowerCase(),props[key]);}else if(key==='style'&&typeof props[key]==='object'){if(typeof props[key]==='function'){setEffect(()=>{Object.assign(el.style,props[key]());});}else{Object.assign(el.style,props[key]);}}else if(key==='className'||key==='class'){if(typeof props[key]==='function'){setEffect(()=>{el.setAttribute('class',props[key]());});}else{el.setAttribute('class',props[key]);}}else if(typeof props[key]!=='function'){el.setAttribute(key,props[key]);}}if(props.ref&&typeof props.ref==='function'){props.ref(el);}insertChildren(el,props.children);return el;}function h(type,props,...children){props=props||{};if(children.length)props.children=children.length===1?children[0]:children;return jsx(type,props);}return{setSignal,setEffect,setMemo,jsx,h,Fragment};})();
+    
+      const formatTime = (ms) => {
+        const total = Math.max(0, ms);
+        const hours = Math.floor(total / 3600000);
+        const minutes = Math.floor((total % 3600000) / 60000);
+        const seconds = Math.floor((total % 60000) / 1000);
+        const centiseconds = Math.floor((total % 1000) / 10);
+        
+        const pad = (n) => n.toString().padStart(2, '0');
+        
+        if (hours > 0) {
+          return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(centiseconds)}`;
+        }
+        return `${pad(minutes)}:${pad(seconds)}.${pad(centiseconds)}`;
+      };
+
+      const LS_KEY = 'chronos_v1';
+      const loadState = () => { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } };
+      const saveState = (patch) => { try { localStorage.setItem(LS_KEY, JSON.stringify({ ...loadState(), ...patch })); } catch {} };
+
+      function ChronosApp() {
+        const saved = loadState();
+        const [mode, setMode] = setSignal('stopwatch');
+
+        const [swTime, setSwTime] = setSignal(saved.swAccumulated || 0);
+        const [swRunning, setSwRunning] = setSignal(false);
+        let swInterval = null;
+        let swStartTime = 0;
+        let swAccumulated = saved.swAccumulated || 0;
+
+        const handleSwStart = () => {
+          if (swRunning()) return;
+          swStartTime = performance.now();
+          setSwRunning(true);
+          swInterval = setInterval(() => {
+            const current = swAccumulated + (performance.now() - swStartTime);
+            setSwTime(current);
+          }, 10);
+        };
+
+        const handleSwPause = () => {
+          if (!swRunning()) return;
+          clearInterval(swInterval);
+          swAccumulated += (performance.now() - swStartTime);
+          setSwRunning(false);
+          setSwTime(swAccumulated);
+          saveState({ swAccumulated });
+        };
+
+        const handleSwReset = () => {
+          clearInterval(swInterval);
+          swAccumulated = 0;
+          setSwRunning(false);
+          setSwTime(0);
+          saveState({ swAccumulated: 0 });
+        };
+        
+        const [tTime, setTTime] = setSignal(saved.tRemaining || 0);
+        const [tRunning, setTRunning] = setSignal(false);
+        const [inputH, setInputH] = setSignal(saved.inputH || '');
+        const [inputM, setInputM] = setSignal(saved.inputM || '');
+        const [inputS, setInputS] = setSignal(saved.inputS || '');
+        const [isInputMode, setIsInputMode] = setSignal(saved.tRemaining > 0 ? false : true);
+        let tInterval = null;
+        let tEndTime = 0;
+        let tRemaining = saved.tRemaining || 0;
+
+        const handleTStart = () => {
+          if (tRunning()) return;
+
+          if (isInputMode()) {
+            const hVal = parseInt(inputH() || '0');
+            const mVal = parseInt(inputM() || '0');
+            const sVal = parseInt(inputS() || '0');
+            const totalMs = (hVal * 3600 + mVal * 60 + sVal) * 1000;
+            if (totalMs <= 0) return;
+
+            tRemaining = totalMs;
+            setTTime(tRemaining);
+            setIsInputMode(false);
+            saveState({ inputH: inputH(), inputM: inputM(), inputS: inputS(), tRemaining });
+          }
+
+          if (tRemaining <= 0) return;
+
+          tEndTime = performance.now() + tRemaining;
+          setTRunning(true);
+
+          tInterval = setInterval(() => {
+            let left = tEndTime - performance.now();
+            if (left <= 0) {
+              clearInterval(tInterval);
+              setTTime(0);
+              setTRunning(false);
+              tRemaining = 0;
+              setIsInputMode(true);
+              saveState({ tRemaining: 0 });
+            } else {
+              setTTime(left);
+            }
+          }, 10);
+        };
+
+        const handleTPause = () => {
+          if (!tRunning()) return;
+          clearInterval(tInterval);
+          tRemaining = tEndTime - performance.now();
+          setTRunning(false);
+          setTTime(tRemaining);
+          saveState({ tRemaining });
+        };
+
+        const handleTReset = () => {
+          clearInterval(tInterval);
+          tRemaining = 0;
+          setTRunning(false);
+          setTTime(0);
+          setInputH('');
+          setInputM('');
+          setInputS('');
+          setIsInputMode(true);
+          saveState({ tRemaining: 0, inputH: '', inputM: '', inputS: '' });
+        };
+
+        return h('div', { className: 'container' },
+          h('h1', null, 'CHRONOS'),
+          h('div', { className: 'tabs' },
+            h('button', { className: () => (mode() === 'stopwatch' ? 'tab active' : 'tab'), onclick: () => { handleSwPause(); handleTPause(); setMode('stopwatch'); } }, 'Cronómetro'),
+            h('button', { className: () => (mode() === 'timer' ? 'tab active' : 'tab'), onclick: () => { handleSwPause(); handleTPause(); setMode('timer'); } }, 'Temporizador')
+          ),
+          () => {
+            if (mode() === 'stopwatch') {
+              return h('div', null,
+                h('div', { className: 'display-board' },
+                  h('div', { className: 'time-text' }, () => formatTime(swTime()))
+                ),
+                h('div', { className: 'controls' },
+                  () => {
+                    if (!swRunning()) return h('button', { className: 'btn btn-primary', onclick: handleSwStart }, 'Iniciar');
+                    return h('button', { className: 'btn btn-danger', onclick: handleSwPause }, 'Pausar');
+                  },
+                  () => swTime() > 0 ? h('button', { className: 'btn btn-secondary', onclick: handleSwReset }, 'Reiniciar') : null
+                )
+              );
+            } else {
+              return h('div', null,
+                () => {
+                  if (isInputMode()) {
+                    return h('div', { className: 'display-board timer-inputs' },
+                      h('div', { className: 'input-group' },
+                        h('input', { className: 'time-input', type: 'number', min: '0', max: '99', placeholder: '00', value: () => inputH(), oninput: e => setInputH(e.target.value) }),
+                        h('div', { className: 'input-label' }, 'HRS')
+                      ),
+                      h('div', { className: 'colon' }, ':'),
+                      h('div', { className: 'input-group' },
+                        h('input', { className: 'time-input', type: 'number', min: '0', max: '59', placeholder: '00', value: () => inputM(), oninput: e => setInputM(e.target.value) }),
+                        h('div', { className: 'input-label' }, 'MIN')
+                      ),
+                      h('div', { className: 'colon' }, ':'),
+                      h('div', { className: 'input-group' },
+                        h('input', { className: 'time-input', type: 'number', min: '0', max: '59', placeholder: '00', value: () => inputS(), oninput: e => setInputS(e.target.value) }),
+                        h('div', { className: 'input-label' }, 'SEC')
+                      )
+                    );
+                  } else {
+                    return h('div', { className: 'display-board' },
+                      h('div', { className: 'time-text' }, () => formatTime(tTime()))
+                    );
+                  }
+                },
+                h('div', { className: 'controls' },
+                  () => {
+                    if (!tRunning()) return h('button', { className: 'btn btn-primary', onclick: handleTStart }, 'Iniciar');
+                    return h('button', { className: 'btn btn-danger', onclick: handleTPause }, 'Pausar');
+                  },
+                  h('button', { className: 'btn btn-secondary', onclick: handleTReset }, 'Reiniciar')
+                )
+              );
+            }
+          }
+        );
+      }
+
+      document.body.appendChild(ChronosApp());
+    </script>
+  </body>
+</html>
